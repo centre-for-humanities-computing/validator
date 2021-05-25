@@ -1,0 +1,19 @@
+{
+  "name": "validator",
+  "version": "0.9.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["validation", "validator", "validate"],
+  "author": "Peter B. Vahlstrup",
+  "bugs": {
+    "url": "https://github.com/centre-for-humanities-computing/validator/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/centre-for-humanities-computing/validator.git"
+  },
+  "license": "ISC"
+}
