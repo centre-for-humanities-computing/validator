@@ -1,13 +1,18 @@
 {
   "name": "validator",
   "version": "0.9.0",
-  "description": "",
-  "main": "index.js",
+  "description": "A fluent validation API for validating arguments, form-data etc.",
+  "author": "Peter B. Vahlstrup",
+  "keywords": [
+    "validation",
+    "validator",
+    "validate"
+  ],
+  "main": "./src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["validation", "validator", "validate"],
-  "author": "Peter B. Vahlstrup",
+  "files": ["/src/**"],
   "bugs": {
     "url": "https://github.com/centre-for-humanities-computing/validator/issues"
   },
@@ -15,5 +20,8 @@
     "type": "git",
     "url": "git+https://github.com/centre-for-humanities-computing/validator.git"
   },
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "lodash": "^4.17.21"
+  }
 }
