@@ -10,7 +10,7 @@ class ValidationResult {
      * @returns {string|undefined}
      */
     getError(path = "") {
-        return this.getErrors()[0];
+        return this.getErrors(path)[0];
     }
 
     /**
@@ -64,6 +64,11 @@ class ValidationResult {
         this.#errors.clear();
     }
 
+    /**
+     * @param path
+     * @param message
+     * @private
+     */
     _addError(path, message) {
         if (!this.#errors.has(path)) {
             this.#errors.set(path, []);
@@ -75,10 +80,23 @@ class ValidationResult {
 
 // TODO
 // use in validator etc for the different modes
-// ved test igen i de forskellige modes, hvis man ikke resetter bygger den bare ovenpå, the ved throw og break tilføjer den en ny error
+// ved test igen i de forskellige modes, hvis man ikke resetter bygger den bare ovenpå, og ved throw og break tilføjer den en enkelt ny error
 // osv. Ved next Path tilføjer den ny for hver path...
 // dokumenter dette
 // dokumenter de forskellige modes..
 // dokumenter a test funktionen har en result property (jsdoc, so kan content assist)
+// lav conditionally
+// lav README, med eksempler
+// put på npm og brug i de to projekter...
+
+// lav eksempler på brug af den nye feature jeg er ved at lave hvor man i test(value, "path.path") kan give en path med som prefixes
+// i ${PATH} og i ValidationResult messages, så kan man lave mange små tests efter hinanden af værdier uafhængige af hinanden og stadig holde styr på dem
+// let a = 3;
+// let b = 4;
+/*
+* test(a, 'a')...
+* test(b, 'b')...
+* */
+
 
 module.exports = { ValidationResult };

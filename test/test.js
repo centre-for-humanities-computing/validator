@@ -1,7 +1,7 @@
 const { Validator } = require('../src/validator');
 
 try {
-    let test = Validator.create('Validation error:', Validator.mode.ON_ERROR_NEXT_PATH);
+    let test = Validator.create('test error:', Validator.mode.ON_ERROR_NEXT_PATH);
 
    /* let name = "";
     test(name).isNot.nil('Name cannot be null or undefined');
@@ -29,19 +29,27 @@ try {
     ]));
 
 */
-    let person = { name: "", age: "54" };
-    test(person).fulfillAllOf((person) => [
+/*    let person = { name: "", age: "54" };
+    test(person, 'person').fulfillAllOf((person) => [
         () => person.is.anObject('person must be an object'),
-        () => person.prop('name').fulfillAllOf((name) => [
+        () => person.prop('name').conditionally((name) => name.is.equalTo('')).fulfillAllOf((name) => [
             () => name.is.aString('"${PATH}" must be a string'),
             () => name.does.match(/\w+/, '"${PATH}" must only contain [a-Z_0-9]'),
-            () => name.is.equalTo('ding', "name must be 'ding'")
+            () => name.is.equalTo('ding', "${PATH} must be 'ding'")
         ]),
         () => person.prop("age").optional.is.aNumber('"${PATH}" must be a number')
     ]);
 
     //test(person).prop('name').prop('length').is.equalTo(4, "${CURRENT_PATH} of ${PATH} must have en length of 1");
+*/
 
+    let person = { name: "Eric", age: 49 };
+    test(person).fulfillAllOf((person) => [
+        () => person.is.anObject('person must be an object'),
+        () => person.conditionally((person) => person.value.name === 'Eric').fulfill(
+            () => person.prop('age').is.greaterThan(50, 'Age must be greater that 50 for persons named Eric')
+        )
+    ]);
     console.log(test.result.getAllErrors());
 
 } catch (e) {

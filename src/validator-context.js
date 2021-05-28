@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const { ValidationResult } = require('./validation-result');
+const { ValidationError } = require('./validation-error');
 const sharedConstants = require('./shared-constants');
 
 const INTEGER_STRING_PATTERN = /^-?\d+$/;
@@ -12,18 +12,11 @@ const PLACEHOLDER_CONTEXT_VALUE_PATTERN = /(?<!\\)\${VALUE}/g;
 const PLACEHOLDER_CONTEXT_PATH_PATTERN = /(?<!\\)\${PATH}/g;
 const PLACEHOLDER_CONTEXT_CURRENT_PATH_PATTERN = /(?<!\\)\${CURRENT_PATH}/g;
 
-const PRIVATE_CONSTRUCTOR_KEY = {};
-
 class ValidatorContext {
 
     #name;
     #validator;
-    #mode;
-    #validationResult;
-    #contextValue;
-    #contextValuePath;
-    #contextValueCurrentPath;
-    #errorPrefix;
+    #validatorState;
     #notContext;
     #contextDoneCb;
 
@@ -33,26 +26,14 @@ class ValidatorContext {
 
     /**
      * @param {Validator} validator
-     * @param {string} mode
-     * @param {ValidationResult} validationResult
-     * @param {*} contextValue
-     * @param {string} contextValuePath
-     * @param {string} contextValueCurrentPath
-     * @param {string} errorPrefix
+     * @param {ValidatorInternalState} validatorState
      * @param {boolean} notContext
      * @param {function} contextDoneCb
-     * @param privateConstructorKey
      * @private
      */
-    _init(validator, mode, validationResult, contextValue, contextValuePath, contextValueCurrentPath, errorPrefix,
-          notContext, contextDoneCb) {
+    _init(validator, validatorState, notContext, contextDoneCb) {
         this.#validator = validator;
-        this.#mode = mode;
-        this.#validationResult = validationResult;
-        this.#contextValue = contextValue;
-        this.#contextValuePath = contextValuePath;
-        this.#contextValueCurrentPath = contextValueCurrentPath;
-        this.#errorPrefix = errorPrefix;
+        this.#validatorState = validatorState;
         this.#notContext = notContext;
         this.#contextDoneCb = contextDoneCb;
     }
@@ -62,14 +43,21 @@ class ValidatorContext {
      */
     _reset() {
         this.#validator = undefined;
-        this.#mode = undefined;
-        this.#validationResult = undefined;
-        this.#contextValue = undefined;
-        this.#contextValuePath = undefined;
-        this.#contextValueCurrentPath = undefined;
-        this.#errorPrefix = undefined;
+        this.#validatorState = undefined;
         this.#notContext = undefined;
         this.#contextDoneCb = undefined;
+    }
+
+    get #contextValue() {
+        return this.#validatorState.contextValue;
+    }
+
+    get #contextValuePath() {
+        return this.#validatorState.contextValuePath;
+    }
+
+    get #contextValueCurrentPath() {
+        return this.#validatorState.contextValueCurrentPath;
     }
 
     /**
@@ -398,7 +386,7 @@ class ValidatorContext {
             }
             success = predicate(this.#validator);
             // on mode = ON_ERROR_NEXT_PATH we need to let the validator handle it so it can collect errors for all paths
-            if (!success && this.#mode !== sharedConstants.mode.ON_ERROR_NEXT_PATH) {
+            if (!success && this.#validatorState.mode !== sharedConstants.mode.ON_ERROR_NEXT_PATH) {
                 break;
             }
         }
@@ -437,22 +425,20 @@ class ValidatorContext {
 
         try {
             if (!success && errorMessage !== undefined) {
-                fullMessage = errorMessage;
-                if (this.#errorPrefix) {
-                    fullMessage = `${this.#errorPrefix} ${errorMessage}`;
-                }
+                fullMessage = this.#validatorState.getFullErrorMessage(errorMessage);
+
                 if (messageArgs.length > 0 || fullMessage.match(PLACEHOLDER_PRE_TEST_PATTERN)) {
                     fullMessage = fullMessage.replace(PLACEHOLDER_PATTERN, (match, group1) => messageArgs[group1]);
                     fullMessage = fullMessage.replace(PLACEHOLDER_CONTEXT_VALUE_PATTERN, this.#contextValue);
                     if (this.#contextValuePath) {
-                        fullMessage = fullMessage.replace(PLACEHOLDER_CONTEXT_PATH_PATTERN, this.#contextValuePath);
+                        fullMessage = fullMessage.replace(PLACEHOLDER_CONTEXT_PATH_PATTERN, this.#validatorState.errorContextValuePath);
                     }
                     if (this.#contextValueCurrentPath) {
                         fullMessage = fullMessage.replace(PLACEHOLDER_CONTEXT_CURRENT_PATH_PATTERN, this.#contextValueCurrentPath);
                     }
                 }
-                if (this.#mode === sharedConstants.mode.ON_ERROR_THROW) {
-                    throw new Error(fullMessage);
+                if (this.#validatorState.mode === sharedConstants.mode.ON_ERROR_THROW) {
+                    throw new ValidationError(fullMessage, this.#contextValuePath);
                 }
             }
         } finally {
