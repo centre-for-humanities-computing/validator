@@ -1,4 +1,5 @@
 const _ = require('lodash');
+const { ValidationInternalState } = require('./validator-internal-state');
 const { ValidationError } = require('./validation-error');
 const sharedConstants = require('./shared-constants');
 
@@ -382,7 +383,7 @@ class ValidatorContext {
             // If we accepted resolved predicates (booleans) resolved before entering this method it would
             // make it behave differently than expected of an AND-like predicate which should end as soon a one predicate is false
             if (!_.isFunction(predicate)) {
-                this.#throwArgumentError(`The elements of the array "predicates" must be all be functions`);
+                this.#throwArgumentError(`The elements of the array "predicates" must all be functions`);
             }
             success = predicate(this.#validator);
             // on mode = ON_ERROR_NEXT_PATH we need to let the validator handle it so it can collect errors for all paths

@@ -2,6 +2,7 @@ const utils = require('./utils');
 
 class ValidatorInternalState {
 
+    #name;
     #mode;
     #contextValue;
     #contextValuePath;
@@ -10,7 +11,11 @@ class ValidatorInternalState {
     #errorBasePath;
     #validationResult;
 
-    constructor(mode, contextValue, contextValuePath, contextValueCurrentPath, errorPrefix, errorBasePath, validationResult) {
+    constructor(name) {
+        this.#name = name;
+    }
+
+    _init(mode, contextValue, contextValuePath, contextValueCurrentPath, errorPrefix, errorBasePath, validationResult) {
         this.#mode = mode;
         this.#contextValue = contextValue;
         this.#contextValuePath = contextValuePath;
@@ -65,18 +70,18 @@ class ValidatorInternalState {
     }
 
     /**
-     *
-     * @param [contextValue] the contextValue for the clone, if <code>undefined</code> the contextValue from this instance will be used
-     * @param [contextValuePath] the contextValuePath for the clone, if <code>undefined</code> the contextValuePath from this instance will be used
-     * @param [contextValueCurrentPath] the contextValueCurrentPath for the clone, if <code>undefined</code> the contextValueCurrentPath from this instance will be used
+     * @param {ValidatorInternalState} the dest to clone to
+     * @param {string} [contextValue] the contextValue for the clone, if <code>undefined</code> the contextValue from this instance will be used
+     * @param {string} [contextValuePath] the contextValuePath for the clone, if <code>undefined</code> the contextValuePath from this instance will be used
+     * @param {string} [contextValueCurrentPath] the contextValueCurrentPath for the clone, if <code>undefined</code> the contextValueCurrentPath from this instance will be used
      * @returns {ValidatorInternalState}
      */
-    cloneWith(contextValue, contextValuePath, contextValueCurrentPath) {
+    cloneWith(dest, contextValue, contextValuePath, contextValueCurrentPath) {
         contextValue = contextValue === undefined ? this.#contextValue : contextValue;
-        contextValuePath = contextValuePath === undefined ? this.contextValuePath : contextValuePath;
-        contextValueCurrentPath = contextValueCurrentPath === undefined ? this.contextValueCurrentPath : contextValueCurrentPath;
-        return new ValidatorInternalState(this.mode, contextValue, contextValuePath, contextValueCurrentPath,
-            this.#errorPrefix, this.errorBasePath, this.validationResult);
+        contextValuePath = contextValuePath === undefined ? this.#contextValuePath : contextValuePath;
+        contextValueCurrentPath = contextValueCurrentPath === undefined ? this.#contextValueCurrentPath : contextValueCurrentPath;
+        dest._init(this.mode, contextValue, contextValuePath, contextValueCurrentPath, this.errorPrefix, this.errorBasePath, this.validationResult);
+        return dest;
     }
 
 }

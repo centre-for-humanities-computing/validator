@@ -98,5 +98,9 @@ class ValidationResult {
 * test(b, 'b')...
 * */
 
+/*
+* omskriv eks. for fulfill, fulfullOneOf fulfillAllOf, så de matcher den typiske brug og der tages højde for forskellige modes. også i create() delen af eks.
+* */
+
 
 module.exports = { ValidationResult };

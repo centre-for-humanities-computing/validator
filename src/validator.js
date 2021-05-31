@@ -15,15 +15,16 @@ const MODE_VALUES = new Set(Object.values(sharedConstants.mode));
 /*
 * note to self
 * When returning something else than "this" to the user the chain is broken for this validator
-* and it is important that we end the context so the validator can be reused, see examples in prop(), value(), transform(), each()
+* and therefore important that we end the context so the validator can be reused, see examples in prop(), value(), transform(), each()
 * we need to do it explicitly because there will never be a call to an actual ValidatorContext which is normally responsible
-* for calling contextDone()
+* for calling validatorContextDone() which returns the validator to the pool
 * */
 
 class Validator {
 
     static #contextPool = new ValidatorPool(POOL_MAX_SIZE,(name) => new ValidatorContext(name), 'ContextPool');
     static #validatorPool = new ValidatorPool(POOL_MAX_SIZE, (name) => new Validator(name, PRIVATE_CONSTRUCTOR_KEY), 'ValidatorPool');
+    static #validatorStatePool = new ValidatorPool(POOL_MAX_SIZE, (name) => new ValidatorInternalState(), 'ValidatorStatePool');
     static #shortCircuitFulfilledValidatorContext = new Proxy(new ValidatorContext(), {
         fulfilledPredicate() {
             return true;
@@ -45,8 +46,8 @@ class Validator {
      * @type ValidatorInternalState
      */
     #validatorState;
-    #rootValidatorContext;
     #validatorSharedState;
+    #rootValidatorContext;
     #contextShortCircuit = { fulfilled: false };
 
     constructor(name, privateConstructorKey) {
@@ -80,15 +81,16 @@ class Validator {
 
         this.#contextShortCircuit.fulfilled = false;
 
-        /* only the root validatorContext can reset the entire validator to idle state
+        /* only the root validatorContext can reset the entire validator
          * otherwise nested methods like fulfillOneOf, fulfillAllOf cannot
          * have multiple conditions when using the passed in Validator
          * because the first condition would then reset the Validator when finishing
          */
         if (this.#rootValidatorContext === validatorContext) {
+            Validator.#validatorStatePool.return(this.#validatorState);
             this.#validatorState = undefined;
-            this.#rootValidatorContext = undefined;
             this.#validatorSharedState = undefined;
+            this.#rootValidatorContext = undefined;
             Validator.#validatorPool.return(this);
         }
     }
@@ -194,7 +196,7 @@ class Validator {
      * @returns {Validator}
      */
     #createChildValidator(currentValidatorContext, contextValue, contextValuePath, contextValueCurrentPath) {
-        let validatorState = this.#validatorState.cloneWith(contextValue, contextValuePath, contextValueCurrentPath);
+        let validatorState = this.#validatorState.cloneWith(Validator.#validatorStatePool.get(), contextValue, contextValuePath, contextValueCurrentPath);
         let validator = Validator.#validatorPool.get();
         validator.#init(validatorState, this.#validatorSharedState);
         // if the parent is optional and short circuited make sure the child is a well, this goes for e.g. prop()
@@ -371,7 +373,7 @@ class Validator {
      *          () => name.isNot.empty()
      *      ])
      * ], 'person must be an object and must have the property "name" which cannot be empty');
-     * @param path the path of the property to make a validator for
+     * @param {string} path the path of the property to make a validator for
      * @returns {Validator}
      */
     prop(path) {
@@ -465,7 +467,8 @@ class Validator {
     static #instance(mode, contextValue, contextValuePath, contextValueCurrentPath, errorPrefix,
                      errorBasePath, validationResult, validatorSharedState) {
         let validator = Validator.#validatorPool.get();
-        let validatorState = new ValidatorInternalState(mode, contextValue, contextValuePath,
+        let validatorState = Validator.#validatorStatePool.get();
+        validatorState._init(mode, contextValue, contextValuePath,
             contextValueCurrentPath, errorPrefix, errorBasePath, validationResult);
         validator.#init(validatorState, validatorSharedState);
         return validator;
