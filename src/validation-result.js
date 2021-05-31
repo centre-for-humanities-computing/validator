@@ -69,11 +69,13 @@ class ValidationResult {
      * @param message
      * @private
      */
-    _addError(path, message) {
+    _addFailedPath(path, message) {
         if (!this.#errors.has(path)) {
             this.#errors.set(path, []);
         }
-        this.#errors.get(path).push(message);
+        if (message) {
+            this.#errors.get(path).push(message);
+        }
     }
 
 }
@@ -100,6 +102,8 @@ class ValidationResult {
 
 /*
 * omskriv eks. for fulfill, fulfullOneOf fulfillAllOf, så de matcher den typiske brug og der tages højde for forskellige modes. også i create() delen af eks.
+*
+* Lav meget simpel README. med install instructions og et par eksempler, og så smid på NPM
 * */
 
 

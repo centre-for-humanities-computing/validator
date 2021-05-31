@@ -444,7 +444,7 @@ class ValidatorContext {
             }
         } finally {
             // should be the last thing we do
-            this.#contextDoneCb(this, fullMessage);
+            this.#contextDoneCb(this, success, fullMessage);
         }
         return !!success; // make sure it's a boolean
     }

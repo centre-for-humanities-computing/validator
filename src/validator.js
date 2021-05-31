@@ -176,9 +176,9 @@ class Validator {
         this.#validatorContextDone(validatorContext);
     }
 
-    #validatorContextDone = (validatorContext, errorMessage) => {
-        if (errorMessage && !this.#shortCircuit()) {
-            this.#validatorState.validationResult._addError(this.#errorContextValuePath, errorMessage);
+    #validatorContextDone = (validatorContext, success = true, errorMessage) => {
+        if (!success && !this.#shortCircuit()) {
+            this.#validatorState.validationResult._addFailedPath(this.#errorContextValuePath, errorMessage);
             this.#validatorSharedState.failedPaths.push(this.#errorContextValuePath);
         }
 
@@ -330,10 +330,7 @@ class Validator {
             return true; // just fulfill right away
         }
 
-        if (_.isNil(this.#contextValue)) { // nothing to iterate over, if nothing to test we cannot known, so return false
-            this.#validatorContextDone(validatorContext);
-            return false;
-        } else if (!(Symbol.iterator in this.#contextValue)) {
+        if (_.isNil(this.#contextValue) || !(Symbol.iterator in this.#contextValue)) { // nothing to iterate over, if nothing to test we cannot known, so return false
             Validator.#throwArgumentError('the value must be iterable to use each()');
         }
 

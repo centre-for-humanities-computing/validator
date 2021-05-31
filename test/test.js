@@ -65,30 +65,33 @@ try {
 }
 
 
-/*
+
 let person = { name: "John", age: 54, ssn: undefined };
 
-let test = ArgValidator.create('Person validation error:');
+let test = Validator.create('Person validation error:', Validator.mode.ON_ERROR_NEXT_PATH);
 
-for (let i = 0; i < 100; i++) {
 
-    console.time('t');
-    test(person).fulfillAllOf((person) => [
-        () => person.is.anObject('person must be an object'),
-        () => person.prop('name').fulfillAllOf((name) => [
-            () => name.is.aString('${PATH} must be a string'),
-            () => name.transform((name) => name.trim()).isNot.empty('${PATH} cannot be empty')
-        ]),
-        () => person.prop('age').is.aNumber('${PATH} must be a number'),
-        () => person.prop('ssn').optional.fulfillAllOf((ssn) => [
-            () => ssn.is.aString('${PATH} must be a string or undefined'),
-            () => ssn.does.match(/^\d{6}-?\d{4}$/, '${PATH} must match xxxxxx-xxxx')
-        ])
-    ]);
-    console.timeEnd('t');
-}
+/*test(person).fulfillAllOf((person) => [
+    () => person.is.anObject('person must be an object'),
+    () => person.prop('name').fulfillAllOf((name) => [
+        () => name.is.aString('${PATH} must be a string'),
+        () => name.transform((name) => name.trim()).isNot.empty('${PATH} cannot be empty')
+    ]),
+    () => person.prop('age').is.aNumber('${PATH} must be a number'),
+    () => person.prop('ssn').optional.fulfillAllOf((ssn) => [
+        () => ssn.is.aString('${PATH} must be a string or undefined'),
+        () => ssn.does.match(/^\d{6}-?\d{4}$/, '${PATH} must match xxxxxx-xxxx')
+    ])
+]);*/
 
-for (let i = 0; i < 100; i++) {
+test(person).fulfillAllOf(person => [
+    () => person.prop('name').is.aNumber()
+])
+
+console.log(test.result.isValid());
+console.log(test.result.getAllErrors())
+
+/*for (let i = 0; i < 100; i++) {
 
     console.time('t');
 
@@ -113,137 +116,7 @@ for (let i = 0; i < 100; i++) {
         }
     }
     console.timeEnd('t')
-}
-*/
-
-/*
-* eksempler på andre validator tilgange og hastigheder: https://github.com/icebob/validator-benchmark/blob/master/suites/simple.js
-* */
+}*/
 
 
-function testOther() {
 
-        const Joi = require('joi');
-
-    const obj = {
-        name: "John Doe",
-        email: "john.doe@company.space",
-        firstName: "John",
-        phone: "123-4567",
-        age: 33
-    };
-
-        const constraints = Joi.object().keys({
-            name: Joi.string().min(4).max(25).required(),
-            email: Joi.string().required(),
-            firstName: Joi.required(),
-            phone: Joi.required(),
-            age: Joi.number().integer().min(18).required()
-        });
-
-
-        console.time('t');
-        for (let i = 0; i < 100; i++) {
-
-            constraints.validate(obj);
-        }
-        console.timeEnd('t')
-
-}
-
-testOther();
-
-function testFastest() {
-    const obj = {
-        name: "John Doe",
-        email: "john.doe@company.space",
-        firstName: "John",
-        phone: "123-4567",
-        age: 33
-    };
-    const Validator = require('fastest-validator');
-    const v = new Validator();
-
-    const constraints = {
-        name: {
-            type: "string",
-            min: 4,
-            max: 25
-        },
-        email: { type: "string" },
-        firstName: { type: "string" },
-        phone: { type: "string" },
-        age: {
-            type: "number",
-            min: 18
-        }
-    };
-
-    let check = v.compile(constraints);
-
-    let testObj = obj;
-
-    console.time('t')
-    for (let i = 0; i < 100; i++) {
-        let res = check(testObj);
-    }
-    console.timeEnd('t')
-}
-testFastest();
-
-function testSelf() {
-    let test = Validator.createOnErrorBreakValidator();
-    const obj = {
-        name: "John Doe",
-        email: "john.doe@company.space",
-        firstName: "John",
-        phone: null,
-        age: 33
-    };
-
-    /*
-    let a = [];
-    let nameRules = name => [
-        () => name.is.aString(),
-        () => name.prop('length').is.inRange(4, 25)
-    ];
-    let ageRules = age => [
-        () => age.is.anInteger(),
-        () => age.is.greaterThan(18)
-    ]
-    let objRules = obj => [
-        () => obj.prop('name').fulfillAllOf(nameRules),
-        () => obj.prop('email').does.match(/\w+@\w+\.\w{1,4}/),
-        () => obj.prop('firstName').is.aString(),
-        () => obj.prop('phone').is.aString(),
-        () => obj.prop('age').fulfillAllOf(ageRules)
-    ]*/
-
-    console.time('t')
-
-
-    for (let i = 0; i < 100; i++) {
-        //test(obj).fulfillAllOf(objRules);
-        /*test(obj).fulfillAllOf(obj => [
-            () => obj.is.anObject(),
-            () => obj.isNot.nil(),
-        ])*/
-        test(obj).fulfillAllOf(obj => [
-            () => obj.prop('name').fulfillAllOf(name => [
-                () => name.is.aString(),
-                () => name.prop('length').is.inRange(4, 25)
-            ]),
-            () => obj.prop('email').is.aString(),
-            () => obj.prop('firstName').is.aString(),
-            () => obj.prop('phone').is.aString(),
-            () => obj.prop('age').fulfillAllOf(age => [
-                () => age.is.anInteger(),
-                () => age.is.greaterThan(18)
-            ])
-        ])
-    }
-    console.timeEnd('t')
-    console.log(test.result.getAllErrors())
-}
-
-testSelf()
