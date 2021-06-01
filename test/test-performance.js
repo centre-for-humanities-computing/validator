@@ -38,7 +38,7 @@ function testJoi() {
 
 }
 
-testJoi();
+
 
 function testFastest() {
     const obj = {
@@ -76,7 +76,6 @@ function testFastest() {
     }
     console.timeEnd('t')
 }
-testFastest();
 
 function testSelf() {
     let test = Validator.createOnErrorBreakValidator();
@@ -94,7 +93,7 @@ function testSelf() {
         test(obj).fulfillAllOf(obj => [
             () => obj.prop('name').fulfillAllOf(name => [
                 () => name.is.aString('${PATH} must be a string'),
-                () => name.prop('length').is.inRange(4, 25, '${PATH} must be >= 4 4 and <= 25')
+                () => name.prop('length').is.inRange(4, 25, '${PATH} must be >= 4 and <= 25')
             ]),
             () => obj.prop('email').is.aString('${PATH} must be a string'),
             () => obj.prop('firstName').is.aString('${PATH} must be a string'),
@@ -109,4 +108,6 @@ function testSelf() {
     console.log(test.result.getAllErrors())
 }
 
+//testJoi();
+//testFastest();
 testSelf()

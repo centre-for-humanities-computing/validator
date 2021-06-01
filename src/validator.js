@@ -3,6 +3,7 @@ const { ValidatorPool } = require('./validator-pool');
 const { ValidatorContext } = require('./validator-context');
 const { ValidationResult } = require('./validation-result');
 const { ValidatorInternalState } = require('./validator-internal-state');
+const { ValidationError } = require('./validation-error');
 const sharedConstants = require('./shared-constants');
 const utils = require('./utils');
 
@@ -39,6 +40,15 @@ class Validator {
         }
     })
 
+    /**
+     * ON_ERROR_THROW:      Throws a {@link ValidationError} if a test fails
+     *
+     * ON_ERROR_BREAK:      Abort the remaining tests if a test fails
+     *
+     * ON_ERROR_NEXT_PATH:  Continue to next path if the test for current path fails
+     *
+     * @type {Readonly<{ON_ERROR_NEXT_PATH: string, ON_ERROR_THROW: string, ON_ERROR_BREAK: string}>}
+     */
     static mode = sharedConstants.mode;
 
     #name;
@@ -77,8 +87,6 @@ class Validator {
             throw Error('Internal Validator error, validatorContext must be passed to #reset()');
         }
 
-        validatorContext._reset();
-
         this.#contextShortCircuit.fulfilled = false;
 
         /* only the root validatorContext can reset the entire validator
@@ -92,6 +100,11 @@ class Validator {
             this.#validatorSharedState = undefined;
             this.#rootValidatorContext = undefined;
             Validator.#validatorPool.return(this);
+        }
+
+        if (validatorContext !== Validator.#shortCircuitFulfilledValidatorContext) {
+            validatorContext._reset();
+            Validator.#contextPool.return(validatorContext);
         }
     }
 
@@ -183,9 +196,6 @@ class Validator {
         }
 
         this.#reset(validatorContext);
-        if (validatorContext !== Validator.#shortCircuitFulfilledValidatorContext) {
-            Validator.#contextPool.return(validatorContext);
-        }
     }
 
     /**
@@ -376,8 +386,15 @@ class Validator {
     prop(path) {
         let validatorContext = this.#getValidatorContext(false);
         let fullPropPath = utils.joinPropPaths(this.#contextValuePath, path);
-        // if parent is optional and nil, _.get() will return undefined, which is fine because createChildValidator sets optional() if parent i optional
-        let validator = this.#createChildValidator(validatorContext, _.get(this.#contextValue, path), fullPropPath, path);
+        let childValue;
+        if (!_.isNil(this.#contextValue)) {
+            childValue = this.#contextValue[path];
+        }
+        if (childValue === undefined) { // lodash get() is a little slow, so only use it if needed
+            // if parent is optional and nil, _.get() will return undefined, which is fine because createChildValidator sets optional() if parent i optional
+            childValue = _.get(this.#contextValue, path);
+        }
+        let validator = this.#createChildValidator(validatorContext, childValue, fullPropPath, path);
         this.#validatorContextDone(validatorContext); // important to call this to make sure reset() is called and the context is returned to the contextPool, because we are leaving this context and enter a child validator
         return validator;
     }
@@ -480,7 +497,7 @@ class Validator {
      * Creates a new validation context. The returned "test" function gives access to the verb context which return the
      * predicate used for performing the actual test.
      *
-     * If a error message is passed to a test predicate it will throw an error if the predicate is not fulfilled.
+     * If a error message is passed to a test predicate it add it to the result if the predicate is not fulfilled.
      * Every predicate returns a boolean with the result of the test.
      *
      * Error message string can use placeholders which will be substituted when the error i thrown
@@ -488,6 +505,7 @@ class Validator {
      * @example
      * let test = Validator.create('Validation error:', Validator.mode.ON_ERROR_BREAK);
      * let name = "John";
+     * let age = 54;
      * let person = { name: "John", age: 43 };
      * test(name).isNot.nil('Name cannot be null or undefined');
      * test(name).is.aString('Name must be a string');
@@ -495,6 +513,16 @@ class Validator {
      *      () => name.value.length > 1,
      *      () => name.does.match(/\w+/)
      * ], 'Name must have length > 1 and only contain letters');
+     *
+     * // when testing individual values (or objects) an errorPathPrefix can be passed in a second argument to the the test-function.
+     * // the errorPathPrefix will be used a prefix for the path in validation result and for ${PATH} placeholders (see below) in error messages.
+     * // This makes it possible to collect errors from multiple values without having them in an object and still be able to tell them appart
+     *
+     * test(name, 'name').is.aString('Name must be a string');
+     * test(age, 'age').is.anInteger('Age must be an integer');
+     *
+     * console.log(test.result.getError('name'));
+     * console.log(test.result.getError('age'));
      *
      * // validate properties of an object
      * test(person).prop("age").is.aNumber('${PATH} must be an string');
@@ -514,41 +542,51 @@ class Validator {
      * test(name).is.aString('The name: "${VALUE}" is not of type string');
      * // the path validated can be referenced directly
      * test(person).prop("name").is.aString('The property "${PATH}": "${VALUE}" is not of type string');
-     * // the current path for nested properties can be referenced as well
-     * test(person).prop("name").prop("length").is.equalTo(1, 'The property "${CURRENT_PATH}": "${VALUE}" of ${PATH} must be 1');
+     * // the current path and parent path for nested properties can be referenced as well
+     * test(person).prop("name").prop("length").is.equalTo(1, 'The property "${CURRENT_PATH}": "${VALUE}" of ${PARENT_PATH} must be 1');
      *
-     * // inspect the collected errors if mode is ON_ERROR_BREAK|ON_ERROR_NEXT_PATH
+     * // inspect the collected errors
      * let rootError = test.result.getError()
      * let nameError = test.result.getError('name')
-     * let isValid = test.result.isValid()
+     * let isValid = test.result.isValid() // was all test valid. This does purely rely on if all tests passed and not if an error message was supplied or not
      * // see the ValidationResult documentation for all possibilities
      *
      * @param {string} errorPrefix a prefix to prepend to every error thrown by this validator
      * @param {string} mode the [mode]{@link Validator.mode} for this validator
+     * @see {@link ValidationResult}
+     * @see {@link Validator.createOnErrorThrowValidator}
+     * @see {@link Validator.createOnErrorBreakValidator}
+     * @see {@link Validator.createOnErrorNextPathValidator}
      */
     static create(errorPrefix = '', mode = Validator.mode.ON_ERROR_THROW) {
         return Validator.#testFunction(errorPrefix, mode);
     }
 
     /**
+     * Creates a validator which throws an {@link ValidationError} if a test fails
      * @param {string} errorPrefix a prefix to prepend to every error thrown by this validator
-     * @see {@link #create} for examples of usage
+     * @see {@link Validator.create} for examples of usage
+     * @see {@link Validator.mode}
      */
     static createOnErrorThrowValidator(errorPrefix = '') {
         return Validator.#testFunction(errorPrefix, Validator.mode.ON_ERROR_THROW);
     }
 
     /**
+     * Creates a validator which aborts the remaining tests if a test fails
      * @param {string} errorPrefix a prefix to prepend to every error thrown by this validator
-     * @see {@link #create} for examples of usage
+     * @see {@link Validator.create} for examples of usage
+     * @see {@link Validator.mode}
      */
     static createOnErrorBreakValidator(errorPrefix = '') {
         return Validator.#testFunction(errorPrefix, Validator.mode.ON_ERROR_BREAK);
     }
 
     /**
+     * Creates a validator which continuous to test the next path if a test fails
      * @param {string} errorPrefix a prefix to prepend to every error thrown by this validator
-     * @see {@link #create} for examples of usage
+     * @see {@link Validator.create} for examples of usage
+     * @see {@link Validator.mode}
      */
     static createOnErrorNextPathValidator(errorPrefix = '') {
         return Validator.#testFunction(errorPrefix, Validator.mode.ON_ERROR_NEXT_PATH);

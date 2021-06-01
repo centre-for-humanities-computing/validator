@@ -42,7 +42,8 @@ class ValidationResult {
     }
 
     /**
-     * Test if everything is valid
+     * Test if everything is valid.
+     * This does purely rely on if all tests passed or not and not whether an error message was supplied.
      *
      * @returns {boolean} <code>true</code> if no errors otherwise <code>false</code>
      */
@@ -51,7 +52,8 @@ class ValidationResult {
     }
 
     /**
-     * Test if the given path is valid
+     * Test if the given path is valid.
+     * This does purely rely on if all tests passed or not and not whether an error message was supplied.
      *
      * @param {string} path the path to test if valid, the path must be relative to the root object under validation
      * @returns {boolean} <code>true</code> if no errors for the given path otherwise <code>false</code>
@@ -81,30 +83,9 @@ class ValidationResult {
 }
 
 // TODO
-// use in validator etc for the different modes
-// ved test igen i de forskellige modes, hvis man ikke resetter bygger den bare ovenpå, og ved throw og break tilføjer den en enkelt ny error
-// osv. Ved next Path tilføjer den ny for hver path...
-// dokumenter dette
-// dokumenter de forskellige modes..
-// dokumenter a test funktionen har en result property (jsdoc, so kan content assist)
-// lav conditionally
 // lav README, med eksempler
 // put på npm og brug i de to projekter...
 
-// lav eksempler på brug af den nye feature jeg er ved at lave hvor man i test(value, "path.path") kan give en path med som prefixes
-// i ${PATH} og i ValidationResult messages, så kan man lave mange små tests efter hinanden af værdier uafhængige af hinanden og stadig holde styr på dem
-// let a = 3;
-// let b = 4;
-/*
-* test(a, 'a')...
-* test(b, 'b')...
-* */
-
-/*
-* omskriv eks. for fulfill, fulfullOneOf fulfillAllOf, så de matcher den typiske brug og der tages højde for forskellige modes. også i create() delen af eks.
-*
-* Lav meget simpel README. med install instructions og et par eksempler, og så smid på NPM
-* */
 
 
 module.exports = { ValidationResult };

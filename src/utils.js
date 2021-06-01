@@ -17,3 +17,16 @@ module.exports.joinPropPaths = function(...elements) {
     }
     return result;
 };
+
+/**
+ * @param {string} fullPath the full path
+ * @param {string} path the path to get the parent for
+ * @returns {string}
+ */
+module.exports.getParentPath = function(fullPath, path) {
+    let parentPath = fullPath.substr(0, fullPath.length - path.length);
+    if (parentPath.endsWith('.')) {
+        parentPath = parentPath.substr(0, parentPath.length - 1);
+    }
+    return parentPath;
+};

@@ -2,6 +2,7 @@ const _ = require('lodash');
 const { ValidationInternalState } = require('./validator-internal-state');
 const { ValidationError } = require('./validation-error');
 const sharedConstants = require('./shared-constants');
+const utils = require('./utils');
 
 const INTEGER_STRING_PATTERN = /^-?\d+$/;
 const FLOAT_STRING_PATTERN = /^-?\d+(\.\d+)?$/;
@@ -12,6 +13,7 @@ const PLACEHOLDER_PATTERN = /(?<!\\)\${(\d+)}/g;
 const PLACEHOLDER_CONTEXT_VALUE_PATTERN = /(?<!\\)\${VALUE}/g;
 const PLACEHOLDER_CONTEXT_PATH_PATTERN = /(?<!\\)\${PATH}/g;
 const PLACEHOLDER_CONTEXT_CURRENT_PATH_PATTERN = /(?<!\\)\${CURRENT_PATH}/g;
+const PLACEHOLDER_CONTEXT_PARENT_PATH_PATTERN = /(?<!\\)\${PARENT_PATH}/g;
 
 class ValidatorContext {
 
@@ -59,6 +61,10 @@ class ValidatorContext {
 
     get #contextValueCurrentPath() {
         return this.#validatorState.contextValueCurrentPath;
+    }
+
+    get #errorContextValuePath() {
+        return this.#validatorState.errorContextValuePath;
     }
 
     /**
@@ -279,7 +285,7 @@ class ValidatorContext {
      * test(name).does.fulfill((name) => name.is.aString(), 'Name must be a string');
      *
      * // OBS we can add a general error message which relates to the full predicate test. If so it is important not
-     * // to pass in an error message to the inner predicates because they would then throw an error immediately
+     * // to pass in an error message to the inner predicates because they would then throw an error or break depending on the mode of the validator
      *
      * @param {function(Validator)|boolean} predicate a predicate function which returns a boolean or the results of a predicate. Use the passed in validator context to get access to the predicates of this validator
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
@@ -308,8 +314,9 @@ class ValidatorContext {
      *     () => true
      * ], 'weird validation did not pass');
      *
-     * // OBS it is important not to pass in an error message to the inner predicates because they would then throw an error immediately
-     * // and the remaining predicates would not be tested, which they should in fulfillOnOf
+     * // OBS it is important not to pass in an error message to the inner predicates because they would then
+     * // throw an error or break depending on the mode of the validator and the remaining predicates would not be tested,
+     * // which they should in fulfillOnOf
      *
      * @param {function(Validator)[]|function(Validator):function(Validator)[]} predicates  an array of, or a function returning an array
      * of, predicate functions returning a boolean.
@@ -344,7 +351,7 @@ class ValidatorContext {
 
     /**
      * @example
-     * let test = Validator.create('Validation error:');
+     * let test = Validator.create('Validation error:', Validator.mode.ON_ERROR_BREAK);
      * let name = "John";
      * test(name).fulfillAllOf(name) => [
      *     () => name.is.aString(),
@@ -360,7 +367,7 @@ class ValidatorContext {
      * ], 'weird validation did not pass');
      *
      * // OBS we can add a general error message which relates to all tests in the array. If so it is important not
-     * // to pass in an error message to the inner predicates because they would then throw an error immediately
+     * // to pass in an error message to the inner predicates because they would then throw an error or break depending on the mode of the validator
      *
      * @param {function(Validator)[]|function(Validator):function(Validator)[]} predicates an array of, or a function returning an array
      * of, predicate functions returning a boolean.
@@ -414,12 +421,12 @@ class ValidatorContext {
      * @param {string|string[]} [messageArgs]
      * @return {boolean}
      */
-    #handleError(success, errorMessage, messageArgs= []) {
-        if (!Array.isArray(messageArgs)) {
-            messageArgs = [messageArgs];
-        }
+    #handleError(success, errorMessage, messageArgs = []) {
         if (this.#notContext) {
             success = !success;
+        }
+        if (!success && !Array.isArray(messageArgs)) {
+            messageArgs = [messageArgs];
         }
 
         let fullMessage;
@@ -431,15 +438,16 @@ class ValidatorContext {
                 if (messageArgs.length > 0 || fullMessage.match(PLACEHOLDER_PRE_TEST_PATTERN)) {
                     fullMessage = fullMessage.replace(PLACEHOLDER_PATTERN, (match, group1) => messageArgs[group1]);
                     fullMessage = fullMessage.replace(PLACEHOLDER_CONTEXT_VALUE_PATTERN, this.#contextValue);
-                    if (this.#contextValuePath) {
-                        fullMessage = fullMessage.replace(PLACEHOLDER_CONTEXT_PATH_PATTERN, this.#validatorState.errorContextValuePath);
+                    if (this.#errorContextValuePath) {
+                        fullMessage = fullMessage.replace(PLACEHOLDER_CONTEXT_PATH_PATTERN, this.#errorContextValuePath);
+                        fullMessage = fullMessage.replace(PLACEHOLDER_CONTEXT_PARENT_PATH_PATTERN, utils.getParentPath(this.#errorContextValuePath, this.#contextValueCurrentPath));
                     }
                     if (this.#contextValueCurrentPath) {
                         fullMessage = fullMessage.replace(PLACEHOLDER_CONTEXT_CURRENT_PATH_PATTERN, this.#contextValueCurrentPath);
                     }
                 }
                 if (this.#validatorState.mode === sharedConstants.mode.ON_ERROR_THROW) {
-                    throw new ValidationError(fullMessage, this.#contextValuePath);
+                    throw new ValidationError(fullMessage, this.#errorContextValuePath);
                 }
             }
         } finally {
