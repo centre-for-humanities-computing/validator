@@ -1,5 +1,6 @@
 const { Validator } = require('../src/validator');
 const _ = require('lodash');
+const nameGenerator = require('project-name-generator');
 
 /*
 * examples with different libraries and stats here: https://github.com/icebob/validator-benchmark/blob/master/suites/simple.js
@@ -8,17 +9,23 @@ const _ = require('lodash');
 
 const iterations = 100000;
 
-function testJoi() {
-
-    const Joi = require('joi');
-
-    const obj = {
-        name: "John Doe",
+function getTestObj() {
+    return {
+        name: nameGenerator().spaced.substr(0, 25),
         email: "john.doe@company.space",
-        firstName: "John",
-        phone: "123-4567",
-        age: 33
+        firstName: nameGenerator({ words: 1 }).spaced,
+        phone: "" + Math.round(Math.random() * 1000000),
+        age: 18 + Math.round(Math.random() * 80)
     };
+}
+
+let testObjects = new Array(iterations);
+for (let i = 0; i < iterations; i++) {
+    testObjects[i] = getTestObj();
+}
+
+function testJoi() {
+    const Joi = require('joi');
 
     const constraints = Joi.object().keys({
         name: Joi.string().min(4).max(25).required(),
@@ -31,7 +38,7 @@ function testJoi() {
 
     console.time('t');
     for (let i = 0; i < iterations; i++) {
-
+        let obj = testObjects[i];
         constraints.validate(obj);
     }
     console.timeEnd('t')
@@ -41,13 +48,6 @@ function testJoi() {
 
 
 function testFastest() {
-    const obj = {
-        name: "John Doe",
-        email: "john.doe@company.space",
-        firstName: "John",
-        phone: "123-4567",
-        age: 33
-    };
     const Validator = require('fastest-validator');
     const v = new Validator();
 
@@ -68,28 +68,21 @@ function testFastest() {
 
     let check = v.compile(constraints);
 
-    let testObj = obj;
-
     console.time('t')
     for (let i = 0; i < iterations; i++) {
-        let res = check(testObj);
+        let obj = testObjects[i];
+        let res = check(obj);
     }
     console.timeEnd('t')
 }
 
 function testSelf() {
     let test = Validator.createOnErrorBreakValidator();
-    const obj = {
-        name: "John Doe",
-        email: "john.doe@company.space",
-        firstName: "John",
-        phone: "123-4567",
-        age: 33
-    };
 
     console.time('t')
 
     for (let i = 0; i < iterations; i++) {
+        let obj = testObjects[i];
         test(obj).fulfillAllOf(obj => [
             () => obj.prop('name').fulfillAllOf(name => [
                 () => name.is.aString('${PATH} must be a string'),
@@ -108,6 +101,6 @@ function testSelf() {
     console.log(test.result.getAllErrors())
 }
 
-//testJoi();
-//testFastest();
+testJoi();
+testFastest();
 testSelf()

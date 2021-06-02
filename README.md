@@ -7,14 +7,20 @@ A fluent validator API for validating function arguments, form-data etc.
 npm install @chcaa/validator
 ```
 
-## Usage
-See the JsDoc for each method for further examples.
 ## Getting Started
+Import the module and create a new `Validator` (see examples further down for different kinds of validators).
 ```ecmascript 6
 const { Validator } = require('@chcaa/validator');
-let test = Validator.createOnErrorThrowValidator('SOME PREFIX ERROR MESSAGE');
+let test = Validator.createOnErrorThrowValidator();
+let name = "Peter";
+test(name).fulfillAllOf(name => [
+    () => name.is.aString('"name" must be a string'),
+    () => name.is.equalTo('Peter', '"name" must be "Peter"')
+]);
 ```
-### Test Arguments
+See also the JsDoc for each method for further examples.
+
+## Test Function Arguments
 If an argument does not meet the requirements we want to throw a `ValidationError` so we 
 create a `Validator` which throws an error when a test fails.
 
@@ -26,10 +32,10 @@ function add(x, y) {
 }
 ```
 
-### Test Form Data and Objects
-When testing form data we would like to be able to gather information and show it the user. We therefore
-create a `Validator` which just moves on the next path if a test fails instead of throwing an Error. To keep
-the error messages separated in the `ValidationResult` we supply a `errorPrefixPath` as the second argument to `test`.
+## Test Form Data and Objects
+When testing form data we would like to be able to gather information and show it to the user. We can then
+create a `Validator` which just breaks if a test fails instead of throwing an Error. To keep
+the error messages separated in the `ValidationResult` we supply an `errorPrefixPath` as the second argument to `test`.
 
 ````ecmascript 6
 function validateUserForm(username, age) {
@@ -80,13 +86,13 @@ function validateUserForm(user) {
 }
 ```
 
-### Error Messages
-Error messages can be supplied for the individual test and as combined messages for `fulfill()`, `fulfillAllOf`, `fulfillOneOf()`, `each()`.
+## Error Messages
+Error messages can be supplied for the individual test and as combined messages for `fulfill()`, `fulfillAllOf()`, `fulfillOneOf()` and `each()`.
 
-Individual messages i simply supplied as an argument to the test:
+Individual messages is supplied as an argument to the test:
 ```ecmascript 6
 let test = Validator.createOnErrorBreakValidator();
-test('peter').is.equalTo('peter', `"peter" must be equal to "peter"`);
+test('Peter').is.equalTo('Peter', `"Peter" must be equal to "Peter"`);
 ```
 Combined messages is supplied as a second argument to e.g. `fulfillAllOf()`:
 ```ecmascript 6
@@ -94,15 +100,30 @@ let test = Validator.createOnErrorBreakValidator();
 test('peter').fulfillAllOf(peter => [
     peter.is.aString(),
     peter.is.equalTo('peter')
-], '"peter" must be a string and be equal to "peter"');
+], '"Peter" must be a string and be equal to "Peter"');
 ```
 When using combined messages it is important not to add individual messages as well as these will overrule the combined message.
 
+All error messages for the same `Validator` can have the same prefix which can be provided when creating the `Validator`.
+```ecmascript 6
+let test = Validator.createOnErrorBreakValidator('Name error');
+test('peter').fulfillAllOf(peter => [
+    peter.is.aString('must be a string'),
+    peter.is.equalTo('peter', 'must equal "Peter"')
+]);
+```
+
+
 ### Arguments
 
-// TODO beskriv arguement her og vis eks....
+Arguments for error messages can be passed in as an array of values and be referenced by their index number.
+```ecmascript 6
+let person = { name: "peter", age: 41 };
+let test = Validator.createOnErrorNextPathValidator('Person error');
+test(person).prop('age').is.inRange(18, 99, 'The age must be in range ${0} - ${1}', [18, 99])
+```
 
-#### Placeholders
+### Context Placeholders
 The different paths and values in the current validation context can be referenced in the error messages using the following
 placeholders:
 
@@ -112,7 +133,7 @@ placeholders:
 - `${PARENT_PATH}` - the parent of `${CURRENT_PATH}`
 
 ```ecmascript 6
-let person = { name: "peter", age:41 };
+let person = { name: "peter", age: 41 };
 let test = Validator.createOnErrorNextPathValidator('Person error');
 test(person).fulfillAllOf(person => [
     person.prop('name').fulfillAllOf(name => [

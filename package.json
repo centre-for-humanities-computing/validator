@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "fastest-validator": "^1.11.0",
-    "joi": "^17.4.0"
+    "joi": "^17.4.0",
+    "project-name-generator": "^2.1.9"
   }
 }
