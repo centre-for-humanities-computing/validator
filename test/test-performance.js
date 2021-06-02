@@ -1,6 +1,6 @@
 const { Validator } = require('../src/validator');
 const _ = require('lodash');
-const nameGenerator = require('project-name-generator');
+const nameGenerator = require('random-name');
 
 /*
 * examples with different libraries and stats here: https://github.com/icebob/validator-benchmark/blob/master/suites/simple.js
@@ -10,10 +10,13 @@ const nameGenerator = require('project-name-generator');
 const iterations = 100000;
 
 function getTestObj() {
+    let first = nameGenerator.first();
+    let last = nameGenerator.last();
+    let full = `${first} ${last}`;
     return {
-        name: nameGenerator().spaced.substr(0, 25),
+        name: full,
         email: "john.doe@company.space",
-        firstName: nameGenerator({ words: 1 }).spaced,
+        firstName: first,
         phone: "" + Math.round(Math.random() * 1000000),
         age: 18 + Math.round(Math.random() * 80)
     };
@@ -77,7 +80,7 @@ function testFastest() {
 }
 
 function testSelf() {
-    let test = Validator.createOnErrorBreakValidator();
+    let test = Validator.createOnErrorNextPathValidator();
 
     console.time('t')
 

@@ -97,9 +97,9 @@ test('Peter').is.equalTo('Peter', `"Peter" must be equal to "Peter"`);
 Combined messages is supplied as a second argument to e.g. `fulfillAllOf()`:
 ```ecmascript 6
 let test = Validator.createOnErrorBreakValidator();
-test('peter').fulfillAllOf(peter => [
+test('Peter').fulfillAllOf(peter => [
     peter.is.aString(),
-    peter.is.equalTo('peter')
+    peter.is.equalTo('Peter')
 ], '"Peter" must be a string and be equal to "Peter"');
 ```
 When using combined messages it is important not to add individual messages as well as these will overrule the combined message.
@@ -107,9 +107,9 @@ When using combined messages it is important not to add individual messages as w
 All error messages for the same `Validator` can have the same prefix which can be provided when creating the `Validator`.
 ```ecmascript 6
 let test = Validator.createOnErrorBreakValidator('Name error');
-test('peter').fulfillAllOf(peter => [
+test('Peter').fulfillAllOf(peter => [
     peter.is.aString('must be a string'),
-    peter.is.equalTo('peter', 'must equal "Peter"')
+    peter.is.equalTo('Peter', 'must equal "Peter"')
 ]);
 ```
 
@@ -118,9 +118,9 @@ test('peter').fulfillAllOf(peter => [
 
 Arguments for error messages can be passed in as an array of values and be referenced by their index number.
 ```ecmascript 6
-let person = { name: "peter", age: 41 };
+let person = { name: "Peter", age: 41 };
 let test = Validator.createOnErrorNextPathValidator('Person error');
-test(person).prop('age').is.inRange(18, 99, 'The age must be in range ${0} - ${1}', [18, 99])
+test(person).prop('age').is.inRange(18, 99, 'The age must be in range ${0} - ${1}', [18, 99]);
 ```
 
 ### Context Placeholders
@@ -133,7 +133,7 @@ placeholders:
 - `${PARENT_PATH}` - the parent of `${CURRENT_PATH}`
 
 ```ecmascript 6
-let person = { name: "peter", age: 41 };
+let person = { name: "Peter", age: 41 };
 let test = Validator.createOnErrorNextPathValidator('Person error');
 test(person).fulfillAllOf(person => [
     person.prop('name').fulfillAllOf(name => [
@@ -146,7 +146,47 @@ test(person).fulfillAllOf(person => [
 test(person.name, 'name').fulfillAllOf(name => [
     name.is.aString('${PATH} must be a string but was ${VALUE}'),
     name.prop('length').is.inRange(4, 25, 'The ${CURRENT_PATH} of ${PARENT_PATH} must be 4 - 25 but was ${VALUE}')
-])
+]);
 ```
 
-    
+## Validator Overview
+- `does:ValidatorContext`
+- `doesNot:ValidatorContext`
+- `is:ValidatorContext`
+- `isNot:ValidatorContext`
+- `optional:Validator` - only validate the following predicates if the current value i not `nil`
+- `value:*` - returns the actual value for this context
+- `conditionally(predicate(validator)):Validator` - only validate the following predicates if predicate is fulfilled
+- `each(predicate, [errorMessage, [messageArgs]]):boolean` - validate each element in the `iterable` against the predicate
+- `transform(tranformer):Validator` - transform the current value into something else, e.g. making a `string` lowercase
+- `prop(path):Validator` - get a `Validator` for the `path` relative to the current context value (typically an object)
+- `fulfill(predicate):ValidatorContext` - alias for `does.fulfill()`
+- `fulfillOneOf(predicates):ValidatorContext` - alias for `does.fulfillOneOf()`
+- `fulfillAllOf(predicates):ValidatorContext` - alias for `does.fulfillAllOf()`
+
+## ValidatorContext Overview
+All methods take an optional `errorMessage` and `messageArgs` as the last two arguments and all methods
+returns a boolean.
+
+- `anArray()`
+- `aBoolean()`
+- `aFloatString()`
+- `anInteger()`
+- `anIntegerString()`
+- `aNumber()`
+- `anObject()`
+- `aString()`
+- `empty()`
+- `equalTo(otherValue)`
+- `fulfill(predicate)`
+- `fulfillAllOf(predicates)`
+- `fulfillOneOf(predicates)`
+- `greaterThan(value)`
+- `greaterThanOrEqualTo(value)`
+- `identicalTo(otherValue)`
+- `in(values)`
+- `inRange(start, end)`
+- `lessThan(value)`
+- `lessThanOrEqualTo(value)`
+- `match(regex)`
+- `nil()`
