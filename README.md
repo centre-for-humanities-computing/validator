@@ -9,7 +9,7 @@ npm install @chcaa/validator
 
 ## Getting Started
 Import the module and create a new `Validator` (see examples further down for different kinds of validators).
-```ecmascript 6
+```js
 const { Validator } = require('@chcaa/validator');
 let test = Validator.createOnErrorThrowValidator();
 let name = "Peter";
@@ -24,7 +24,7 @@ See also the JsDoc for each method for further examples.
 If an argument does not meet the requirements we want to throw a `ValidationError` so we 
 create a `Validator` which throws an error when a test fails.
 
-```ecmascript 6
+```js
 function add(x, y) {
     let test = Validator.createOnErrorThrowValidator('Argument error for add');
     test(x).is.aNumber('x must be a number bus was ${VALUE}');
@@ -37,7 +37,7 @@ When testing form data we would like to be able to gather information and show i
 create a `Validator` which just breaks if a test fails instead of throwing an Error. To keep
 the error messages separated in the `ValidationResult` we supply an `errorPrefixPath` as the second argument to `test`.
 
-````ecmascript 6
+````js
 function validateUserForm(username, age) {
     let test = Validator.createOnErrorBreakValidator();
     test(username, 'username').fulfillAllOf(username => [
@@ -63,7 +63,7 @@ a `Validator` in `ON_ERROR_NEXT_PATH` mode to move on to the next path when a te
 information about all paths. If we only wanted the error message for the first path which failed we 
 could use an `ON_ERROR_BREAK` `Validator`. 
 
-```ecmascript 6
+```js
 function validateUserForm(user) {
     let test = Validator.createOnErrorBreakValidator();
     test(user).fulfillAllOf(user => [
@@ -90,12 +90,12 @@ function validateUserForm(user) {
 Error messages can be supplied for the individual test and as combined messages for `fulfill()`, `fulfillAllOf()`, `fulfillOneOf()` and `each()`.
 
 Individual messages is supplied as an argument to the test:
-```ecmascript 6
+```js
 let test = Validator.createOnErrorBreakValidator();
 test('Peter').is.equalTo('Peter', `"Peter" must be equal to "Peter"`);
 ```
 Combined messages is supplied as a second argument to e.g. `fulfillAllOf()`:
-```ecmascript 6
+```js
 let test = Validator.createOnErrorBreakValidator();
 test('Peter').fulfillAllOf(peter => [
     peter.is.aString(),
@@ -105,7 +105,7 @@ test('Peter').fulfillAllOf(peter => [
 When using combined messages it is important not to add individual messages as well as these will overrule the combined message.
 
 All error messages for the same `Validator` can have the same prefix which can be provided when creating the `Validator`.
-```ecmascript 6
+```js
 let test = Validator.createOnErrorBreakValidator('Name error');
 test('Peter').fulfillAllOf(peter => [
     peter.is.aString('must be a string'),
@@ -117,7 +117,7 @@ test('Peter').fulfillAllOf(peter => [
 ### Arguments
 
 Arguments for error messages can be passed in as an array of values and be referenced by their index number.
-```ecmascript 6
+```js
 let person = { name: "Peter", age: 41 };
 let test = Validator.createOnErrorNextPathValidator('Person error');
 test(person).prop('age').is.inRange(18, 99, 'The age must be in range ${0} - ${1}', [18, 99]);
@@ -132,7 +132,7 @@ placeholders:
 - `${CURRENT_PATH}` - the path for the current value under test
 - `${PARENT_PATH}` - the parent of `${CURRENT_PATH}`
 
-```ecmascript 6
+```js
 let person = { name: "Peter", age: 41 };
 let test = Validator.createOnErrorNextPathValidator('Person error');
 test(person).fulfillAllOf(person => [
