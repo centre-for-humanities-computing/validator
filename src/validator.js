@@ -74,7 +74,7 @@ class Validator {
      * @param {ValidatorInternalState} validatorState
      * @param {object} validatorSharedState
      */
-    #init(validatorState, validatorSharedState) {
+    #init(validatorState, validatorSharedState, shortCircuit = false) {
         this.#validatorState = validatorState;
         if (validatorSharedState) {
             this.#validatorSharedState = validatorSharedState;
@@ -82,6 +82,9 @@ class Validator {
             this.#validatorSharedState = {
                 failedPaths: []
             };
+        }
+        if (shortCircuit) {
+            this.#contextShortCircuit.fulfilled = true;
         }
     }
 
@@ -211,11 +214,9 @@ class Validator {
     #createChildValidator(currentValidatorContext, contextValue, contextValuePath, contextValueCurrentPath) {
         let validatorState = this.#validatorState.cloneWith(Validator.#validatorStatePool.get(), contextValue, contextValuePath, contextValueCurrentPath);
         let validator = Validator.#validatorPool.get();
-        validator.#init(validatorState, this.#validatorSharedState);
-        // if the parent is optional and short circuited make sure the child is a well, this goes for e.g. prop()
-        if (this.#istShortCircuitValidatorContext(currentValidatorContext) || this.#shortCircuit()) {
-            validator = validator.optional;
-        }
+        let shortCircuit = this.#istShortCircuitValidatorContext(currentValidatorContext) || this.#shortCircuit();
+        // if the parent is short circuited make sure the child is a well, this goes for e.g. prop()
+        validator.#init(validatorState, this.#validatorSharedState, shortCircuit);
         return validator;
     }
 
@@ -309,6 +310,7 @@ class Validator {
         if (!fulfilled) {
             this.#contextShortCircuit.fulfilled = true;
         }
+        console.log(fulfilled, "conditional")
         return this;
     }
 

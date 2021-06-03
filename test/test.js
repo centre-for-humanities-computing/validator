@@ -85,6 +85,13 @@ let test = Validator.createOnErrorThrowValidator('Person validation error');
 ]);*/
 
 
+//problemet er måske at vi i conditionally laver en noopValidationResult object??
+test(person).fulfillAllOf(person => [
+    () => person.conditionally(person => person.is.equalTo(person.value)).prop('name').fulfillAllOf(name => [
+        () => name.is.aNumber("name must be a int"),
+    ])
+]);
+
 test(person).fulfillAllOf(person => [
     () => person.conditionally(() => true).prop('name').fulfillAllOf(name => [
         () => name.is.aString("name must be a sintr"),
