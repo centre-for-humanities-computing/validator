@@ -35,8 +35,11 @@ class Validator {
         }
     });
     static #noopValidationResult = new Proxy(new ValidationResult(), {
+        noopFunc: function() {
+
+        },
         get: function(target, prop, receiver) {
-            // do nothing
+            return this.noopFunc;
         }
     })
 

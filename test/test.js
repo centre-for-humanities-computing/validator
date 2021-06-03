@@ -68,7 +68,7 @@ try {
 
 let person = { name: "John", age: 54, ssn: undefined };
 
-let test = Validator.create('Person validation error:', Validator.mode.ON_ERROR_NEXT_PATH);
+let test = Validator.createOnErrorThrowValidator('Person validation error');
 
 
 /*test(person).fulfillAllOf((person) => [
@@ -84,9 +84,13 @@ let test = Validator.create('Person validation error:', Validator.mode.ON_ERROR_
     ])
 ]);*/
 
+
 test(person).fulfillAllOf(person => [
-    () => person.prop('name').is.aNumber()
-])
+    () => person.conditionally(() => true).prop('name').fulfillAllOf(name => [
+        () => name.is.aString("name must be a sintr"),
+        () => name.is.aNumber('Name must be a number')
+    ])
+]);
 
 console.log(test.result.isValid());
 console.log(test.result.getAllErrors())
