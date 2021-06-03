@@ -358,7 +358,8 @@ class Validator {
                 }
                 let validator = this.#createChildValidator(validatorContext, element, `${this.#contextValuePath}${indexPath}`, indexPath);
                 success = validator.does.fulfill(predicate, errorMessage, messageArgs);
-                if (!success) {
+                // on mode = ON_ERROR_NEXT_PATH we need to let the validator handle it so it can collect errors for all paths
+                if (!success && this.#validatorState.mode !== sharedConstants.mode.ON_ERROR_NEXT_PATH) {
                     break;
                 }
                 i++;

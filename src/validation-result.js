@@ -82,10 +82,4 @@ class ValidationResult {
 
 }
 
-// TODO
-// lav README, med eksempler
-// put på npm og brug i de to projekter...
-
-
-
 module.exports = { ValidationResult };
