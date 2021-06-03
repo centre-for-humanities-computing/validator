@@ -310,7 +310,6 @@ class Validator {
         if (!fulfilled) {
             this.#contextShortCircuit.fulfilled = true;
         }
-        console.log(fulfilled, "conditional")
         return this;
     }
 
