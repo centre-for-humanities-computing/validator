@@ -331,7 +331,7 @@ class ValidatorContext {
      * @see {@link #fulfill}, {@link #fulfillAllOf}
      */
     fulfillOneOf(predicates, errorMessage, messageArgs) {
-        //this.#validatorCallbackContext.enableShortCircuitStickyOn(true);
+        this.#validatorCallbackContext.enableShortCircuitStickyOn(true);
         if (_.isFunction(predicates)) {
             predicates = predicates(this.#validator);
         }
@@ -350,7 +350,7 @@ class ValidatorContext {
                 break;
             }
         }
-        //this.#validatorCallbackContext.disableShortCircuitSticky();
+        this.#validatorCallbackContext.disableShortCircuitSticky();
         return this.#handleError(success, errorMessage, messageArgs);
     }
 

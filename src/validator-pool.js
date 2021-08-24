@@ -24,7 +24,7 @@ class ValidatorPool {
         if (this.#pool.length < this.#maxSize) {
             this.#pool.push(instance);
         }
-        // console.log(`pool size: ${this.#name} ` + this.#pool.length)
+        //console.log(`pool size: ${this.#name} ` + this.#pool.length)
     }
 }
 

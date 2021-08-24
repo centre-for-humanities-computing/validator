@@ -26,6 +26,7 @@ class Validator {
     static #contextPool = new ValidatorPool(POOL_MAX_SIZE,(name) => new ValidatorContext(name), 'ContextPool');
     static #validatorPool = new ValidatorPool(POOL_MAX_SIZE, (name) => new Validator(name, PRIVATE_CONSTRUCTOR_KEY), 'ValidatorPool');
     static #validatorStatePool = new ValidatorPool(POOL_MAX_SIZE, (name) => new ValidatorInternalState(), 'ValidatorStatePool');
+
     static #shortCircuitFulfilledValidatorContext = new Proxy(new ValidatorContext(), {
         fulfilledPredicate() {
             return true;
@@ -234,6 +235,7 @@ class Validator {
         *     ])
         * ]);
         * */
+
         this.#contextShortCircuit.sticky.push({
             fulfillValue: successValue,
             fulfilled: false
@@ -392,8 +394,8 @@ class Validator {
         try {
             let i = 0;
             let isArray = Array.isArray(this.#contextValue);
-            for (let element of this.#contextValue) {
 
+            for (let element of this.#contextValue) {
                 let indexPath;
                 if (isArray) {
                     indexPath =  `[${i}]`;

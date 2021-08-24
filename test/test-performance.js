@@ -106,4 +106,4 @@ function testSelf() {
 
 testJoi();
 testFastest();
-testSelf()
+testSelf();
