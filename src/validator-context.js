@@ -320,8 +320,7 @@ class ValidatorContext {
      * // which they should in fulfillOnOf
      *
      * // OBS OBS for short circuit on a false predicate to work as expected (no more predicates are tested after a predicate resolves to true)
-     * // each predicate should either be a function or the result of a call to a method of a ValidatorContext. If custom
-     * // validation logic is required enclose it in a ValidatorContext.fulfill() predicate
+     * // each predicate should either be a function or the result of a call to a method of a ValidatorContext
      *
      * @param {function(Validator)[]|function(Validator):(function(Validator)|boolean)[]} predicates  an array of predicate functions, or a function returning an array of predicate functions or predicate results
      * of, predicate functions returning a boolean.
@@ -375,9 +374,8 @@ class ValidatorContext {
      * // OBS we can add a general error message which relates to all tests in the array. If so it is important not
      * // to pass in an error message to the inner predicates because they would then throw an error or break depending on the mode of the validator
      *
-     * OBS OBS for short circuit on a false predicate to work as expected (no more predicates are tested after a predicate resolves to true)
-     * // each predicate should either be a function or the result of a call to a method of a ValidatorContext. If custom
-     * // validation logic is required enclose it in a ValidatorContext.fulfill() predicate
+     * // OBS OBS for short circuit on a false predicate to work as expected (no more predicates are tested after a predicate resolves to true)
+     * // each predicate should either be a function or the result of a call to a method of a ValidatorContext
      *
      * @param {function(Validator)[]|function(Validator):(function(Validator)|boolean)[]} predicates an array of, or a function returning an array
      * of, predicate functions returning a boolean.
