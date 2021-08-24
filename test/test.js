@@ -8,16 +8,16 @@ try {
     test(name).isNot.nil('Name cannot be null or undefined');
     test(name).is.aString('Name must be a string');
     test(name).optional.fulfillAllOf((name) => [
-            () => name.is.aString(),
-            () => name.does.match(/\w+/)
+            name.is.aString(),
+            name.does.match(/\w+/)
         ],
         'Name must have length > 1 and only contain letters'
     );
 
     test(name).fulfillAllOf((name) => [
-        () => name.is.aString(),
-        () => name.is.aNumber('must be a number'),
-        () => name.is.in(['John', 'Michael'])
+        name.is.aString(),
+        name.is.aNumber('must be a number'),
+        name.is.in(['John', 'Michael'])
     ], 'The name must be a string and one of "John" or "Michael"');
 
     let numbers = [1, 2, 3, 4, 5, 6, 7, 8];
@@ -25,8 +25,8 @@ try {
 
 
     test(numbers).optional.each((number) => number.fulfillAllOf((number) => [
-        () => number.is.aNumber('The element must be a number but was "${VALUE}"'),
-        () => number.is.inRange(1, 10, 'The element must be in the range [1, 10] but was "${VALUE}"'),
+        number.is.aNumber('The element must be a number but was "${VALUE}"'),
+        number.is.inRange(1, 10, 'The element must be in the range [1, 10] but was "${VALUE}"'),
     ]));
 
 */
@@ -37,13 +37,13 @@ try {
     for (let i = 0; i < 100000; i++) {
 
     test(person, 'person').fulfillAllOf((person) => [
-        () => person.is.anObject('person must be an object'),
-        () => person.prop('name').fulfillAllOf((name) => [
-            () => name.is.aString('"${PATH}" must be a string'),
-            () => name.does.match(/\w+/, '"${PATH}" must only contain [a-Z_0-9]'),
-            () => name.is.equalTo('ding', "${PATH} must be 'ding'")
+        person.is.anObject('person must be an object'),
+        person.prop('name').fulfillAllOf((name) => [
+            name.is.aString('"${PATH}" must be a string'),
+            name.does.match(/\w+/, '"${PATH}" must only contain [a-Z_0-9]'),
+            name.is.equalTo('ding', "${PATH} must be 'ding'")
         ]),
-        () => person.prop("age").optional.is.aNumber('"${PATH}" must be a number')
+        person.prop("age").optional.is.aNumber('"${PATH}" must be a number')
     ]);
     }
     console.timeEnd("t")
@@ -53,9 +53,9 @@ try {
 
     /*let person = { name: "Eric", age: 49 };
     test(person).fulfillAllOf((person) => [
-        () => person.is.anObject('person must be an object'),
-        () => person.conditionally((person) => person.value.name === 'Eric').fulfill(
-            () => person.prop('age').is.greaterThan(50, 'Age must be greater that 50 for persons named Eric')
+        person.is.anObject('person must be an object'),
+        person.conditionally((person) => person.value.name === 'Eric').fulfill(
+            person.prop('age').is.greaterThan(50, 'Age must be greater that 50 for persons named Eric')
         )
     ]);
     console.log(test.result.getAllErrors());*/
@@ -72,30 +72,30 @@ let test = Validator.createOnErrorThrowValidator('Person validation error');
 
 
 /*test(person).fulfillAllOf((person) => [
-    () => person.is.anObject('person must be an object'),
-    () => person.prop('name').fulfillAllOf((name) => [
-        () => name.is.aString('${PATH} must be a string'),
-        () => name.transform((name) => name.trim()).isNot.empty('${PATH} cannot be empty')
+    person.is.anObject('person must be an object'),
+    person.prop('name').fulfillAllOf((name) => [
+        name.is.aString('${PATH} must be a string'),
+        name.transform((name) => name.trim()).isNot.empty('${PATH} cannot be empty')
     ]),
-    () => person.prop('age').is.aNumber('${PATH} must be a number'),
-    () => person.prop('ssn').optional.fulfillAllOf((ssn) => [
-        () => ssn.is.aString('${PATH} must be a string or undefined'),
-        () => ssn.does.match(/^\d{6}-?\d{4}$/, '${PATH} must match xxxxxx-xxxx')
+    person.prop('age').is.aNumber('${PATH} must be a number'),
+    person.prop('ssn').optional.fulfillAllOf((ssn) => [
+        ssn.is.aString('${PATH} must be a string or undefined'),
+        ssn.does.match(/^\d{6}-?\d{4}$/, '${PATH} must match xxxxxx-xxxx')
     ])
 ]);*/
 
 
 //problemet er måske at vi i conditionally laver en noopValidationResult object??
 test(person).fulfillAllOf(person => [
-    () => person.conditionally(person => person.is.equalTo(person.value)).prop('name').fulfillAllOf(name => [
-        () => name.is.aNumber("name must be a int"),
+    person.conditionally(person => person.is.equalTo(person.value)).prop('name').fulfillAllOf(name => [
+        name.is.aNumber("name must be a int"),
     ])
 ]);
 
 test(person).fulfillAllOf(person => [
-    () => person.conditionally(() => true).prop('name').fulfillAllOf(name => [
-        () => name.is.aString("name must be a sintr"),
-        () => name.is.aNumber('Name must be a number')
+    person.conditionally(() => true).prop('name').fulfillAllOf(name => [
+        name.is.aString("name must be a sintr"),
+        name.is.aNumber('Name must be a number')
     ])
 ]);
 

@@ -14,8 +14,8 @@ const { Validator } = require('@chcaa/validator');
 let test = Validator.createOnErrorThrowValidator();
 let name = "Peter";
 test(name).fulfillAllOf(name => [
-    () => name.is.aString('"name" must be a string'),
-    () => name.is.equalTo('Peter', '"name" must be "Peter"')
+    name.is.aString('"name" must be a string'),
+    name.is.equalTo('Peter', '"name" must be "Peter"')
 ]);
 ```
 See also the JsDoc for each method for further examples.
@@ -41,12 +41,12 @@ the error messages separated in the `ValidationResult` we supply an `errorPrefix
 function validateUserForm(username, age) {
     let test = Validator.createOnErrorBreakValidator();
     test(username, 'username').fulfillAllOf(username => [
-        () => username.is.aString('Username must be a string'),
-        () => username.does.match(/\w{4, 25}/, "Username must only contain a-zA-Z0-9_ and have a length of 4-25 characters")
+        username.is.aString('Username must be a string'),
+        username.does.match(/\w{4, 25}/, "Username must only contain a-zA-Z0-9_ and have a length of 4-25 characters")
     ]);
     test(age, 'age').fulfillAllOf(age => [
-        () => age.is.anInteger('Age must be an integer'),
-        () => age.is.inRange(0, 120, 'Age must be in range 0 - 120')
+        age.is.anInteger('Age must be an integer'),
+        age.is.inRange(0, 120, 'Age must be in range 0 - 120')
     ]);
     // show the errors to the user
     if (!test.result.isValid()) {
@@ -68,12 +68,12 @@ function validateUserForm(user) {
     let test = Validator.createOnErrorBreakValidator();
     test(user).fulfillAllOf(user => [
         user.prop('username').fulfillAllOf(username => [
-            () => username.is.aString('Username must be a string'),
-            () => username.does.match(/\w{4, 25}/, "Username must only contain a-zA-Z0-9_ and have a length of 4-25 characters")
+            username.is.aString('Username must be a string'),
+            username.does.match(/\w{4, 25}/, "Username must only contain a-zA-Z0-9_ and have a length of 4-25 characters")
         ]),
         user.prop('age').fulfillAllOf(age => [
-            () => age.is.anInteger('Age must be an integer'),
-            () => age.is.inRange(0, 120, 'Age must be in range 0 - 120')
+            age.is.anInteger('Age must be an integer'),
+            age.is.inRange(0, 120, 'Age must be in range 0 - 120')
         ])
     ]);
     // show the errors to the user
@@ -156,7 +156,7 @@ test(person.name, 'name').fulfillAllOf(name => [
 - `isNot:ValidatorContext`
 - `optional:Validator` - only validate the following predicates if the current value i not `nil`
 - `value:*` - returns the actual value for this context
-- `conditionally(predicate(validator)):Validator` - only validate the following predicates if predicate is fulfilled
+- `conditionally(predicate(validator)):Validator` - only validate the following predicates if the predicate is fulfilled
 - `each(predicate, [errorMessage, [messageArgs]]):boolean` - validate each element in the `iterable` against the predicate
 - `transform(tranformer):Validator` - transform the current value into something else, e.g. making a `string` lowercase
 - `prop(path):Validator` - get a `Validator` for the `path` relative to the current context value (typically an object)
@@ -166,7 +166,7 @@ test(person.name, 'name').fulfillAllOf(name => [
 
 ## ValidatorContext Overview
 All methods take an optional `errorMessage` and `messageArgs` as the last two arguments and all methods
-returns a boolean.
+returns a `boolean`.
 
 - `anArray()`
 - `aBoolean()`

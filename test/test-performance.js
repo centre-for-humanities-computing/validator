@@ -39,12 +39,12 @@ function testJoi() {
     });
 
 
-    console.time('t');
+    console.time('joi\t\t');
     for (let i = 0; i < iterations; i++) {
         let obj = testObjects[i];
         constraints.validate(obj);
     }
-    console.timeEnd('t')
+    console.timeEnd('joi\t\t')
 
 }
 
@@ -71,36 +71,36 @@ function testFastest() {
 
     let check = v.compile(constraints);
 
-    console.time('t')
+    console.time('fastest\t\t')
     for (let i = 0; i < iterations; i++) {
         let obj = testObjects[i];
         let res = check(obj);
     }
-    console.timeEnd('t')
+    console.timeEnd('fastest\t\t')
 }
 
 function testSelf() {
     let test = Validator.createOnErrorNextPathValidator();
 
-    console.time('t')
+    console.time('self\t\t')
 
     for (let i = 0; i < iterations; i++) {
         let obj = testObjects[i];
         test(obj).fulfillAllOf(obj => [
-            () => obj.prop('name').fulfillAllOf(name => [
-                () => name.is.aString('${PATH} must be a string'),
-                () => name.prop('length').is.inRange(4, 25, '${PATH} must be >= 4 and <= 25')
+            obj.prop('name').fulfillAllOf(name => [
+                name.is.aString('${PATH} must be a string'),
+                name.prop('length').is.inRange(4, 25, '${PATH} must be >= 4 and <= 25, but was ${VALUE}')
             ]),
-            () => obj.prop('email').is.aString('${PATH} must be a string'),
-            () => obj.prop('firstName').is.aString('${PATH} must be a string'),
-            () => obj.prop('phone').is.aString('${PATH} must be a string'),
-            () => obj.prop('age').fulfillAllOf(age => [
-                () => age.is.anInteger('${PATH} must be an integer'),
-                () => age.is.greaterThanOrEqualTo(18, '${PATH} must be >= 18')
+            obj.prop('email').is.aString('${PATH} must be a string'),
+            obj.prop('firstName').is.aString('${PATH} must be a string'),
+            obj.prop('phone').is.aString('${PATH} must be a string'),
+            obj.prop('age').fulfillAllOf(age => [
+                age.is.anInteger('${PATH} must be an integer'),
+                age.is.greaterThanOrEqualTo(18, '${PATH} must be >= 18, but was ${VALUE}')
             ])
         ])
     }
-    console.timeEnd('t')
+    console.timeEnd('self\t\t')
     console.log(test.result.getAllErrors())
 }
 

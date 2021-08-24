@@ -61,13 +61,20 @@ class Validator {
     #validatorState;
     #validatorSharedState;
     #rootValidatorContext;
-    #contextShortCircuit = { fulfilled: false };
+    #contextShortCircuit = { fulfilled: false, sticky: undefined };
+    #callbackContext;
 
     constructor(name, privateConstructorKey) {
         if (privateConstructorKey !== PRIVATE_CONSTRUCTOR_KEY) {
             throw new Error('Use Validator.create*() to create a new validation context');
         }
         this.#name = name;
+
+        this.#callbackContext = {
+            validatorContextDone: this.#validatorContextDone,
+            enableShortCircuitStickyOn: this.#enableShortCircuitStickyOn,
+            disableShortCircuitSticky: this.#disableShortCircuitSticky
+        };
     }
 
     /**
@@ -90,7 +97,7 @@ class Validator {
 
     #reset(validatorContext) {
         if (!validatorContext) {
-            throw Error('Internal Validator error, validatorContext must be passed to #reset()');
+            throw new Error('Internal Validator error, validatorContext must be passed to #reset()');
         }
 
         this.#contextShortCircuit.fulfilled = false;
@@ -105,6 +112,9 @@ class Validator {
             this.#validatorState = undefined;
             this.#validatorSharedState = undefined;
             this.#rootValidatorContext = undefined;
+            if (this.#contextShortCircuit.sticky) {
+                throw new Error('Internal Validator error, #contextShortCircuit.sticky should have been disabled')
+            }
             Validator.#validatorPool.return(this);
         }
 
@@ -152,7 +162,7 @@ class Validator {
             validatorContext = Validator.#shortCircuitFulfilledValidatorContext;
         } else {
             validatorContext = Validator.#contextPool.get();
-            validatorContext._init(this, this.#validatorState, notContext, this.#validatorContextDone);
+            validatorContext._init(this, this.#validatorState, notContext, this.#callbackContext);
         }
         // we need this to know when we can return the validator to the pool, see #reset
         if (!this.#rootValidatorContext) {
@@ -186,7 +196,8 @@ class Validator {
                 }
             }
         }
-        return this.#contextShortCircuit.fulfilled || shortCircuitDueToAction;
+
+        return this.#contextShortCircuit.fulfilled || this.#contextShortCircuit?.sticky?.fulfilled || shortCircuitDueToAction;
     }
 
     #noopContext() {
@@ -200,8 +211,25 @@ class Validator {
             this.#validatorState.validationResult._addFailedPath(this.#errorContextValuePath, errorMessage);
             this.#validatorSharedState.failedPaths.push(this.#errorContextValuePath);
         }
+        if (this.#contextShortCircuit.sticky && !this.#contextShortCircuit.sticky.fulfilled && this.#contextShortCircuit.sticky.fulfillValue === success) {
+            this.#contextShortCircuit.sticky.fulfilled = true;
+        }
 
         this.#reset(validatorContext);
+    }
+
+    #enableShortCircuitStickyOn = (successValue) => {
+        if (this.#contextShortCircuit.sticky) {
+            throw new Error('Internal Validator error, this.#contextShortCircuit.sticky is already set');
+        }
+        this.#contextShortCircuit.sticky = {
+            fulfillValue: successValue,
+            fulfilled: false
+        };
+    }
+
+    #disableShortCircuitSticky = () => {
+        this.#contextShortCircuit.sticky = undefined;
     }
 
     /**
@@ -262,13 +290,13 @@ class Validator {
      * let person = null;
      * // the below tests will only be performed is person i defined
      * test(person).optional.fulfillAllOf((person) => [
-     *      () => person.is.anObject('person must be an object'),
-     *      () => person.prop("name").fulfillAllOf((name) => [
-     *          () => name.is.aString('"${PATH}" must be a string'),
-     *          () => name.does.match(/\w+/, '"${PATH}" must only contain [a-Z_0-9]')
+     *      person.is.anObject('person must be an object'),
+     *      person.prop("name").fulfillAllOf((name) => [
+     *          name.is.aString('"${PATH}" must be a string'),
+     *          name.does.match(/\w+/, '"${PATH}" must only contain [a-Z_0-9]')
      *      ]),
      *      // will only be tested if person is defined and person.age is defined
-     *      () => test(person).optional.prop("age").optional.is.aNumber('"${PATH}" must be a number')
+     *      test(person).optional.prop("age").optional.is.aNumber('"${PATH}" must be a number')
      * ]);
      *
      * @returns {Validator} this instance set to optional mode
@@ -288,9 +316,9 @@ class Validator {
      * @example
      * let person = { name: "John", age: 54 };
      * test(person).fulfillAllOf((person) => [
-     *      () => person.is.anObject('person must be an object'),
-     *      () => person.conditionally((person) => person.prop('name').is.equalTo('Eric')).fulfill(
-     *          () => person.prop('age').is.greaterThan(50, 'Age must be greater that 50 for persons named Eric')
+     *      person.is.anObject('person must be an object'),
+     *      person.conditionally((person) => person.prop('name').is.equalTo('Eric')).fulfill(
+     *          person.prop('age').is.greaterThan(50, 'Age must be greater that 50 for persons named Eric')
      *      )
      * ]);
      *
@@ -327,8 +355,8 @@ class Validator {
      *      'The number cannot 10 and must be greater than 7');
      * // for more fine grained error message add the error message to the individual test
      * test(numbers).each((number) => number.fulfillAllOf((number) => [
-     *      () => number.is.aNumber('The element must be a number but was "${VALUE}"'),
-     *      () => number.is.inRange(1, 10, 'The element must be in the range [1, 10] was "${VALUE}"'),
+     *      number.is.aNumber('The element must be a number but was "${VALUE}"'),
+     *      number.is.inRange(1, 10, 'The element must be in the range [1, 10] was "${VALUE}"'),
      * ]));
      *
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
@@ -379,10 +407,10 @@ class Validator {
      * let person = { name: "John" }
      * let test = Validator.create('Person validation error:');
      * test(person).fulfillAllOf((person) => [
-     *      () => person.is.anObject(),
-     *      () => person.prop('name').fulfillAllOf((name) => [
-     *          () => name.is.aString(),
-     *          () => name.isNot.empty()
+     *      person.is.anObject(),
+     *      person.prop('name').fulfillAllOf((name) => [
+     *          name.is.aString(),
+     *          name.isNot.empty()
      *      ])
      * ], 'person must be an object and must have the property "name" which cannot be empty');
      * @param {string} path the path of the property to make a validator for
@@ -418,8 +446,8 @@ class Validator {
      * let test = Validator.create();
      * let name = "John";
      * test(name).fulfillAllOf((name) => [
-     *      () => name.is.aString(),
-     *      () => name.transform((name) => name.trim()).isNot.empty()
+     *      name.is.aString(),
+     *      name.transform((name) => name.trim()).isNot.empty()
      * ], 'Name must be a string and name cannot be empty');
      *
      * @param {function(*):Validator} transformer a function for transforming the current value into a new value which should be tested
@@ -452,7 +480,7 @@ class Validator {
 
     /**
      * Alias for [does.fulfillOneOf]{@link ValidatorContext.fulfillOneOf}
-     * @param {function(Validator)[]|function(Validator):function(Validator)[]} predicates
+     * @param {function(Validator)[]|function(Validator):(function(Validator)|boolean)[]} predicates
      * @param {string} [errorMessage]
      * @param {string|string[]} [messageArgs]
      * @returns {boolean}
@@ -463,7 +491,7 @@ class Validator {
 
     /**
      * Alias for [does.fulfillAllOf]{@link ValidatorContext.fulfillAllOf}
-     * @param {function(Validator)[]|function(Validator):function(Validator)[]} predicates
+     * @param {function(Validator)[]|function(Validator):(function(Validator)|boolean)[]} predicates
      * @param {string} [errorMessage]
      * @param {string|string[]} [messageArgs]
      * @returns {boolean}
@@ -515,8 +543,8 @@ class Validator {
      * test(name).isNot.nil('Name cannot be null or undefined');
      * test(name).is.aString('Name must be a string');
      * test(name).fulfillAllOf((name) => [
-     *      () => name.value.length > 1,
-     *      () => name.does.match(/\w+/)
+     *      name.value.length > 1,
+     *      name.does.match(/\w+/)
      * ], 'Name must have length > 1 and only contain letters');
      *
      * // when testing individual values (or objects) an errorPathPrefix can be passed in a second argument to the the test-function.
@@ -532,10 +560,10 @@ class Validator {
      * // validate properties of an object
      * test(person).prop("age").is.aNumber('${PATH} must be an string');
      * test(person).fulfillAllOf((person) => [
-     *      () => person.is.anObject('person must be an object'),
-     *      () => person.prop("name").fulfillAllOf((name) => [
-     *          () => name.is.aString('"${PATH}" must be a string'),
-     *          () => name.does.match(/\w+/, '"${PATH}" must only contain [a-Z_0-9]')
+     *      person.is.anObject('person must be an object'),
+     *      person.prop("name").fulfillAllOf((name) => [
+     *          name.is.aString('"${PATH}" must be a string'),
+     *          name.does.match(/\w+/, '"${PATH}" must only contain [a-Z_0-9]')
      *      ]),
      *      person.prop("age").optional.is.aNumber('"${PATH}" must be a number')
      * ]);

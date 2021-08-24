@@ -21,7 +21,7 @@ class ValidatorContext {
     #validator;
     #validatorState;
     #notContext;
-    #contextDoneCb;
+    #validatorCallbackContext;
 
     constructor(name) {
         this.#name = name;
@@ -31,14 +31,14 @@ class ValidatorContext {
      * @param {Validator} validator
      * @param {ValidatorInternalState} validatorState
      * @param {boolean} notContext
-     * @param {function} contextDoneCb
+     * @param {object} validatorCallbackContext
      * @private
      */
-    _init(validator, validatorState, notContext, contextDoneCb) {
+    _init(validator, validatorState, notContext, validatorCallbackContext) {
         this.#validator = validator;
         this.#validatorState = validatorState;
         this.#notContext = notContext;
-        this.#contextDoneCb = contextDoneCb;
+        this.#validatorCallbackContext = validatorCallbackContext;
     }
 
     /**
@@ -48,7 +48,7 @@ class ValidatorContext {
         this.#validator = undefined;
         this.#validatorState = undefined;
         this.#notContext = undefined;
-        this.#contextDoneCb = undefined;
+        this.#validatorCallbackContext = undefined;
     }
 
     get #contextValue() {
@@ -298,6 +298,7 @@ class ValidatorContext {
     }
 
     /**
+     *
      * @example
      * let test = Validator.create('Validation error:');
      * let name = "John";
@@ -318,7 +319,11 @@ class ValidatorContext {
      * // throw an error or break depending on the mode of the validator and the remaining predicates would not be tested,
      * // which they should in fulfillOnOf
      *
-     * @param {function(Validator)[]|function(Validator):function(Validator)[]} predicates  an array of, or a function returning an array
+     * // OBS OBS for short circuit on a false predicate to work as expected (no more predicates are tested after a predicate resolves to true)
+     * // each predicate should either be a function or the result of a call to a method of a ValidatorContext. If custom
+     * // validation logic is required enclose it in a ValidatorContext.fulfill() predicate
+     *
+     * @param {function(Validator)[]|function(Validator):(function(Validator)|boolean)[]} predicates  an array of predicate functions, or a function returning an array of predicate functions or predicate results
      * of, predicate functions returning a boolean.
      * Use the passed in validator to add further predicates for the current value
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
@@ -327,6 +332,7 @@ class ValidatorContext {
      * @see {@link #fulfill}, {@link #fulfillAllOf}
      */
     fulfillOneOf(predicates, errorMessage, messageArgs) {
+        this.#validatorCallbackContext.enableShortCircuitStickyOn(true);
         if (_.isFunction(predicates)) {
             predicates = predicates(this.#validator);
         }
@@ -335,17 +341,17 @@ class ValidatorContext {
         }
         let success = false;
         for (let predicate of predicates) {
-            // we need it to be a function so they are called in the order of the array so we can short circuit when fulfilled.
-            // If we accepted resolved predicates (booleans) resolved before entering this method it would
-            // make it behave differently than expected of an OR-like predicate which should end as soon a one predicate is true
-            if (!_.isFunction(predicate)) {
-                this.#throwArgumentError(`The elements of the array "predicates" must be all be functions`);
+            if (_.isFunction(predicate)) {
+                success = predicate(this.#validator);
+            } else {
+                success = !!predicate;
             }
-            success = predicate(this.#validator);
+
             if (success) {
                 break;
             }
         }
+        this.#validatorCallbackContext.disableShortCircuitSticky();
         return this.#handleError(success, errorMessage, messageArgs);
     }
 
@@ -369,7 +375,11 @@ class ValidatorContext {
      * // OBS we can add a general error message which relates to all tests in the array. If so it is important not
      * // to pass in an error message to the inner predicates because they would then throw an error or break depending on the mode of the validator
      *
-     * @param {function(Validator)[]|function(Validator):function(Validator)[]} predicates an array of, or a function returning an array
+     * OBS OBS for short circuit on a false predicate to work as expected (no more predicates are tested after a predicate resolves to true)
+     * // each predicate should either be a function or the result of a call to a method of a ValidatorContext. If custom
+     * // validation logic is required enclose it in a ValidatorContext.fulfill() predicate
+     *
+     * @param {function(Validator)[]|function(Validator):(function(Validator)|boolean)[]} predicates an array of, or a function returning an array
      * of, predicate functions returning a boolean.
      * Use the passed in validator to add further predicates for the current value
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
@@ -378,6 +388,7 @@ class ValidatorContext {
      * @see {@link #fulfill}, {@link #fulfillOneOf}
      */
     fulfillAllOf(predicates, errorMessage, messageArgs) {
+        this.#validatorCallbackContext.enableShortCircuitStickyOn(false);
         if (_.isFunction(predicates)) {
             predicates = predicates(this.#validator);
         }
@@ -386,18 +397,17 @@ class ValidatorContext {
         }
         let success = true;
         for (let predicate of predicates) {
-            // we need it to be a function so they are called in the order of the array so we can short circuit when not fulfilled
-            // If we accepted resolved predicates (booleans) resolved before entering this method it would
-            // make it behave differently than expected of an AND-like predicate which should end as soon a one predicate is false
-            if (!_.isFunction(predicate)) {
-                this.#throwArgumentError(`The elements of the array "predicates" must all be functions`);
+            if (_.isFunction(predicate)) {
+                success = predicate(this.#validator);
+            } else {
+                success = !!predicate;
             }
-            success = predicate(this.#validator);
-            // on mode = ON_ERROR_NEXT_PATH we need to let the validator handle it so it can collect errors for all paths
+            // on mode = ON_ERROR_NEXT_PATH we need to let the validator handle it so it can collect errors for all paths (not required in fulfillOneOf as it only needs to fulfill one predicate)
             if (!success && this.#validatorState.mode !== sharedConstants.mode.ON_ERROR_NEXT_PATH) {
                 break;
             }
         }
+        this.#validatorCallbackContext.disableShortCircuitSticky();
         return this.#handleError(success, errorMessage, messageArgs);
     }
 
@@ -452,7 +462,7 @@ class ValidatorContext {
             }
         } finally {
             // should be the last thing we do
-            this.#contextDoneCb(this, success, fullMessage);
+            this.#validatorCallbackContext.validatorContextDone(this, success, fullMessage);
         }
         return !!success; // make sure it's a boolean
     }
