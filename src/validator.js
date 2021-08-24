@@ -61,7 +61,7 @@ class Validator {
     #validatorState;
     #validatorSharedState;
     #rootValidatorContext;
-    #contextShortCircuit = { fulfilled: false, sticky: undefined };
+    #contextShortCircuit = { fulfilled: false, sticky: [] };
     #callbackContext;
 
     constructor(name, privateConstructorKey) {
@@ -112,7 +112,7 @@ class Validator {
             this.#validatorState = undefined;
             this.#validatorSharedState = undefined;
             this.#rootValidatorContext = undefined;
-            if (this.#contextShortCircuit.sticky) {
+            if (this.#contextShortCircuit.sticky.length > 0) {
                 throw new Error('Internal Validator error, #contextShortCircuit.sticky should have been disabled')
             }
             Validator.#validatorPool.return(this);
@@ -197,7 +197,9 @@ class Validator {
             }
         }
 
-        return this.#contextShortCircuit.fulfilled || this.#contextShortCircuit.sticky?.[this.#contextShortCircuit.sticky.length - 1].fulfilled || shortCircuitDueToAction;
+        let stickyFulfilled = (this.#contextShortCircuit.sticky.length > 0 && this.#contextShortCircuit.sticky[this.#contextShortCircuit.sticky.length - 1].fulfilled);
+
+        return this.#contextShortCircuit.fulfilled || stickyFulfilled || shortCircuitDueToAction;
     }
 
     #noopContext() {
@@ -211,7 +213,7 @@ class Validator {
             this.#validatorState.validationResult._addFailedPath(this.#errorContextValuePath, errorMessage);
             this.#validatorSharedState.failedPaths.push(this.#errorContextValuePath);
         }
-        if (this.#contextShortCircuit.sticky) {
+        if (this.#contextShortCircuit.sticky.length > 0) {
             let stickyContext = this.#contextShortCircuit.sticky[this.#contextShortCircuit.sticky.length - 1];
             if (!stickyContext.fulfilled && stickyContext.fulfillValue === success) {
                 stickyContext.fulfilled = true;
@@ -222,9 +224,6 @@ class Validator {
     }
 
     #enableShortCircuitStickyOn = (successValue) => {
-        if (!this.#contextShortCircuit.sticky) {
-            this.#contextShortCircuit.sticky = [];
-        }
         /*
         * We allow re-entrant shortCircuitSticky calls e.g.
         * test(name).fulfillAllOf((name) => [
@@ -243,9 +242,6 @@ class Validator {
 
     #disableShortCircuitSticky = () => {
         this.#contextShortCircuit.sticky.pop();
-        if (this.#contextShortCircuit.sticky.length === 0) {
-            this.#contextShortCircuit.sticky = undefined;
-        }
     }
 
     /**

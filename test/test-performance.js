@@ -98,7 +98,7 @@ function testSelf() {
                 age.is.anInteger('${PATH} must be an integer'),
                 age.is.greaterThanOrEqualTo(18, '${PATH} must be >= 18, but was ${VALUE}')
             ])
-        ])
+        ]);
     }
     console.timeEnd('self\t\t')
     console.log(test.result.getAllErrors())
