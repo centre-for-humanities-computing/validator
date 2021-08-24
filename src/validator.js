@@ -197,7 +197,7 @@ class Validator {
             }
         }
 
-        return this.#contextShortCircuit.fulfilled || this.#contextShortCircuit?.sticky?.fulfilled || shortCircuitDueToAction;
+        return this.#contextShortCircuit.fulfilled || this.#contextShortCircuit.sticky?.[this.#contextShortCircuit.sticky.length - 1].fulfilled || shortCircuitDueToAction;
     }
 
     #noopContext() {
@@ -211,25 +211,41 @@ class Validator {
             this.#validatorState.validationResult._addFailedPath(this.#errorContextValuePath, errorMessage);
             this.#validatorSharedState.failedPaths.push(this.#errorContextValuePath);
         }
-        if (this.#contextShortCircuit.sticky && !this.#contextShortCircuit.sticky.fulfilled && this.#contextShortCircuit.sticky.fulfillValue === success) {
-            this.#contextShortCircuit.sticky.fulfilled = true;
+        if (this.#contextShortCircuit.sticky) {
+            let stickyContext = this.#contextShortCircuit.sticky[this.#contextShortCircuit.sticky.length - 1];
+            if (!stickyContext.fulfilled && stickyContext.fulfillValue === success) {
+                stickyContext.fulfilled = true;
+            }
         }
 
         this.#reset(validatorContext);
     }
 
     #enableShortCircuitStickyOn = (successValue) => {
-        if (this.#contextShortCircuit.sticky) {
-            throw new Error('Internal Validator error, this.#contextShortCircuit.sticky is already set');
+        if (!this.#contextShortCircuit.sticky) {
+            this.#contextShortCircuit.sticky = [];
         }
-        this.#contextShortCircuit.sticky = {
+        /*
+        * We allow re-entrant shortCircuitSticky calls e.g.
+        * test(name).fulfillAllOf((name) => [
+        *     name.is.aString(),
+        *     name.fulfillAllOf(name => [
+        *        ...,
+        *        ...
+        *     ])
+        * ]);
+        * */
+        this.#contextShortCircuit.sticky.push({
             fulfillValue: successValue,
             fulfilled: false
-        };
+        });
     }
 
     #disableShortCircuitSticky = () => {
-        this.#contextShortCircuit.sticky = undefined;
+        this.#contextShortCircuit.sticky.pop();
+        if (this.#contextShortCircuit.sticky.length === 0) {
+            this.#contextShortCircuit.sticky = undefined;
+        }
     }
 
     /**

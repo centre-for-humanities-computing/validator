@@ -85,6 +85,13 @@ let test = Validator.createOnErrorThrowValidator('Person validation error');
 ]);*/
 
 
+test(person).fulfillAllOf(person => [
+    person.is.anObject(),
+    person.fulfillAllOf(person => [
+        person.is.anObject(),
+    ])
+], "bang")
+
 //problemet er måske at vi i conditionally laver en noopValidationResult object??
 test(person).fulfillAllOf(person => [
     person.conditionally(person => person.is.equalTo(person.value)).prop('name').fulfillAllOf(name => [
