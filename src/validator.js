@@ -647,7 +647,7 @@ class Validator {
 
         /**
          * The test function
-         * @param {*} value the value to test
+         * @param {*} [value] the value to test
          * @param {string} [errorBasePath=""] prefix path for the error message placeholder "${PATH}" and error messages in {@link ValidationResult}
          * @returns {Validator}
          */
