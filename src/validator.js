@@ -599,7 +599,7 @@ class Validator {
      * let isValid = test.result.isValid() // was all test valid. This does purely rely on if all tests passed and not if an error message was supplied or not
      * // see the ValidationResult documentation for all possibilities
      *
-     * @param {string} errorPrefix a prefix to prepend to every error thrown by this validator
+     * @param {string} errorPrefix a prefix to prepend to every error created by this validator
      * @param {string} mode the [mode]{@link Validator.mode} for this validator
      * @see {@link ValidationResult}
      * @see {@link Validator.createOnErrorThrowValidator}
@@ -641,6 +641,16 @@ class Validator {
     }
 
     // TODO dokumenter lige så meget som create()
+    /**
+     *
+     * @param {string} errorPrefix a prefix to prepend to every error created by this validator
+     * @param {string} mode the [mode]{@link Validator.mode} for this validator
+     * @return {RuleSet}
+     * @see {@link ValidationResult}
+     * @see {@link Validator.createOnErrorThrowRuleSet}
+     * @see {@link Validator.createOnErrorBreakRuleSet}
+     * @see {@link Validator.createOnErrorNextPathRuleSet}
+     */
     static createRuleSet(errorPrefix = '', mode = Validator.mode.ON_ERROR_THROW) {
         return new RuleSet(errorPrefix, mode, Validator.create);
     }

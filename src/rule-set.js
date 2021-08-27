@@ -2,8 +2,10 @@ const _ = require("lodash");
 const { Validator } = require('./validator');
 const { ValidationResult } = require('./validation-result');
 
-// TODO dokumenter
 
+/**
+ * Create a set of reusable rules associated with one or more paths.
+ */
 class RuleSet {
 
     #errorPrefix;
@@ -37,10 +39,27 @@ class RuleSet {
         return this;
     }
 
+    /**
+     * @param object the object to validate
+     * @param {string|string[]|undefined} [path] the path(s) to validate. If path is undefined all rules will be validated against the object
+     * @return {boolean}
+     * @see {@link #isValidValue}
+     * @see {@link #validate}
+     * @see {@link #validateValue}
+     */
     isValid(object, path) {
         return this.validate(object, path).isValid();
     }
 
+    /**
+     *
+     * @param value the value to validate
+     * @param {string|string[]|undefined} [path] the path(s) to validate. If path is undefined all rules will be validated against the value
+     * @return {boolean}
+     * @see {@link #isValidObject}
+     * @see {@link #validate}
+     * @see {@link #validateValue}
+     */
     isValidValue(value, path) {
         return this.validateValue(value, path).isValid();
     }
@@ -48,10 +67,13 @@ class RuleSet {
     /**
      *
      * @param object
-     * @param {string|string[]|undefined} [path] the path(s) to validate. If path is undefined all rules will be validated against the object.
+     * @param {string|string[]|undefined} [path] the path(s) to validate. If path is undefined all rules will be validated against the object
      * @param {boolean} isObject should be <code>true</code> if the object should be considered an object with "paths" to validate
      * and <code>false</code> if the object is to be considered a single value to validate
      * @returns {ValidationResult}
+     * @see {@link #validateValue}
+     * @see {@link #idValidValue}
+     * @see {@link #isValidObject}
      */
     validate(object, path = undefined, isObject = true) {
         let rules;
