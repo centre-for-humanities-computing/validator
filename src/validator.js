@@ -4,6 +4,7 @@ const { ValidatorContext } = require('./validator-context');
 const { ValidationResult } = require('./validation-result');
 const { ValidatorInternalState } = require('./validator-internal-state');
 const { ValidationError } = require('./validation-error');
+const { RuleSet } = require('./rule-set');
 const sharedConstants = require('./shared-constants');
 const utils = require('./utils');
 
@@ -621,7 +622,7 @@ class Validator {
 
     /**
      * Creates a validator which aborts the remaining tests if a test fails
-     * @param {string} errorPrefix a prefix to prepend to every error thrown by this validator
+     * @param {string} errorPrefix a prefix to prepend to every error created by this validator
      * @see {@link Validator.create} for examples of usage
      * @see {@link Validator.mode}
      */
@@ -631,12 +632,50 @@ class Validator {
 
     /**
      * Creates a validator which continuous to test the next path if a test fails
-     * @param {string} errorPrefix a prefix to prepend to every error thrown by this validator
+     * @param {string} errorPrefix a prefix to prepend to every created thrown by this validator
      * @see {@link Validator.create} for examples of usage
      * @see {@link Validator.mode}
      */
     static createOnErrorNextPathValidator(errorPrefix = '') {
         return Validator.#testFunction(errorPrefix, Validator.mode.ON_ERROR_NEXT_PATH);
+    }
+
+    // TODO dokumenter lige så meget som create()
+    static createRuleSet(errorPrefix = '', mode = Validator.mode.ON_ERROR_THROW) {
+        return new RuleSet(errorPrefix, mode, Validator.create);
+    }
+
+    /**
+     * Creates a validator which throws an {@link ValidationError} if a test fails
+     * @param {string} errorPrefix a prefix to prepend to every error thrown by this validator
+     * @return {RuleSet}
+     * @see {@link Validator.createRuleSet} for examples of usage
+     * @see {@link Validator.mode}
+     */
+    static createOnErrorThrowRuleSet(errorPrefix = '') {
+        return Validator.createRuleSet(errorPrefix, Validator.mode.ON_ERROR_THROW);
+    }
+
+    /**
+     * Creates a rule-set which aborts the remaining tests if a test fails
+     * @param {string} errorPrefix a prefix to prepend to every error created by this validator
+     * @return {RuleSet}
+     * @see {@link Validator.createRuleSet} for examples of usage
+     * @see {@link Validator.mode}
+     */
+    static createOnErrorBreakRuleSet(errorPrefix = '') {
+        return Validator.createRuleSet(errorPrefix, Validator.mode.ON_ERROR_BREAK);
+    }
+
+    /**
+     * Creates a rule-set which continuous to test the next path if a test fails
+     * @param {string} errorPrefix a prefix to prepend to every error created by this validator
+     * @return {RuleSet}
+     * @see {@link Validator.createRuleSet} for examples of usage
+     * @see {@link Validator.mode}
+     */
+    static createOnErrorNextPathRuleSet(errorPrefix = '') {
+        return Validator.createRuleSet(errorPrefix, Validator.mode.ON_ERROR_NEXT_PATH);
     }
 
     static #testFunction(errorPrefix, mode) {
