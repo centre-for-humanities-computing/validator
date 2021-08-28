@@ -455,7 +455,9 @@ class ValidatorContext {
                     }
                 }
                 if (this.#validatorState.mode === sharedConstants.mode.ON_ERROR_THROW) {
-                    throw new ValidationError(fullMessage, this.#errorContextValuePath);
+                    let error = new ValidationError(fullMessage, this.#errorContextValuePath);
+                    Error.captureStackTrace(error, this.#handleError); // exclude this method from stacktrace
+                    throw error;
                 }
             }
         } finally {

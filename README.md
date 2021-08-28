@@ -86,6 +86,49 @@ function validateUserForm(user) {
 }
 ```
 
+## Reusing Rules
+Rules can be stored and reused using a `RuleSet`. 
+
+For objects a single set of rules for whole object can be applied using `Validator.prop()` to access
+each property, as the examples above, but  it is more performant and sometimes easier to read 
+if rules are divided by each property and added separately.
+
+ 
+```js
+let ruleSet = Validator.createOnErrorBreakRuleSet();
+ruleSet.addRule('username', (username) => username.fulfillAllOf(username => [
+    username.is.aString('Username must be a string'),
+    username.does.match(/\w{4, 25}/, "Username must only contain a-zA-Z0-9_ and have a length of 4-25 characters")
+]));
+ruleSet.addRule('age', (age) => age.fulfillAllOf(age => [
+    age.is.anInteger('Age must be an integer'),
+    age.is.inRange(0, 120, 'Age must be in range 0 - 120')
+]));
+
+// simple test if a user is valid
+if (ruleSet.isValid(user)) {
+    // do something usefull here
+}
+
+// or get detailed validation results
+let validationResult = ruleSet.validate(user);
+console.log(validationResult.getAllErrors()); // all erros
+console.log(validationResult.getError('age')); // first error
+console.log(validationResult.getErrors('age')); // all errors for path
+
+// we can also test individual paths 
+if (ruleSet.isValid(user, 'age')) {
+    // do something
+}
+// or validate and get a result only for a single path
+validationResult = ruleSet.validate(user, 'age');
+
+// values can also be validated directly against paths
+let ageIsValid = ruleSet.isValidValue(23, 'age');
+validationResult = ruleSet.validateValue(23, 'age');
+```
+
+
 ## Error Messages
 Error messages can be supplied for the individual test and as combined messages for `fulfill()`, `fulfillAllOf()`, `fulfillOneOf()` and `each()`.
 
@@ -149,6 +192,18 @@ test(person.name, 'name').fulfillAllOf(name => [
 ]);
 ```
 
+## Validator Factory Methods
+- `Validator.create(erorPrefix, mode):testFunction` - Creates a new validation context with the given mode. 
+  The returned "test" function gives access to the verb context 
+  which return the predicate used for performing the actual tests
+- `Validator.createOnErrorThrowValidator(errorPrefix):testFunction` - Creates a new validation context which throws an `ValidationError` if a test fails
+- `Validator.createOnErrorBreakValidator(errorPrefix):testFunction` - Creates a new validation context which breaks if a test fails
+- `Validator.createOnErrorNextPathValidator(errorPrefix):testFunction` - Creates a new validation context which moves on to the next path if a test fails
+- `Validator.createRuleSet(errorPrefix):RuleSet` - Creates a `RuleSet` with the given mode
+- `Validator.createOnErrorThrowRuleSet(errorPrefix):RuleSet` - Creates a `RuleSet` which throws an `ValidationError` if a test fails
+- `Validator.createOnErrorBreakRuleSet(errorPrefix):RuleSet` - Creates a `RuleSet` which breaks if a test fails
+- `Validator.createOnErrorNextPathRuleSet(errorPrefix):RuleSet` - Creates a `RuleSet` which moves on to the next path if a test fails
+
 ## Validator Overview
 - `does:ValidatorContext`
 - `doesNot:ValidatorContext`
@@ -190,3 +245,16 @@ returns a `boolean`.
 - `lessThanOrEqualTo(value)`
 - `match(regex)`
 - `nil()`
+
+## RuleSet Overview
+- TODO lav denne
+## ValidationResult Overview
+NOTE: If a test for at path do not provide an error message  use 
+`isValid()` and `isPathValid()` to test if the path is valid or not. 
+
+- `getError(path):string` - get the first error for the given path.
+- `getErrors(path):string[]` - get all errors for the given path
+- `getAllErrors():string[]` - get all errors
+- `isValid():boolean` - `true` of there is no errors otherwise `false`
+- `isPAthValid(path):boolean` - is the given path valid
+- `reset()` - resets the validation result. (not relevant in the context of a RuleSet as this always creates a new instance for every test) 

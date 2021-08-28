@@ -82,11 +82,25 @@ function testFastest() {
 function testSelf() {
     let test = Validator.createOnErrorNextPathValidator();
 
+    let ruleSet = Validator.createOnErrorNextPathRuleSet();
+    ruleSet.addRule('name', (name) => name.fulfillAllOf(name => [
+        name.is.aString('${PATH} must be a string'),
+        name.prop('length').is.inRange(4, 25, '${PATH} must be >= 4 and <= 25, but was ${VALUE}')
+    ]));
+    ruleSet.addRule('email', (email) => email.is.aString('${PATH} must be a string'));
+    ruleSet.addRule('firstName', (firstName) => firstName.is.aString('${PATH} must be a string'));
+    ruleSet.addRule('phone', (phone) => phone.is.aString('${PATH} must be a string'));
+    ruleSet.addRule('age', (age) => age.fulfillAllOf(age => [
+        age.is.anInteger('${PATH} must be an integer'),
+        age.is.greaterThanOrEqualTo(18, '${PATH} must be >= 18, but was ${VALUE}')
+    ]));
+
     console.time('self\t\t')
 
     for (let i = 0; i < iterations; i++) {
         let obj = testObjects[i];
-        test(obj).fulfillAllOf(obj => [
+        ruleSet.validate(obj);
+        /*test(obj).fulfillAllOf(obj => [
             obj.prop('name').fulfillAllOf(name => [
                 name.is.aString('${PATH} must be a string'),
                 name.prop('length').is.inRange(4, 25, '${PATH} must be >= 4 and <= 25, but was ${VALUE}')
@@ -98,7 +112,7 @@ function testSelf() {
                 age.is.anInteger('${PATH} must be an integer'),
                 age.is.greaterThanOrEqualTo(18, '${PATH} must be >= 18, but was ${VALUE}')
             ])
-        ]);
+        ]);*/
     }
     console.timeEnd('self\t\t')
     console.log(test.result.getAllErrors())

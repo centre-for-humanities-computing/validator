@@ -641,6 +641,7 @@ class Validator {
     }
 
     // TODO dokumenter lige så meget som create()
+    // og put eks. i README.md
     /**
      *
      * @param {string} errorPrefix a prefix to prepend to every error created by this validator

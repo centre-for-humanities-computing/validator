@@ -4,20 +4,26 @@ class ValidationResult {
     #errors = new Map();
 
     /**
-     * Get the first error for the given path
+     * Get the first error for the given path.
+     * <p>If no error message is provided for the tests use {@link isValid} or {@link isPathValid} instead.</p>
      *
      * @param {string} [path=""] the path to get the error for, the path must be relative to the root object under validation
      * @returns {string|undefined}
+     * @see isValid
+     * @see isPathValid
      */
     getError(path = "") {
         return this.getErrors(path)[0];
     }
 
     /**
-     * Get the all error for the given path
+     * Get the all error for the given path.
+     * <p>If no error message is provided for the tests use {@link isValid} or {@link isPathValid} instead.</p>
      *
      * @param {string} [path=""] the path to get the error for, the path must be relative to the root object under validation
      * @returns {string[]}
+     * @see isValid
+     * @see isPathValid
      */
     getErrors(path = "") {
         let errors = this.#errors.get(path);
@@ -29,9 +35,12 @@ class ValidationResult {
     }
 
     /**
-     * Get all errors for all paths
+     * Get all errors for all paths.
+     * <p>If no error message is provided for the tests use {@link isValid} or {@link isPathValid} instead.</p>
      *
      * @returns {string[]}
+     * @see isValid
+     * @see isPathValid
      */
     getAllErrors() {
         let allErrors = [];
