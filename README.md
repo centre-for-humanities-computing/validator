@@ -12,11 +12,24 @@ Import the module and create a new `Validator` (see examples further down for di
 ```js
 const { Validator } = require('@chcaa/validator');
 let test = Validator.createOnErrorThrowValidator();
-let name = "Peter";
-test(name).fulfillAllOf(name => [
+let person = {
+    name: "Peter"
+};
+test(person.name).fulfillAllOf(name => [
     name.is.aString('"name" must be a string'),
     name.is.equalTo('Peter', '"name" must be "Peter"')
 ]);
+
+// or make a set of reusable rules
+let ruleSet = Validator.createOnErrorNextPathRuleSet();
+ruleSet.addRule('name', (name) => name.fulfillAllOf(name => [
+  name.is.aString('"name" must be a string'),
+  name.is.equalTo('Peter', '"name" must be "Peter"')
+]));
+
+let validationResult = ruleSet.validate(person);
+console.log(validationResult.getAllErrors());
+
 ```
 See also the JsDoc for each method for further examples.
 
@@ -247,14 +260,20 @@ returns a `boolean`.
 - `nil()`
 
 ## RuleSet Overview
-- TODO lav denne
+- `addRule(path, rule):RuleSet` - add a rule for the given to the `RuleSet` in the form of a function which will be called when rule is tested
+- `isValid(object, [path]):boolean` - test if the object is valid. The path or paths to test can be optional passed in as the second argument
+- `isValidValue(value, [path]):boolean` - test if the given value is valid. The path or paths to test can be optional passed in as the second argument
+- `validate(object, [[path, [isObject]]):ValidationResult` - validate the object which depending on the mode of the `RuleSet` will produce a `ValidationResult` with errors or throw an `ValidationError`if the object is not valid
+- `validateValue(value, [path]):ValidationResult` - validate the value which depending on the mode of the `RuleSet` will produce a `ValidationResult` with errors or throw an `ValidationError`if the object is not valid
+
+
 ## ValidationResult Overview
 NOTE: If a test for at path do not provide an error message  use 
 `isValid()` and `isPathValid()` to test if the path is valid or not. 
 
-- `getError(path):string` - get the first error for the given path.
+- `getError(path):string` - get the first error for the given path
 - `getErrors(path):string[]` - get all errors for the given path
 - `getAllErrors():string[]` - get all errors
 - `isValid():boolean` - `true` of there is no errors otherwise `false`
-- `isPAthValid(path):boolean` - is the given path valid
+- `isPAthValid(path):boolean` - `true` if the given path is valid otherwise `false`
 - `reset()` - resets the validation result. (not relevant in the context of a RuleSet as this always creates a new instance for every test) 

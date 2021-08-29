@@ -40,34 +40,51 @@ class RuleSet {
     }
 
     /**
+     * Test if the object is valid. This method is guarantied to always return a boolean, in the case of an exception <code>false</code>
+     * will be returned.
+     *
      * @param object the object to validate
-     * @param {string|string[]|undefined} [path] the path(s) to validate. If path is undefined all rules will be validated against the object
+     * @param {string|string[]} [path] the path(s) to validate. If path is undefined all rules will be validated against the object
      * @return {boolean}
      * @see {@link #isValidValue}
      * @see {@link #validate}
      * @see {@link #validateValue}
      */
     isValid(object, path) {
-        return this.validate(object, path).isValid();
+        let result = false;
+        try {
+            result = this.validate(object, path).isValid();
+        } catch (e) {
+            // noop
+        }
+        return result;
     }
 
     /**
+     * Test if the value is valid. This method is guarantied to always return a boolean, in the case of an exception <code>false</code>
+     * will be returned.
      *
      * @param value the value to validate
-     * @param {string|string[]|undefined} [path] the path(s) to validate. If path is undefined all rules will be validated against the value
+     * @param {string|string[]} [path] the path(s) to validate. If path is undefined all rules will be validated against the value
      * @return {boolean}
      * @see {@link #isValidObject}
      * @see {@link #validate}
      * @see {@link #validateValue}
      */
     isValidValue(value, path) {
-        return this.validateValue(value, path).isValid();
+        let result = false;
+        try {
+            result = this.validateValue(value, path).isValid();
+        } catch (e) {
+            // noop
+        }
+        return result;
     }
 
     /**
      *
      * @param object
-     * @param {string|string[]|undefined} [path] the path(s) to validate. If path is undefined all rules will be validated against the object
+     * @param {string|string[]} [path] the path(s) to validate. If path is undefined all rules will be validated against the object
      * @param {boolean} isObject should be <code>true</code> if the object should be considered an object with "paths" to validate
      * and <code>false</code> if the object is to be considered a single value to validate
      * @returns {ValidationResult}
@@ -111,7 +128,7 @@ class RuleSet {
 
     /**
      * @param value the value to validate against the rule for the path
-     * @param path the path for the rule to validate against
+     * @param {string|string[]} [path] the path(s) to validate. If path is undefined all rules will be validated against the value
      * @returns {ValidationResult}
      */
     validateValue(value, path) {
