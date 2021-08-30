@@ -106,21 +106,20 @@ For objects a single set of rules for whole object can be applied using `Validat
 each property, as the examples above, but  it is more performant and sometimes easier to read 
 if rules are divided by each property and added separately.
 
- 
 ```js
 let ruleSet = Validator.createOnErrorBreakRuleSet();
 ruleSet.addRule('username', (username) => username.fulfillAllOf(username => [
-    username.is.aString('Username must be a string'),
-    username.does.match(/\w{4, 25}/, "Username must only contain a-zA-Z0-9_ and have a length of 4-25 characters")
+  username.is.aString('Username must be a string'),
+  username.does.match(/\w{4, 25}/, "Username must only contain a-zA-Z0-9_ and have a length of 4-25 characters")
 ]));
 ruleSet.addRule('age', (age) => age.fulfillAllOf(age => [
-    age.is.anInteger('Age must be an integer'),
-    age.is.inRange(0, 120, 'Age must be in range 0 - 120')
+  age.is.anInteger('Age must be an integer'),
+  age.is.inRange(0, 120, 'Age must be in range 0 - 120')
 ]));
 
 // simple test if a user is valid
 if (ruleSet.isValid(user)) {
-    // do something usefull here
+  // do something usefull here
 }
 
 // or get detailed validation results
@@ -131,13 +130,13 @@ console.log(validationResult.getErrors('age')); // all errors for path
 
 // we can also test individual paths 
 if (ruleSet.isValid(user, 'age')) {
-    // do something
+  // do something
 }
 // or validate and get a result only for a single path
 validationResult = ruleSet.validate(user, 'age');
 
 // values can also be validated directly against paths
-let ageIsValid = ruleSet.isValidValue(23, 'age');
+let ageIsValid = ruleSet.isValueValid(23, 'age');
 validationResult = ruleSet.validateValue(23, 'age');
 ```
 
@@ -261,8 +260,8 @@ returns a `boolean`.
 
 ## RuleSet Overview
 - `addRule(path, rule):RuleSet` - add a rule for the given to the `RuleSet` in the form of a function which will be called when rule is tested
-- `isValid(object, [path]):boolean` - test if the object is valid. The path or paths to test can be optional passed in as the second argument
-- `isValidValue(value, [path]):boolean` - test if the given value is valid. The path or paths to test can be optional passed in as the second argument
+- `isValid(object, [path]):boolean` - test if the property paths of the object is valid. The path or paths to test can be optional passed in as the second argument
+- `isValueValid(value, [path]):boolean` - test if the value is valid. The path or paths to test can be optional passed in as the second argument
 - `validate(object, [[path, [isObject]]):ValidationResult` - validate the object which depending on the mode of the `RuleSet` will produce a `ValidationResult` with errors or throw an `ValidationError`if the object is not valid
 - `validateValue(value, [path]):ValidationResult` - validate the value which depending on the mode of the `RuleSet` will produce a `ValidationResult` with errors or throw an `ValidationError`if the object is not valid
 

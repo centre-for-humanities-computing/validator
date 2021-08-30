@@ -1,6 +1,7 @@
 const _ = require("lodash");
 const { Validator } = require('./validator');
 const { ValidationResult } = require('./validation-result');
+const { ValidationError } = require('./validation-error');
 
 
 /**
@@ -20,6 +21,15 @@ class RuleSet {
     }
 
     /**
+     * @example
+     *
+     * let ruleSet = Validator.createOnErrorNextPathRuleSet();
+     * ruleSet.addRule('', (person) => person.is.anObject('a person must be an object'); // '' references the object itself
+     * ruleSet.addRule('name', (name) => name.fulfillAllOf((name) => [
+     *     name.is.aString('"${PATH}" must be a string'),
+     *     name.does.match(/\w+/, '"${PATH}" must only contain [a-Z_0-9]')
+     * ]);
+     * ruleSet.addRule('age', (age) => age.optional.is.aNumber('"${PATH}" must be a number'));
      *
      * @param {string} path the path for the rule. An empty string is considered the default rule.
      * @param {function(Validator)} rule
@@ -40,13 +50,24 @@ class RuleSet {
     }
 
     /**
-     * Test if the object is valid. This method is guarantied to always return a boolean, in the case of an exception <code>false</code>
-     * will be returned.
+     * Test if the property paths of the object is valid. In the case of an `ValidationError` <code>false</code> will be returned.
+     *
+     * @example
+     * let ruleSet = Validator.createOnErrorNextPathRuleSet();
+     * ruleSet.addRule('', (person) => person.is.anObject('a person must be an object');
+     * ruleSet.addRule('name', (name) => name.is.aString('"${PATH}" must be a string');
+     * ruleSet.addRule('age', (age) => age.is.aNumber('"${PATH}" must be a number');
+     *
+     * let person = { name: "John", age: 43 };
+     *
+     * console.log(ruleSet.isValid(person));
+     * console.log(ruleSet.isValid(person, '')); // test only the rule for ''
+     * console.log(ruleSet.isValid(person, ['', 'name'])); // test only the rules for '' and 'name'
      *
      * @param object the object to validate
      * @param {string|string[]} [path] the path(s) to validate. If path is undefined all rules will be validated against the object
      * @return {boolean}
-     * @see {@link #isValidValue}
+     * @see {@link #isValueValid}
      * @see {@link #validate}
      * @see {@link #validateValue}
      */
@@ -55,14 +76,30 @@ class RuleSet {
         try {
             result = this.validate(object, path).isValid();
         } catch (e) {
-            // noop
+            if (!(e instanceof ValidationError)) {
+                throw e;
+            }
         }
         return result;
     }
 
     /**
-     * Test if the value is valid. This method is guarantied to always return a boolean, in the case of an exception <code>false</code>
-     * will be returned.
+     * Test if the value is valid. In the case of an `ValidationError` <code>false</code> will be returned.
+     *
+     * @example
+     * let ruleSet = Validator.createOnErrorNextPathRuleSet();
+     *
+     * ruleSet.addRule('name', (name) => name.fulfillAllOf((name) => [
+     *     name.is.aString('"${PATH}" must be a string'),
+     *     name.does.match(/\w+/, '"${PATH}" must only contain [a-Z_0-9]')
+     * ]);
+     * ruleSet.addRule('age', (age) => age.is.aNumber('"${PATH}" must be a number'));
+     *
+     * let name = 'john';
+     * let age = 43;
+     *
+     * console.log(ruleSet.isValueValid(name, 'name'));
+     * console.log(ruleSet.isValueValid(age, 'age'));
      *
      * @param value the value to validate
      * @param {string|string[]} [path] the path(s) to validate. If path is undefined all rules will be validated against the value
@@ -71,17 +108,34 @@ class RuleSet {
      * @see {@link #validate}
      * @see {@link #validateValue}
      */
-    isValidValue(value, path) {
+    isValueValid(value, path) {
         let result = false;
         try {
             result = this.validateValue(value, path).isValid();
         } catch (e) {
-            // noop
+            if (!(e instanceof ValidationError)) {
+                throw e;
+            }
         }
         return result;
     }
 
     /**
+     * @example
+     * let ruleSet = Validator.createOnErrorNextPathRuleSet();
+     * ruleSet.addRule('', (person) => person.is.anObject('a person must be an object');
+     * ruleSet.addRule('name', (name) => name.is.aString('"${PATH}" must be a string');
+     * ruleSet.addRule('age', (age) => age.is.aNumber('"${PATH}" must be a number');
+     *
+     * let person = { name: "John", age: 43 };
+     *
+     * let validationResult = ruleSet.validate(person);
+     * console.log(validationResult.isValid());
+     * console.log(validationResult.getAllErrors());
+     * console.log(validationResult.getErrors('name'));
+     *
+     * // when path(s) is passed in we only get a `ValidationResult` for passed in `path(s)`
+     * validationResult = ruleSet.validate(person, 'name');
      *
      * @param object
      * @param {string|string[]} [path] the path(s) to validate. If path is undefined all rules will be validated against the object
@@ -127,7 +181,23 @@ class RuleSet {
     }
 
     /**
-     * @param value the value to validate against the rule for the path
+     *
+     * @example
+     * let ruleSet = Validator.createOnErrorNextPathRuleSet();
+     * ruleSet.addRule('name', (name) => name.is.aString('"${PATH}" must be a string');
+     * ruleSet.addRule('age', (age) => age.is.aNumber('"${PATH}" must be a number');
+     *
+     * let name = 'john';
+     * let age = 43;
+     *
+     * let validationResult = ruleSet.validate(name, 'name');
+     * console.log(validationResult.isValid());
+     * console.log(validationResult.getAllErrors());
+     * console.log(validationResult.getErrors('name'));
+     *
+     * validationResult = ruleSet.validate(age, 'age');
+     *
+     * @param value the value to validate against the rule for the path(s)
      * @param {string|string[]} [path] the path(s) to validate. If path is undefined all rules will be validated against the value
      * @returns {ValidationResult}
      */

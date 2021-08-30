@@ -640,13 +640,38 @@ class Validator {
         return Validator.#testFunction(errorPrefix, Validator.mode.ON_ERROR_NEXT_PATH);
     }
 
-    // TODO dokumenter lige så meget som create()
-    // og put eks. i README.md
     /**
+     * Creates a `RuleSet` for reusing a set of tests.
+     *
+     * @example
+     * let ruleSet = Validator.createRuleSet('Validation error:', Validator.mode.ON_ERROR_NEXT_PATH);
+     *
+     * ruleSet.addRule('', (person) => person.is.anObject('a person must be an object'); // '' references the object itself
+     * ruleSet.addRule('name', (name) => name.fulfillAllOf((name) => [
+     *     name.is.aString('"${PATH}" must be a string'),
+     *     name.does.match(/\w+/, '"${PATH}" must only contain [a-Z_0-9]')
+     * ]);
+     * ruleSet.addRule('age', (age) => age.optional.is.aNumber('"${PATH}" must be a number'));
+     *
+     * let person = { name: "John", age: 43 };
+     *
+     * // do a quick test if all rules pass
+     * console.log(ruleSet.isValid(person));
+     *
+     * // or get detailed information
+     * let validationResult = ruleSet.validate(person);
+     * console.log(validationResult.isValid());
+     * console.log(validationResult.getAllErrors());
+     * console.log(validationResult.getErrors('name'));
+     *
+     * // the rules can also be tested on individual values
+     * let name = 'john';
+     * console.log(ruleSet.isValidValue('john', 'name'));
      *
      * @param {string} errorPrefix a prefix to prepend to every error created by this validator
      * @param {string} mode the [mode]{@link Validator.mode} for this validator
      * @return {RuleSet}
+     * @see {@link RuleSet}
      * @see {@link ValidationResult}
      * @see {@link Validator.createOnErrorThrowRuleSet}
      * @see {@link Validator.createOnErrorBreakRuleSet}
