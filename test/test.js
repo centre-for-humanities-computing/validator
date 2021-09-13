@@ -28,6 +28,7 @@ try {
 
 
     let test = Validator.create('test error:', Validator.mode.ON_ERROR_NEXT_PATH);
+    test(3).is.aString()
 
    /* let name = "";
     test(name).isNot.nil('Name cannot be null or undefined');
