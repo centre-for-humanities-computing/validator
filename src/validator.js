@@ -537,7 +537,7 @@ class Validator {
     }
 
     /**
-     * @typedef {function(value:*):Validator} testFunction
+     * @typedef {function(value:*, ):Validator} testFunction
      * @property {ValidationResult} result the result of the performed tests
      */
 
@@ -601,6 +601,7 @@ class Validator {
      *
      * @param {string} errorPrefix a prefix to prepend to every error created by this validator
      * @param {string} mode the [mode]{@link Validator.mode} for this validator
+     * @returns {function(*=, string=): Validator}
      * @see {@link ValidationResult}
      * @see {@link Validator.createOnErrorThrowValidator}
      * @see {@link Validator.createOnErrorBreakValidator}
@@ -613,6 +614,7 @@ class Validator {
     /**
      * Creates a validator which throws an {@link ValidationError} if a test fails
      * @param {string} errorPrefix a prefix to prepend to every error thrown by this validator
+     * @returns {function(*=, string=): Validator}
      * @see {@link Validator.create} for examples of usage
      * @see {@link Validator.mode}
      */
@@ -623,6 +625,7 @@ class Validator {
     /**
      * Creates a validator which aborts the remaining tests if a test fails
      * @param {string} errorPrefix a prefix to prepend to every error created by this validator
+     * @returns {function(*=, string=): Validator}
      * @see {@link Validator.create} for examples of usage
      * @see {@link Validator.mode}
      */
@@ -633,6 +636,7 @@ class Validator {
     /**
      * Creates a validator which continuous to test the next path if a test fails
      * @param {string} errorPrefix a prefix to prepend to every created thrown by this validator
+     * @returns {function(*=, string=): Validator}
      * @see {@link Validator.create} for examples of usage
      * @see {@link Validator.mode}
      */
@@ -714,6 +718,12 @@ class Validator {
         return Validator.createRuleSet(errorPrefix, Validator.mode.ON_ERROR_NEXT_PATH);
     }
 
+    /**
+     *
+     * @param errorPrefix
+     * @param mode
+     * @returns {function(*=, string=): Validator}
+     */
     static #testFunction(errorPrefix, mode) {
         if (!MODE_VALUES.has(mode)) {
             Validator.#throwArgumentError(`"mode" must be one of [${Array.from(MODE_VALUES).join(', ')}]`);
