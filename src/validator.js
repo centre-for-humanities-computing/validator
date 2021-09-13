@@ -720,7 +720,6 @@ class Validator {
      *
      * @param errorPrefix
      * @param mode
-     * @returns {{function(*=, string=): Validator}|{result:ValidationResult}}
      */
     static #testFunction(errorPrefix, mode) {
         if (!MODE_VALUES.has(mode)) {
