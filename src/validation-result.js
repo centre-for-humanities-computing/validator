@@ -89,6 +89,17 @@ class ValidationResult {
         }
     }
 
+    toString() {
+        let errorStr = "ValidationResult: ";
+        for (let [path, messages] of this.#errors) {
+            errorStr += `${path} -> [${messages.join(',')}]\n`
+        }
+        if (this.#errors.size === 0) {
+            errorStr += "is valid";
+        }
+        return errorStr;
+    }
+
 }
 
 module.exports = { ValidationResult };

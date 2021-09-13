@@ -3,7 +3,7 @@ const _ = require('lodash');
 
 try {
     let pers = {
-        name: "peter"
+        name: 2
     };
     let ruleSet = Validator.createOnErrorNextPathRuleSet('ding');
     ruleSet.addRule('', (person) => person.fulfillAllOf((person) => [
@@ -24,7 +24,7 @@ try {
     console.log(ruleSet.validate(pers).getError('name'))*/
     //console.log(ruleSet.validate(pers, '').getAllErrors())
 
-    console.log(ruleSet.validate(pers, 'name').getError('name'))
+    console.log(ruleSet.validate(pers, 'name').toString())
 
 
     let test = Validator.create('test error:', Validator.mode.ON_ERROR_NEXT_PATH);
