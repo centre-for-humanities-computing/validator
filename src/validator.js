@@ -714,10 +714,13 @@ class Validator {
         return Validator.createRuleSet(errorPrefix, Validator.mode.ON_ERROR_NEXT_PATH);
     }
 
+
+    // the two return types is simply to trick jsDoc to accept that the returned function has a property
     /**
      *
      * @param errorPrefix
      * @param mode
+     * @returns {{function(*=, string=): Validator}|{result:ValidationResult}}
      */
     static #testFunction(errorPrefix, mode) {
         if (!MODE_VALUES.has(mode)) {
@@ -737,6 +740,7 @@ class Validator {
         };
         /**
          * @type {ValidationResult}
+         * @property result
          */
         test.result = validationResult;
         return test;
