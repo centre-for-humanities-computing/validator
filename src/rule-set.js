@@ -174,7 +174,7 @@ class RuleSet {
                 }
                 rule.rule(test(value, rule.path));
             } else {
-                rule.rule(test(object));
+                rule.rule(test(object, rule.path));
             }
         }
         return test.result;

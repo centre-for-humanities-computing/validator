@@ -3,26 +3,28 @@ const _ = require('lodash');
 
 try {
     let pers = {
-        name: 'peter'
+        name: "peter"
     };
     let ruleSet = Validator.createOnErrorNextPathRuleSet('ding');
     ruleSet.addRule('', (person) => person.fulfillAllOf((person) => [
         person.is.anObject('person must be an object')
     ]));
     ruleSet.addRule('name', (name) => name.fulfillAllOf((name) => [
-        name.is.aString('name must be a string'),
+        name.is.aString('${PATH} must be a string'),
         name.isNot.empty('name cannot be empty')
     ]));
 
 
-    console.time('te')
+    /*console.time('te')
     for (let i = 0; i < 100_000; i++) {
 
         ruleSet.isValid(pers);
     }
     console.timeEnd('te')
-    console.log(ruleSet.validate(pers).getError('name'))
+    console.log(ruleSet.validate(pers).getError('name'))*/
     //console.log(ruleSet.validate(pers, '').getAllErrors())
+
+    console.log(ruleSet.validate(pers, 'name').getError('name'))
 
 
     let test = Validator.create('test error:', Validator.mode.ON_ERROR_NEXT_PATH);
