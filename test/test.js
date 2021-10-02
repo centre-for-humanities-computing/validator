@@ -2,6 +2,15 @@ const { Validator } = require('../src/validator');
 const _ = require('lodash');
 
 try {
+    let t = Validator.createOnErrorThrowValidator();
+    let validator = (val) => val.optional.fulfillAllOf(val => [
+        val.is.aNumber()
+        ]
+    )
+    t([undefined, 10]).each(validator, "bad");
+    return;
+
+
     let pers = {
         name: 2
     };
