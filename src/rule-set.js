@@ -1,5 +1,5 @@
 const _ = require("lodash");
-const { Validator } = require('./validator');
+//const { Validator } = require('./validator'); // was used for determining type below but resultet in "Warning: Accessing non-existent property 'Validator' of module exports inside circular dependency"
 const { ValidationResult } = require('./validation-result');
 const { ValidationError } = require('./validation-error');
 
@@ -143,8 +143,8 @@ class RuleSet {
      * and <code>false</code> if the object is to be considered a single value to validate
      * @returns {ValidationResult}
      * @see {@link #validateValue}
-     * @see {@link #idValidValue}
-     * @see {@link #isValidObject}
+     * @see {@link #isValueValid}
+     * @see {@link #isValid}
      */
     validate(object, path = undefined, isObject = true) {
         let rules;

@@ -95,6 +95,7 @@ function testSelf() {
         age.is.greaterThanOrEqualTo(18, '${PATH} must be >= 18, but was ${VALUE}')
     ]));
 
+
     console.time('self\t\t')
 
     for (let i = 0; i < iterations; i++) {
