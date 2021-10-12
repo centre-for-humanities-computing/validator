@@ -1,8 +1,7 @@
 const _ = require("lodash");
-//const { Validator } = require('./validator'); // was used for determining type below but resultet in "Warning: Accessing non-existent property 'Validator' of module exports inside circular dependency"
 const { ValidationResult } = require('./validation-result');
 const { ValidationError } = require('./validation-error');
-
+const { Validator } = require('./validator'); // was used for determining type below but resulted in "Warning: Accessing non-existent property 'Validator' of module exports inside circular dependency"
 
 /**
  * Create a set of reusable rules associated with one or more paths.
@@ -211,3 +210,4 @@ class RuleSet {
 }
 
 module.exports = { RuleSet };
+
