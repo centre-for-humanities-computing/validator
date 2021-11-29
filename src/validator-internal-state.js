@@ -4,6 +4,12 @@ class ValidatorInternalState {
 
     static debug;
 
+    static debugIndent = Object.freeze({
+        NONE: 'none',
+        BEGIN: 'begin',
+        END: 'end'
+    });
+
     #name;
     #mode;
     #contextValue;
@@ -85,8 +91,11 @@ class ValidatorInternalState {
         return dest;
     }
 
-    static debug(options) {
-        this.debug = options;
+    static toggleDebug(debug) {
+        if (debug) {
+            debug.indent = 0;
+        }
+        ValidatorInternalState.debug = debug;
     }
 
 }

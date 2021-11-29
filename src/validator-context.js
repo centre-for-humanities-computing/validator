@@ -1,5 +1,5 @@
 const _ = require('lodash');
-const { ValidationInternalState } = require('./validator-internal-state');
+const { ValidatorInternalState } = require('./validator-internal-state');
 const { ValidationError } = require('./validation-error');
 const sharedConstants = require('./shared-constants');
 const utils = require('./utils');
@@ -14,6 +14,8 @@ const PLACEHOLDER_CONTEXT_VALUE_PATTERN = /(?<!\\)\${VALUE}/g;
 const PLACEHOLDER_CONTEXT_PATH_PATTERN = /(?<!\\)\${PATH}/g;
 const PLACEHOLDER_CONTEXT_CURRENT_PATH_PATTERN = /(?<!\\)\${CURRENT_PATH}/g;
 const PLACEHOLDER_CONTEXT_PARENT_PATH_PATTERN = /(?<!\\)\${PARENT_PATH}/g;
+
+const debugIndent = ValidatorInternalState.debugIndent;
 
 class ValidatorContext {
 
@@ -74,11 +76,11 @@ class ValidatorContext {
      * @returns {boolean} the result of the predicate
      */
     identicalTo(otherValue, errorMessage, messageArgs) {
-        let result = this.#contextValue === otherValue;
-        if (ValidationInternalState.debug) {
-            this.#printDebug(this.identicalTo.name, result, [otherValue]);
+        let success = this.#contextValue === otherValue;
+        if (ValidatorInternalState.debug) {
+            this.#printDebug(this.identicalTo.name, success, [otherValue]);
         }
-        return this.#handleError(result, errorMessage, messageArgs);
+        return this.#handleError(success, errorMessage, messageArgs);
     }
 
     /**
@@ -89,11 +91,11 @@ class ValidatorContext {
      * @see {@link https://lodash.com/docs/4.17.15#isEqual}
      */
     equalTo(otherValue, errorMessage, messageArgs) {
-        let result = _.isEqual(this.#contextValue, otherValue);
-        if (ValidationInternalState.debug) {
-            this.#printDebug(this.equalTo.name, result, [otherValue]);
+        let success = _.isEqual(this.#contextValue, otherValue);
+        if (ValidatorInternalState.debug) {
+            this.#printDebug(this.equalTo.name, success, [otherValue]);
         }
-        return this.#handleError(result, errorMessage, messageArgs);
+        return this.#handleError(success, errorMessage, messageArgs);
     }
 
     /**
@@ -102,11 +104,11 @@ class ValidatorContext {
      * @returns {boolean} the result of the predicate
      */
     nil(errorMessage, messageArgs) {
-        let result = _.isNil(this.#contextValue);
-        if (ValidationInternalState.debug) {
-            this.#printDebug(this.nil.name, result);
+        let success = _.isNil(this.#contextValue);
+        if (ValidatorInternalState.debug) {
+            this.#printDebug(this.nil.name, success);
         }
-        return this.#handleError(result, errorMessage, messageArgs);
+        return this.#handleError(success, errorMessage, messageArgs);
     }
 
     /**
@@ -115,11 +117,11 @@ class ValidatorContext {
      * @returns {boolean} the result of the predicate
      */
     anArray(errorMessage, messageArgs) {
-        let result = Array.isArray(this.#contextValue);
-        if (ValidationInternalState.debug) {
-            this.#printDebug(this.anArray.name, result);
+        let success = Array.isArray(this.#contextValue);
+        if (ValidatorInternalState.debug) {
+            this.#printDebug(this.anArray.name, success);
         }
-        return this.#handleError(result, errorMessage, messageArgs);
+        return this.#handleError(success, errorMessage, messageArgs);
     }
 
     /**
@@ -128,11 +130,11 @@ class ValidatorContext {
      * @returns {boolean} the result of the predicate
      */
     aBoolean(errorMessage, messageArgs) {
-        let result = _.isBoolean(this.#contextValue);
-        if (ValidationInternalState.debug) {
-            this.#printDebug(this.aBoolean.name, result);
+        let success = _.isBoolean(this.#contextValue);
+        if (ValidatorInternalState.debug) {
+            this.#printDebug(this.aBoolean.name, success);
         }
-        return this.#handleError(result, errorMessage, messageArgs);
+        return this.#handleError(success, errorMessage, messageArgs);
     }
 
     /**
@@ -142,11 +144,11 @@ class ValidatorContext {
      * @returns {boolean} the result of the predicate
      */
     aFloatString(errorMessage, messageArgs) {
-        let result = _.isString(this.#contextValue) && FLOAT_STRING_PATTERN.test(this.#contextValue);
-        if (ValidationInternalState.debug) {
-            this.#printDebug(this.aFloatString.name, result);
+        let success = _.isString(this.#contextValue) && FLOAT_STRING_PATTERN.test(this.#contextValue);
+        if (ValidatorInternalState.debug) {
+            this.#printDebug(this.aFloatString.name, success);
         }
-        return this.#handleError(result, errorMessage, messageArgs);
+        return this.#handleError(success, errorMessage, messageArgs);
     }
 
     /**
@@ -155,7 +157,11 @@ class ValidatorContext {
      * @returns {boolean} the result of the predicate
      */
     anInteger(errorMessage, messageArgs) {
-        return this.#handleError(_.isInteger(this.#contextValue), errorMessage, messageArgs);
+        let success = _.isInteger(this.#contextValue);
+        if (ValidatorInternalState.debug) {
+            this.#printDebug(this.anInteger.name, success);
+        }
+        return this.#handleError(success, errorMessage, messageArgs);
     }
 
     /**
@@ -165,7 +171,11 @@ class ValidatorContext {
      * @returns {boolean} the result of the predicate
      */
     anIntegerString(errorMessage, messageArgs) {
-        return this.#handleError(_.isString(this.#contextValue) && INTEGER_STRING_PATTERN.test(this.#contextValue), errorMessage, messageArgs);
+        let success = _.isString(this.#contextValue) && INTEGER_STRING_PATTERN.test(this.#contextValue);
+        if (ValidatorInternalState.debug) {
+            this.#printDebug(this.anIntegerString.name, success);
+        }
+        return this.#handleError(success, errorMessage, messageArgs);
     }
 
     /**
@@ -174,7 +184,11 @@ class ValidatorContext {
      * @returns {boolean} the result of the predicate
      */
     aNumber(errorMessage, messageArgs) {
-        return this.#handleError(_.isNumber(this.#contextValue), errorMessage, messageArgs);
+        let success = _.isNumber(this.#contextValue);
+        if (ValidatorInternalState.debug) {
+            this.#printDebug(this.aNumber.name, success);
+        }
+        return this.#handleError(success, errorMessage, messageArgs);
     }
 
     /**
@@ -183,7 +197,11 @@ class ValidatorContext {
      * @returns {boolean} the result of the predicate
      */
     anObject(errorMessage, messageArgs) {
-        return this.#handleError(_.isObject(this.#contextValue), errorMessage, messageArgs);
+        let success = _.isObject(this.#contextValue);
+        if (ValidatorInternalState.debug) {
+            this.#printDebug(this.anObject.name, success);
+        }
+        return this.#handleError(success, errorMessage, messageArgs);
     }
 
     /**
@@ -192,7 +210,11 @@ class ValidatorContext {
      * @returns {boolean} the result of the predicate
      */
     aString(errorMessage, messageArgs) {
-        return this.#handleError(_.isString(this.#contextValue), errorMessage, messageArgs);
+        let success = _.isString(this.#contextValue);
+        if (ValidatorInternalState.debug) {
+            this.#printDebug(this.aString.name, success);
+        }
+        return this.#handleError(success, errorMessage, messageArgs);
     }
 
     /**
@@ -201,7 +223,11 @@ class ValidatorContext {
      * @returns {boolean} the result of the predicate
      */
     empty(errorMessage, messageArgs) {
-        return this.#handleError(_.isEmpty(this.#contextValue), errorMessage, messageArgs);
+        let success = _.isEmpty(this.#contextValue);
+        if (ValidatorInternalState.debug) {
+            this.#printDebug(this.empty.name, success);
+        }
+        return this.#handleError(success, errorMessage, messageArgs);
     }
 
     /**
@@ -215,6 +241,9 @@ class ValidatorContext {
             this.#throwArgumentError(`The argument for "value" must be a number but was: "${value}"`);
         }
         let success = _.isNumber(this.#contextValue) && this.#contextValue < value;
+        if (ValidatorInternalState.debug) {
+            this.#printDebug(this.lessThan.name, success, [value]);
+        }
         return this.#handleError(success, errorMessage, messageArgs);
     }
 
@@ -229,6 +258,9 @@ class ValidatorContext {
             this.#throwArgumentError(`The argument for "value" must be a number but was: "${value}"`);
         }
         let success = _.isNumber(this.#contextValue) && this.#contextValue <= value;
+        if (ValidatorInternalState.debug) {
+            this.#printDebug(this.lessThanOrEqualTo.name, success, [value]);
+        }
         return this.#handleError(success, errorMessage, messageArgs);
     }
 
@@ -243,6 +275,9 @@ class ValidatorContext {
             this.#throwArgumentError(`The argument for "value" must be a number but was: "${value}"`);
         }
         let success = _.isNumber(this.#contextValue) && this.#contextValue > value;
+        if (ValidatorInternalState.debug) {
+            this.#printDebug(this.greaterThan.name, success, [value]);
+        }
         return this.#handleError(success, errorMessage, messageArgs);
     }
 
@@ -257,6 +292,9 @@ class ValidatorContext {
             this.#throwArgumentError(`The argument for "value" must be a number but was: "${value}"`);
         }
         let success = _.isNumber(this.#contextValue) && this.#contextValue >= value;
+        if (ValidatorInternalState.debug) {
+            this.#printDebug(this.greaterThanOrEqualTo.name, success, [value]);
+        }
         return this.#handleError(success, errorMessage, messageArgs);
     }
 
@@ -272,6 +310,9 @@ class ValidatorContext {
             this.#throwArgumentError(`The arguments for "start" and "end" must both be numbers but was: start="${start}", end="${end}"`);
         }
         let success = _.isNumber(this.#contextValue) && this.#contextValue >= start && this.#contextValue <= end;
+        if (ValidatorInternalState.debug) {
+            this.#printDebug(this.inRange.name, success, [start, end]);
+        }
         return this.#handleError(success, errorMessage, messageArgs);
     }
 
@@ -296,6 +337,11 @@ class ValidatorContext {
         } else { // must be a Set
             success = values.has(this.#contextValue);
         }
+
+        if (ValidatorInternalState.debug) {
+            this.#printDebug(this.in.name, success, [values]);
+        }
+
         return this.#handleError(success, errorMessage, messageArgs);
     }
 
@@ -317,7 +363,15 @@ class ValidatorContext {
      * @returns {boolean} the result of the predicate
      */
     fulfill(predicate, errorMessage, messageArgs) {
+        if (ValidatorInternalState.debug) {
+            this.#printDebug(`${this.fulfill.name}<start>`, undefined, [], debugIndent.BEGIN);
+        }
+
         let success = _.isFunction(predicate) ? predicate(this.#validator) : !!predicate;
+
+        if (ValidatorInternalState.debug) {
+            this.#printDebug(`${this.fulfill.name}<end>`, success, [], debugIndent.END);
+        }
         return this.#handleError(success, errorMessage, messageArgs);
     }
 
@@ -359,9 +413,15 @@ class ValidatorContext {
         if (_.isFunction(predicates)) {
             predicates = predicates(this.#validator);
         }
+
+        if (ValidatorInternalState.debug) {
+            this.#printDebug(`${this.fulfillOneOf.name}<start>`, undefined, [], debugIndent.BEGIN);
+        }
+
         if (!Array.isArray(predicates)) {
             this.#throwArgumentError(`The argument "predicates" must be an array or a function returning an array`);
         }
+
         let success = false;
         for (let predicate of predicates) {
             if (_.isFunction(predicate)) {
@@ -375,6 +435,11 @@ class ValidatorContext {
             }
         }
         this.#validatorCallbackContext.disableShortCircuitSticky();
+
+        if (ValidatorInternalState.debug) {
+            this.#printDebug(`${this.fulfillOneOf.name}<end>`, success, [], debugIndent.END);
+        }
+
         return this.#handleError(success, errorMessage, messageArgs);
     }
 
@@ -411,12 +476,17 @@ class ValidatorContext {
      */
     fulfillAllOf(predicates, errorMessage, messageArgs) {
         this.#validatorCallbackContext.enableShortCircuitStickyOn(false);
+        if (ValidatorInternalState.debug) {
+            this.#printDebug(`${this.fulfillAllOf.name}<start>`, undefined, [], debugIndent.BEGIN);
+        }
+
         if (_.isFunction(predicates)) {
             predicates = predicates(this.#validator);
         }
         if (!Array.isArray(predicates)) {
             this.#throwArgumentError(`The argument "predicates" must be an array or a function returning an array`);
         }
+
         let success = true;
         for (let predicate of predicates) {
             if (_.isFunction(predicate)) {
@@ -430,6 +500,11 @@ class ValidatorContext {
             }
         }
         this.#validatorCallbackContext.disableShortCircuitSticky();
+
+        if (ValidatorInternalState.debug) {
+            this.#printDebug(`${this.fulfillAllOf.name}<end>`, success, [], debugIndent.END);
+        }
+
         return this.#handleError(success, errorMessage, messageArgs);
     }
 
@@ -444,6 +519,9 @@ class ValidatorContext {
             this.#throwArgumentError(`The argument "regex" must be an instance of RegEx but was: "${regex}"`);
         }
         let success = regex.test(this.#contextValue);
+        if (ValidatorInternalState.debug) {
+            this.#printDebug(this.match.name, success, [regex]);
+        }
         return this.#handleError(success, errorMessage, messageArgs);
     }
 
@@ -495,6 +573,39 @@ class ValidatorContext {
         throw new Error(`ValidatorContext usage error: ${message}`);
     }
 
+    #printDebug(methodName, success, methodArgs = [], indent = debugIndent.NONE) {
+        let debug = ValidatorInternalState.debug;
+        if (indent === debugIndent.END) {
+            ValidatorInternalState.debug.indent--;
+        }
+        if (this.#notContext) {
+            success = !success;
+        }
+        let resultStr = success === undefined ? ' ' : success ? 'V' : '-';
+        let indentStr = ' '.repeat(debug.indent * 2);
+        let pathStr = this.#contextValuePath ? this.#contextValuePath : 'ROOT';
+        let valueStr = this.#contextValue.toString(); // TODO for object, arrays, maps, sets, probably extract summary or just write the type in [Object] [Array]
+        let methodArgsStr = methodArgs.toString(); // TODO probably do something about these as well
+        let methodPrefix = this.#notContext ? '!' : '';
+        let message = `[${resultStr}] ${indentStr} ${pathStr}=${valueStr} ${methodPrefix}${methodName} ${methodArgsStr}`;
+        console.log(message);
+
+        if (indent === debugIndent.BEGIN) {
+            ValidatorInternalState.debug.indent++;
+        }
+    }
+
 }
 
 module.exports = { ValidatorContext };
+
+// TODO
+/*
+* Lav så man kan give true|false|object med til Validator.debug og det bliver overholdt...
+* Lav så den skriver info ud om optional, conditionally, each, prop, transform
+* de skal have noget andet end [ ], da de ikke er predikater. fx {?} optional, {@} each, {&} conditionally, prop {.}, transform{>}
+* så der står {?}   PATH=[VALUE] NAVN_PÅ_METODE
+*
+* Lav så toString af værdier til PATH= bliver mere præcise, så det er =[Object] (kun hvis det ikke er de andre, array, map, set etc.),
+*  =[Array], =[Map], =[Set] for komplekse typer
+* */

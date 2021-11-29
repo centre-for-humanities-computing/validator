@@ -721,7 +721,7 @@ class Validator {
         /*boolean eller object {mode: ALL|FAILED}
         * boolean defaulter til en object med {mode: ALL}
         * */
-        ValidatorInternalState.debug(options);
+        ValidatorInternalState.toggleDebug(options);
     }
 
     // the two return types is simply to trick jsDoc to accept that the returned function has a property

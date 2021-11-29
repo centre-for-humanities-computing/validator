@@ -2,17 +2,18 @@ const { Validator } = require('../src/validator');
 const _ = require('lodash');
 
 try {
-    let t = Validator.createOnErrorThrowValidator();
+    Validator.debug({});
+    /*let t = Validator.createOnErrorThrowValidator();
     let validator = (val) => val.optional.fulfillAllOf(val => [
         val.is.aNumber()
         ]
     )
     t([undefined, 10]).each(validator, "bad");
-    return;
+*/
 
 
     let pers = {
-        name: 2
+        name: 'peter'
     };
     let ruleSet = Validator.createOnErrorNextPathRuleSet('ding');
     ruleSet.addRule('', (person) => person.fulfillAllOf((person) => [
@@ -23,7 +24,6 @@ try {
         name.isNot.empty('name cannot be empty')
     ]));
 
-
     /*console.time('te')
     for (let i = 0; i < 100_000; i++) {
 
@@ -33,12 +33,15 @@ try {
     console.log(ruleSet.validate(pers).getError('name'))*/
     //console.log(ruleSet.validate(pers, '').getAllErrors())
 
+    ruleSet.isValid(pers);
     console.log(ruleSet.validate(pers, 'name').toString())
 
 
     let test = Validator.create('test error:', Validator.mode.ON_ERROR_NEXT_PATH);
     test(3).is.aString()
     test.result.isValid();
+
+    return;
 
    /* let name = "";
     test(name).isNot.nil('Name cannot be null or undefined');

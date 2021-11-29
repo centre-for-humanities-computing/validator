@@ -102,8 +102,8 @@ function validateUserForm(user) {
 ## Reusing Rules
 Rules can be stored and reused using a `RuleSet`. 
 
-For objects a single set of rules for whole object can be applied using `Validator.prop()` to access
-each property, as the examples above, but  it is more performant and sometimes easier to read 
+For objects a single set of rules for a whole object can be applied using `Validator.prop()` to access
+each property, as the examples above, but it is more performant and sometimes easier to read 
 if rules are divided by each property and added separately.
 
 ```js
