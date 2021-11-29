@@ -2,6 +2,8 @@ const utils = require('./utils');
 
 class ValidatorInternalState {
 
+    static debug;
+
     #name;
     #mode;
     #contextValue;
@@ -81,6 +83,10 @@ class ValidatorInternalState {
         contextValueCurrentPath = contextValueCurrentPath === undefined ? this.#contextValueCurrentPath : contextValueCurrentPath;
         dest._init(this.mode, contextValue, contextValuePath, contextValueCurrentPath, this.errorPrefix, this.errorBasePath, this.validationResult);
         return dest;
+    }
+
+    static debug(options) {
+        this.debug = options;
     }
 
 }

@@ -74,7 +74,11 @@ class ValidatorContext {
      * @returns {boolean} the result of the predicate
      */
     identicalTo(otherValue, errorMessage, messageArgs) {
-        return this.#handleError((this.#contextValue === otherValue), errorMessage, messageArgs);
+        let result = this.#contextValue === otherValue;
+        if (ValidationInternalState.debug) {
+            this.#printDebug(this.identicalTo.name, result, [otherValue]);
+        }
+        return this.#handleError(result, errorMessage, messageArgs);
     }
 
     /**
@@ -85,7 +89,11 @@ class ValidatorContext {
      * @see {@link https://lodash.com/docs/4.17.15#isEqual}
      */
     equalTo(otherValue, errorMessage, messageArgs) {
-        return this.#handleError(_.isEqual(this.#contextValue, otherValue), errorMessage, messageArgs);
+        let result = _.isEqual(this.#contextValue, otherValue);
+        if (ValidationInternalState.debug) {
+            this.#printDebug(this.equalTo.name, result, [otherValue]);
+        }
+        return this.#handleError(result, errorMessage, messageArgs);
     }
 
     /**
@@ -94,7 +102,11 @@ class ValidatorContext {
      * @returns {boolean} the result of the predicate
      */
     nil(errorMessage, messageArgs) {
-        return this.#handleError(_.isNil(this.#contextValue), errorMessage, messageArgs);
+        let result = _.isNil(this.#contextValue);
+        if (ValidationInternalState.debug) {
+            this.#printDebug(this.nil.name, result);
+        }
+        return this.#handleError(result, errorMessage, messageArgs);
     }
 
     /**
@@ -103,7 +115,11 @@ class ValidatorContext {
      * @returns {boolean} the result of the predicate
      */
     anArray(errorMessage, messageArgs) {
-        return this.#handleError(Array.isArray(this.#contextValue), errorMessage, messageArgs);
+        let result = Array.isArray(this.#contextValue);
+        if (ValidationInternalState.debug) {
+            this.#printDebug(this.anArray.name, result);
+        }
+        return this.#handleError(result, errorMessage, messageArgs);
     }
 
     /**
@@ -112,7 +128,11 @@ class ValidatorContext {
      * @returns {boolean} the result of the predicate
      */
     aBoolean(errorMessage, messageArgs) {
-        return this.#handleError(_.isBoolean(this.#contextValue), errorMessage, messageArgs);
+        let result = _.isBoolean(this.#contextValue);
+        if (ValidationInternalState.debug) {
+            this.#printDebug(this.aBoolean.name, result);
+        }
+        return this.#handleError(result, errorMessage, messageArgs);
     }
 
     /**
@@ -122,7 +142,11 @@ class ValidatorContext {
      * @returns {boolean} the result of the predicate
      */
     aFloatString(errorMessage, messageArgs) {
-        return this.#handleError(_.isString(this.#contextValue) && FLOAT_STRING_PATTERN.test(this.#contextValue), errorMessage, messageArgs);
+        let result = _.isString(this.#contextValue) && FLOAT_STRING_PATTERN.test(this.#contextValue);
+        if (ValidationInternalState.debug) {
+            this.#printDebug(this.aFloatString.name, result);
+        }
+        return this.#handleError(result, errorMessage, messageArgs);
     }
 
     /**

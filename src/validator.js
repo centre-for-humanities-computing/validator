@@ -56,6 +56,8 @@ class Validator {
      */
     static mode = sharedConstants.mode;
 
+    static #debug = false;
+
     #name;
     /**
      * @type ValidatorInternalState
@@ -714,6 +716,13 @@ class Validator {
         return Validator.createRuleSet(errorPrefix, Validator.mode.ON_ERROR_NEXT_PATH);
     }
 
+    static debug(options) {
+        // TODO validate first
+        /*boolean eller object {mode: ALL|FAILED}
+        * boolean defaulter til en object med {mode: ALL}
+        * */
+        ValidatorInternalState.debug(options);
+    }
 
     // the two return types is simply to trick jsDoc to accept that the returned function has a property
     /**
