@@ -2,7 +2,7 @@ const { Validator } = require('../src/validator');
 const _ = require('lodash');
 
 try {
-    Validator.debug({});
+    Validator.debug(true);
     /*let t = Validator.createOnErrorThrowValidator();
     let validator = (val) => val.optional.fulfillAllOf(val => [
         val.is.aNumber()
@@ -13,7 +13,8 @@ try {
 
 
     let pers = {
-        name: 'peter'
+        name: 'peter',
+        age: 19
     };
     let ruleSet = Validator.createOnErrorNextPathRuleSet('ding');
     ruleSet.addRule('', (person) => person.fulfillAllOf((person) => [
@@ -23,6 +24,10 @@ try {
         name.is.aString('${PATH} must be a string'),
         name.isNot.empty('name cannot be empty')
     ]));
+    ruleSet.addRule('age', (age) => age.fulfillAllOf((age) => [
+        age.is.anInteger('${PATH} must be an integer'),
+        age.is.inRange(18, 99, 'age must be in range ${0} - ${1}', [18, 99])
+    ]))
 
     /*console.time('te')
     for (let i = 0; i < 100_000; i++) {
@@ -33,15 +38,15 @@ try {
     console.log(ruleSet.validate(pers).getError('name'))*/
     //console.log(ruleSet.validate(pers, '').getAllErrors())
 
-    ruleSet.isValid(pers);
-    console.log(ruleSet.validate(pers, 'name').toString())
+    //ruleSet.isValid(pers);
+    //console.log(ruleSet.validate(pers, 'name').toString())
 
 
     let test = Validator.create('test error:', Validator.mode.ON_ERROR_NEXT_PATH);
-    test(3).is.aString()
-    test.result.isValid();
+    /*test(3).is.aString()
+    test.result.isValid();*/
 
-    return;
+
 
    /* let name = "";
     test(name).isNot.nil('Name cannot be null or undefined');
@@ -90,14 +95,15 @@ try {
     //test(person).prop('name').prop('length').is.equalTo(4, "${CURRENT_PATH} of ${PATH} must have en length of 1");
 
 
-    /*let person = { name: "Eric", age: 49 };
+    let person = { name: "Eric", age: 49 };
     test(person).fulfillAllOf((person) => [
         person.is.anObject('person must be an object'),
-        person.conditionally((person) => person.value.name === 'Eric').fulfill(
+        person.conditionally((person) => person.value.name === 'Eric').fulfill(() =>
             person.prop('age').is.greaterThan(50, 'Age must be greater that 50 for persons named Eric')
         )
     ]);
-    console.log(test.result.getAllErrors());*/
+    //console.log(test.result.getAllErrors());
+    return;
 
 } catch (e) {
     console.error(e);

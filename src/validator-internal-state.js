@@ -2,14 +2,6 @@ const utils = require('./utils');
 
 class ValidatorInternalState {
 
-    static debug;
-
-    static debugIndent = Object.freeze({
-        NONE: 'none',
-        BEGIN: 'begin',
-        END: 'end'
-    });
-
     #name;
     #mode;
     #contextValue;
@@ -89,13 +81,6 @@ class ValidatorInternalState {
         contextValueCurrentPath = contextValueCurrentPath === undefined ? this.#contextValueCurrentPath : contextValueCurrentPath;
         dest._init(this.mode, contextValue, contextValuePath, contextValueCurrentPath, this.errorPrefix, this.errorBasePath, this.validationResult);
         return dest;
-    }
-
-    static toggleDebug(debug) {
-        if (debug) {
-            debug.indent = 0;
-        }
-        ValidatorInternalState.debug = debug;
     }
 
 }

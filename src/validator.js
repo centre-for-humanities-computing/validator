@@ -5,6 +5,7 @@ const { ValidationResult } = require('./validation-result');
 const { ValidatorInternalState } = require('./validator-internal-state');
 const { ValidationError } = require('./validation-error');
 const sharedConstants = require('./shared-constants');
+const { Debug } = require('./debug');
 const utils = require('./utils');
 // const { RuleSet } = require('./rule-set'); THIS IS IMPORTED AT THE BUTTON OF THIS MODULE TO PREVENT NODE WARNING ON CIRCULAR DEPENDENCIES
 
@@ -55,8 +56,6 @@ class Validator {
      * @type {Readonly<{ON_ERROR_NEXT_PATH: string, ON_ERROR_THROW: string, ON_ERROR_BREAK: string}>}
      */
     static mode = sharedConstants.mode;
-
-    static #debug = false;
 
     #name;
     /**
@@ -321,6 +320,9 @@ class Validator {
     get optional() {
         if (_.isNil(this.#contextValue)) {
             this.#contextShortCircuit.fulfilled = true;
+            if (Debug.enabled) {
+                this.#printDebug('{?}', 'optional', 'bypassed branch because of nil value')
+            }
         }
         return this;
     }
@@ -354,6 +356,9 @@ class Validator {
         }
         if (!fulfilled) {
             this.#contextShortCircuit.fulfilled = true;
+            if (Debug.enabled) {
+                this.#printDebug('{&}', this.conditionally.name, 'bypassed branch because of failed condition')
+            }
         }
         return this;
     }
@@ -393,6 +398,10 @@ class Validator {
             Validator.#throwArgumentError('the value must be iterable to use each()');
         }
 
+        if (Debug.enabled) {
+            this.#printDebug('{@}', `${this.each.name}<start>`, '', Debug.indent.BEGIN);
+        }
+
         let success = true;
         try {
             let i = 0;
@@ -415,6 +424,9 @@ class Validator {
             }
         } finally {
             this.#validatorContextDone(validatorContext);
+            if (Debug.enabled) {
+                this.#printDebug('{@}', `${this.each.name}<end>`, '', Debug.indent.END);
+            }
         }
         return success;
     }
@@ -444,6 +456,11 @@ class Validator {
             // if parent is optional and nil, _.get() will return undefined, which is fine because createChildValidator sets optional() if parent i optional
             childValue = _.get(this.#contextValue, path);
         }
+
+        if (Debug.enabled) {
+            this.#printDebug('{.}', `${this.prop.name}[${path}]`, `${path}=${Debug.instance.pathStr(childValue)}`);
+        }
+
         let validator = this.#createChildValidator(validatorContext, childValue, fullPropPath, path);
         this.#validatorContextDone(validatorContext); // important to call this to make sure reset() is called and the context is returned to the contextPool, because we are leaving this context and enter a child validator
         return validator;
@@ -479,6 +496,11 @@ class Validator {
         let transformedValue = transformer(this.#contextValue);
         // we expect that the transformation is used to just transform the current value, so even though it is possible
         // to return everything, transform should only be used to create transformation of what was at the given path
+
+        if (Debug.enabled) {
+            this.#printDebug('{>}', this.transform.name, `${Debug.instance.valueToStr(this.#contextValue)} -> ${Debug.instance.valueToStr(transformedValue)}`);
+        }
+
         let validator = this.#createChildValidator(validatorContext);
         this.#validatorContextDone(validatorContext);
         return validator;
@@ -515,6 +537,20 @@ class Validator {
      */
     fulfillAllOf(predicates, errorMessage, messageArgs) {
         return this.does.fulfillAllOf(predicates, errorMessage, messageArgs);
+    }
+
+    #printDebug(icon, methodName, message, indent = Debug.indent.NONE) {
+        if (indent === Debug.indent.END) {
+            Debug.instance.indent(indent);
+        }
+
+        let pathStr = Debug.instance.pathStr(this.#validatorState.errorContextValuePath);
+        let messageOut = `${pathStr} ${methodName} ${message}`;
+        Debug.instance.printMessage(icon, messageOut);
+
+        if (indent === Debug.indent.BEGIN) {
+            Debug.instance.indent(indent);
+        }
     }
 
     /**
@@ -716,12 +752,8 @@ class Validator {
         return Validator.createRuleSet(errorPrefix, Validator.mode.ON_ERROR_NEXT_PATH);
     }
 
-    static debug(options) {
-        // TODO validate first
-        /*boolean eller object {mode: ALL|FAILED}
-        * boolean defaulter til en object med {mode: ALL}
-        * */
-        ValidatorInternalState.toggleDebug(options);
+    static debug(enable = true) {
+        Debug.enable(enable);
     }
 
     // the two return types is simply to trick jsDoc to accept that the returned function has a property
