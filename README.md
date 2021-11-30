@@ -204,6 +204,9 @@ test(person.name, 'name').fulfillAllOf(name => [
 ]);
 ```
 
+## Debugging
+Debug messages can be toggled on and off by calling `Validator.debug(true|false)`.
+
 ## Validator Factory Methods
 - `Validator.create(erorPrefix, mode):testFunction` - Creates a new validation context with the given mode. 
   The returned "test" function gives access to the verb context 
