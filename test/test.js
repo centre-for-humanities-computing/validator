@@ -29,6 +29,8 @@ try {
         age.is.inRange(18, 99, 'age must be in range ${0} - ${1}', [18, 99])
     ]))
 
+    //ruleSet.validate(pers);
+
     /*console.time('te')
     for (let i = 0; i < 100_000; i++) {
 

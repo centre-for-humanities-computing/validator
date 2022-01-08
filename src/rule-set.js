@@ -10,12 +10,10 @@ class RuleSet {
     #errorPrefix;
     #mode;
     #rules = new Map();
-    #validatorCreate;
 
-    constructor(errorPrefix, mode, validatorCreate) { // validatorCreate function to handle circular dependencies
+    constructor(errorPrefix, mode) {
         this.#errorPrefix = errorPrefix;
         this.#mode = mode;
-        this.#validatorCreate = validatorCreate;
     }
 
     /**
@@ -162,7 +160,7 @@ class RuleSet {
             }
         }
 
-        let test = this.#validatorCreate(this.#errorPrefix, this.#mode);
+        let test = Validator.create(this.#errorPrefix, this.#mode);
 
         for (let rule of rules) {
             if (isObject && rule.path) {

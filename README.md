@@ -277,5 +277,5 @@ NOTE: If a test for at path do not provide an error message  use
 - `getErrors(path):string[]` - get all errors for the given path
 - `getAllErrors():string[]` - get all errors
 - `isValid():boolean` - `true` of there is no errors otherwise `false`
-- `isPAthValid(path):boolean` - `true` if the given path is valid otherwise `false`
+- `isPathValid(path):boolean` - `true` if the given path is valid otherwise `false`
 - `reset()` - resets the validation result. (not relevant in the context of a RuleSet as this always creates a new instance for every test) 

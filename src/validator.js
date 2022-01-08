@@ -794,4 +794,4 @@ class Validator {
 
 module.exports = { Validator };
 
-const { RuleSet } = require('./rule-set'); // put here to avoid warning about circular dependency
+const { RuleSet } = require('./rule-set'); // put here to avoid circular dependency problem
