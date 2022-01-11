@@ -83,6 +83,7 @@ class Validator {
     /**
      * @param {ValidatorInternalState} validatorState
      * @param {object} validatorSharedState
+     * @param {boolean} shortCircuit
      */
     #init(validatorState, validatorSharedState, shortCircuit = false) {
         this.#validatorState = validatorState;

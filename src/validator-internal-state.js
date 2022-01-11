@@ -70,7 +70,7 @@ class ValidatorInternalState {
     }
 
     /**
-     * @param {ValidatorInternalState} the dest to clone to
+     * @param {ValidatorInternalState} dest the dest to clone to
      * @param {string} contextValue the contextValue for the clone
      * @param {string} [contextValuePath] the contextValuePath for the clone, if <code>undefined</code> the contextValuePath from this instance will be used
      * @param {string} [contextValueCurrentPath] the contextValueCurrentPath for the clone, if <code>undefined</code> the contextValueCurrentPath from this instance will be used
