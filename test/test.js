@@ -14,9 +14,13 @@ try {
 
     let pers = {
         name: 'peter',
-        age: 19
+        age: 19,
+        address: {
+            zip: '7000'
+        }
     };
-    let ruleSet = Validator.createOnErrorNextPathRuleSet('ding');
+    let zipCodes = ['8000', '9000'];
+    let ruleSet = Validator.createOnErrorThrowRuleSet('Person object error:');
     ruleSet.addRule('', (person) => person.fulfillAllOf((person) => [
         person.is.anObject('person must be an object')
     ]));
@@ -28,9 +32,9 @@ try {
         age.is.anInteger('${PATH} must be an integer'),
         age.is.inRange(18, 99, 'age must be in range ${0} - ${1}', [18, 99])
     ]))
+    ruleSet.addRule('address.zip', (zip, zipCodes) => zip.is.in(zipCodes, '${PATH} in not a valid zip-code'));
 
-    //ruleSet.validate(pers);
-
+    ruleSet.validate(pers, undefined, zipCodes);
     /*console.time('te')
     for (let i = 0; i < 100_000; i++) {
 
