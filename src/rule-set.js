@@ -26,8 +26,9 @@ class RuleSet {
      * ]);
      * ruleSet.addRule('age', (age) => age.optional.is.aNumber('"${PATH}" must be a number'));
      *
-     * // add a variable values using the second parameter for the rule. The argument for parameter should be passed in during validation
-     * ruleSet.addRule('address.zip', (zip, zipCodes) => zip.is.in(zipCodes, '${PATH} is not a valid zipCode'));
+     * // Values not known at the time the rule is created can be referenced by the second parameter "context".
+     * // The argument for "context" should then be passed in during validation.
+     * ruleSet.addRule('country', (country, acceptedCountries) => country.isNot.in(acceptedCountries, '${VALUE} is not current on our list if countries'));
      *
      * @param {string} path the path for the rule. An empty string is considered the default rule.
      * @param {function(Validator, context?:*)} rule the rule which will be called when validating this path. "context" is an optional argument which can be passed in during validation.
@@ -55,14 +56,14 @@ class RuleSet {
      * ruleSet.addRule('', (person) => person.is.anObject('a person must be an object');
      * ruleSet.addRule('name', (name) => name.is.aString('"${PATH}" must be a string');
      * ruleSet.addRule('age', (age) => age.is.aNumber('"${PATH}" must be a number');
-     * ruleSet.addRule('address.zip', (zip, zipCodes) => zip.is.in(zipCodes, '${PATH} is not a valid zipCode'));
+     * ruleSet.addRule('country', (country, acceptedCountries) => country.isNot.in(acceptedCountries, '${VALUE} is not current on our list if countries'));
      *
-     * let person = { name: "John", age: 43, address: { zip: "8000" }};
+     * let person = { name: "John", age: 43, country: 'Denmark'};
+     * let acceptedCountries = ['Denmark', 'Japan'];
      *
-     * let zipCodes = ['8000', '9000'];
-     * console.log(ruleSet.isValid(person, undefined, zipCodes)); // pass in zipCodes as third argument to use for the 'address.zip' rule
-     * console.log(ruleSet.isValid(person, '')); // test only the rule for '' (we don't need to pass in zipCodes here, as zip-codes will not be tested)
-     * console.log(ruleSet.isValid(person, ['', 'name'])); // test only the rules for '' and 'name' (we don't need to pass in zipCodes here, as zip-codes will not be tested)
+     * console.log(ruleSet.isValid(person, undefined, acceptedCountries)); // pass in acceptedCountries as third argument to use for the 'country' rule
+     * console.log(ruleSet.isValid(person, '')); // test only the rule for '' (we don't need to pass in acceptedCountries here, as country will not be tested)
+     * console.log(ruleSet.isValid(person, ['', 'name'])); // test only the rules for '' and 'name' (we don't need to pass in acceptedCountries here, as country will not be tested)
      *
      * @param object the object to validate
      * @param {string|string[]} [path] the path(s) to validate. If path is undefined all rules will be validated against the object
@@ -96,16 +97,16 @@ class RuleSet {
      *     name.does.match(/\w+/, '"${PATH}" must only contain [a-Z_0-9]')
      * ]);
      * ruleSet.addRule('age', (age) => age.is.aNumber('"${PATH}" must be a number'));
-     * ruleSet.addRule('address.zip', (zip, zipCodes) => zip.is.in(zipCodes, '${PATH} is not a valid zipCode'));
+     * ruleSet.addRule('country', (country, acceptedCountries) => country.isNot.in(acceptedCountries, '${VALUE} is not current on our list if countries'));
      *
      * let name = 'john';
      * let age = 43;
-     * let zip = '8000';
-     * let zipCodes = ['8000', '9000'];
+     * let country = 'Denmark';
+     * let acceptedCountries = ['Denmark', 'Japan'];
      *
      * console.log(ruleSet.isValueValid(name, 'name'));
      * console.log(ruleSet.isValueValid(age, 'age'));
-     * console.log(ruleSet.isValueValid(zip, 'address.zip', zipCodes));
+     * console.log(ruleSet.isValueValid(country, 'country', acceptedCountries));
      *
      * @param value the value to validate
      * @param {string|string[]} [path] the path(s) to validate. If path is undefined all rules will be validated against the value
@@ -133,12 +134,12 @@ class RuleSet {
      * ruleSet.addRule('', (person) => person.is.anObject('a person must be an object');
      * ruleSet.addRule('name', (name) => name.is.aString('"${PATH}" must be a string');
      * ruleSet.addRule('age', (age) => age.is.aNumber('"${PATH}" must be a number');
-     * ruleSet.addRule('address.zip', (zip, zipCodes) => zip.is.in(zipCodes, '${PATH} is not a valid zipCode'));
+     * ruleSet.addRule('country', (country, acceptedCountries) => country.isNot.in(acceptedCountries, '${VALUE} is not current on our list if countries'));
      *
-     * let person = { name: "John", age: 43, address: { zip: "8000" }};
-     * let zipCodes = ['8000', '9000'];
+     * let person = { name: "John", age: 43, country: 'Denmark'};
+     * let acceptedCountries = ['Denmark', 'Japan'];
      *
-     * let validationResult = ruleSet.validate(person, undefined, zipCodes); // if no rule needed a context (zipCodes in this ex.) we could just call ruleSet.validate(person)
+     * let validationResult = ruleSet.validate(person, undefined, acceptedCountries); // if "context" is not needed (acceptedCountries in this ex.) we could just call ruleSet.validate(person)
      * console.log(validationResult.isValid());
      * console.log(validationResult.getAllErrors());
      * console.log(validationResult.getErrors('name'));
@@ -196,12 +197,12 @@ class RuleSet {
      * let ruleSet = Validator.createOnErrorNextPathRuleSet();
      * ruleSet.addRule('name', (name) => name.is.aString('"${PATH}" must be a string');
      * ruleSet.addRule('age', (age) => age.is.aNumber('"${PATH}" must be a number');
-     * ruleSet.addRule('address.zip', (zip, zipCodes) => zip.is.in(zipCodes, '${PATH} is not a valid zipCode'));
+     * ruleSet.addRule('country', (country, acceptedCountries) => country.isNot.in(acceptedCountries, '${VALUE} is not current on our list if countries'));
      *
      * let name = 'john';
      * let age = 43;
-     * let zip = '8000';
-     * let zipCodes = ['8000', '9000'];
+     * let country = 'Denmark';
+     * let acceptedCountries = ['Denmark', 'Japan'];
      *
      * let validationResult = ruleSet.validate(name, 'name');
      * console.log(validationResult.isValid());
@@ -209,7 +210,7 @@ class RuleSet {
      * console.log(validationResult.getErrors('name'));
      *
      * validationResult = ruleSet.validate(age, 'age');
-     * validationResult.validate(zip, 'address.zip', zipCodes);
+     * validationResult.validate(country, 'country', countries);
      *
      * @param value the value to validate against the rule for the path(s)
      * @param {string|string[]} [path] the path(s) to validate. If path is undefined all rules will be validated against the value

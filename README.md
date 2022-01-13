@@ -109,17 +109,22 @@ if rules are divided by each property and added separately.
 ```js
 let ruleSet = Validator.createOnErrorBreakRuleSet();
 ruleSet.addRule('username', (username) => username.fulfillAllOf(username => [
-  username.is.aString('Username must be a string'),
-  username.does.match(/\w{4, 25}/, "Username must only contain a-zA-Z0-9_ and have a length of 4-25 characters")
+    username.is.aString('Username must be a string'),
+    username.does.match(/\w{4, 25}/, "Username must only contain a-zA-Z0-9_ and have a length of 4-25 characters")
 ]));
 ruleSet.addRule('age', (age) => age.fulfillAllOf(age => [
-  age.is.anInteger('Age must be an integer'),
-  age.is.inRange(0, 120, 'Age must be in range 0 - 120')
+    age.is.anInteger('Age must be an integer'),
+    age.is.inRange(0, 120, 'Age must be in range 0 - 120')
 ]));
+
+let user = {
+    username: 'johndoe',
+    age: 45
+}
 
 // simple test if a user is valid
 if (ruleSet.isValid(user)) {
-  // do something usefull here
+    // do something usefull here
 }
 
 // or get detailed validation results
@@ -140,6 +145,31 @@ let ageIsValid = ruleSet.isValueValid(23, 'age');
 validationResult = ruleSet.validateValue(23, 'age');
 ```
 
+### Supplying Values not Known at the Time of Rule Creation
+When creating rules for reuse some values may not be known at the time the rule is created because they are unknown, change
+regularly. Or we could want to create a generic set of rules which can be used in different contexts. 
+"Context" values can be passed in to a rule at validation time and referenced by the rule by adding a second 
+parameter to the rule function as shown in the below example.
+
+```js
+let ruleSet = Validator.createOnErrorBreakRuleSet();
+ruleSet.addRule('username', (username, reservedUsernames) => username.fulfillAllOf(username => [
+    username.is.aString('Username must be a string'),
+    username.does.match(/\w{4, 25}/, "Username must only contain a-zA-Z0-9_ and have a length of 4-25 characters"),
+    username.isNot.in(reversedUsernames, '${VALUE} is a reserved username')
+]));
+
+let reservedUsernames = await fetchReservedUsernames(); // fetch reserved usernamed from some server
+
+let user = {
+    username: 'admin'
+}
+
+ruleSet.validate(user, 'username', reservedUsernames); // we pass in the "context" arg as the third object to validate
+// if we want to validate all paths for an object and need to supply a context argument, we need to pass in "undefined"
+// for the "path" parameter. (in this case both examples gives the same result as we only have a rule for "username")
+ruleSet.validate(user, undefined, reservedUsernames);
+```
 
 ## Error Messages
 Error messages can be supplied for the individual test and as combined messages for `fulfill()`, `fulfillAllOf()`, `fulfillOneOf()` and `each()`.
