@@ -278,6 +278,7 @@ returns a `boolean`.
 - `aString()`
 - `empty()`
 - `equalTo(otherValue)`
+- `endWith(endStr)`
 - `fulfill(predicate)`
 - `fulfillAllOf(predicates)`
 - `fulfillOneOf(predicates)`
@@ -290,6 +291,7 @@ returns a `boolean`.
 - `lessThanOrEqualTo(value)`
 - `match(regex)`
 - `nil()`
+- `startWith(startStr)`
 
 ## RuleSet Overview
 - `addRule(path, rule):RuleSet` - add a rule for the given to the `RuleSet` in the form of a function which will be called when rule is tested

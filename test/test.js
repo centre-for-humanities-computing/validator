@@ -3,13 +3,10 @@ const _ = require('lodash');
 
 try {
     Validator.debug(true);
-    /*let t = Validator.createOnErrorThrowValidator();
-    let validator = (val) => val.optional.fulfillAllOf(val => [
-        val.is.aNumber()
-        ]
-    )
-    t([undefined, 10]).each(validator, "bad");
-*/
+    let t = Validator.createOnErrorThrowValidator();
+    t('name', 'name').is.aFloatString('"${CURRENT_PATH}" no')
+
+    return;
 
 
     let pers = {

@@ -346,6 +346,44 @@ class ValidatorContext {
     }
 
     /**
+     * @param {string} startStr the string the contextValue should start with
+     * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
+     * @param {string|number|(string|number)[]} [messageArgs] values for placeholders in the errorMessage
+     * @returns {boolean} the result of the predicate
+     */
+    startWith(startStr, errorMessage, messageArgs) {
+        if (_.isString(startStr)) {
+            this.#throwArgumentError(`The argument for "startStr" must be a string but was: "${typeof startStr}"`);
+        }
+        let success = this.#contextValue.startsWith(startStr);
+
+        if (Debug.enabled) {
+            this.#printDebug(this.startWith.name, success, [startStr]);
+        }
+
+        return this.#handleError(success, errorMessage, messageArgs);
+    }
+
+    /**
+     * @param {string} endStr the string the contextValue should end with
+     * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
+     * @param {string|number|(string|number)[]} [messageArgs] values for placeholders in the errorMessage
+     * @returns {boolean} the result of the predicate
+     */
+    endWith(endStr, errorMessage, messageArgs) {
+        if (_.isString(endStr)) {
+            this.#throwArgumentError(`The argument for "endStr" must be a string but was: "${typeof endStr}"`);
+        }
+        let success = this.#contextValue.endsWith(endStr);
+
+        if (Debug.enabled) {
+            this.#printDebug(this.endWith.name, success, [endStr]);
+        }
+
+        return this.#handleError(success, errorMessage, messageArgs);
+    }
+
+    /**
      * @example
      * let test = Validator.create('Validation error:');
      * let name = "John";
