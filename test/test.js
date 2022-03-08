@@ -10,7 +10,7 @@ try {
 
 
     let pers = {
-        name: 'peter',
+        name: 4,
         age: 19,
         address: {
             zip: '7000'
@@ -143,7 +143,7 @@ test(person).fulfillAllOf(person => [
 //problemet er måske at vi i conditionally laver en noopValidationResult object??
 test(person).fulfillAllOf(person => [
     person.conditionally(person => person.is.equalTo(person.value)).prop('name').fulfillAllOf(name => [
-        name.is.aNumber("name must be a int"),
+        name.is.aNumber("${CURRENT_PATH} must be a int"),
     ])
 ]);
 

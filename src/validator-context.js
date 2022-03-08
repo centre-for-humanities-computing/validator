@@ -352,7 +352,7 @@ class ValidatorContext {
      * @returns {boolean} the result of the predicate
      */
     startWith(startStr, errorMessage, messageArgs) {
-        if (_.isString(startStr)) {
+        if (!_.isString(startStr)) {
             this.#throwArgumentError(`The argument for "startStr" must be a string but was: "${typeof startStr}"`);
         }
         let success = this.#contextValue.startsWith(startStr);
@@ -371,7 +371,7 @@ class ValidatorContext {
      * @returns {boolean} the result of the predicate
      */
     endWith(endStr, errorMessage, messageArgs) {
-        if (_.isString(endStr)) {
+        if (!_.isString(endStr)) {
             this.#throwArgumentError(`The argument for "endStr" must be a string but was: "${typeof endStr}"`);
         }
         let success = this.#contextValue.endsWith(endStr);
