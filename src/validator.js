@@ -251,7 +251,7 @@ class Validator {
 
     /**
      * @param {ValidatorContext} currentValidatorContext
-     * @param {*} [contextValue] the value for this validator if <code>undefined</code> the value from the parent will be used
+     * @param {*} contextValue the value for this validator
      * @param {string} [contextValuePath] the contextValuePath for this validator if <code>undefined</code> the value from the parent will be used
      * @param {string} [contextValueCurrentPath] the contextValueCurrentPath for this validator if <code>undefined</code> the value from the parent will be used
      * @returns {Validator}
@@ -260,7 +260,7 @@ class Validator {
         let validatorState = this.#validatorState.cloneWith(Validator.#validatorStatePool.get(), contextValue, contextValuePath, contextValueCurrentPath);
         let validator = Validator.#validatorPool.get();
         let shortCircuit = this.#istShortCircuitValidatorContext(currentValidatorContext) || this.#shortCircuit();
-        // if the parent is short circuited make sure the child is a well, this goes for e.g. prop()
+        // if the parent is short-circuited make sure the child is a well, this goes for e.g. prop()
         validator.#init(validatorState, this.#validatorSharedState, shortCircuit);
         return validator;
     }
@@ -502,7 +502,7 @@ class Validator {
             this.#printDebug('{>}', this.transform.name, `${Debug.instance.valueToStr(this.#contextValue)} -> ${Debug.instance.valueToStr(transformedValue)}`);
         }
 
-        let validator = this.#createChildValidator(validatorContext);
+        let validator = this.#createChildValidator(validatorContext, transformedValue);
         this.#validatorContextDone(validatorContext);
         return validator;
     }

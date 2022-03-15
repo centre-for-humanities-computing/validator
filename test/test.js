@@ -4,7 +4,7 @@ const _ = require('lodash');
 try {
     Validator.debug(true);
     let t = Validator.createOnErrorThrowValidator();
-    t('name', 'name').is.aFloatString('"${CURRENT_PATH}" no')
+    t('name', 'name').transform(name => name.trim()).is.aFloatString('"${CURRENT_PATH}" no')
 
     return;
 
