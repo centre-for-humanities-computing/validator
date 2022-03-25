@@ -424,10 +424,10 @@ class Validator {
                 i++;
             }
         } finally {
-            this.#validatorContextDone(validatorContext);
             if (Debug.enabled) {
                 this.#printDebug('{@}', `${this.each.name}<end>`, '', Debug.indent.END);
             }
+            this.#validatorContextDone(validatorContext);
         }
         return success;
     }
