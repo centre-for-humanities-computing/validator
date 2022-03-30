@@ -4,7 +4,21 @@ const _ = require('lodash');
 try {
     Validator.debug(true);
     let t = Validator.createOnErrorThrowValidator();
-    t('name', 'name').transform(name => name.trim()).is.aFloatString('"${CURRENT_PATH}" no')
+
+
+    let isEmptyStringRule = (arg) => arg.fulfillAllOf((arg) => [false,
+        /*arg.is.aString(),
+        arg.fulfill(arg => arg.value.trim() === '') // is empty*/
+    ]);
+
+    let typeValueValidator = (date) => date.optional.fulfillOneOf((date) => [
+        (d) => console.log(d.is.anArray()),
+        date.is.anInteger(), // da denne er true short circuitter fullfillOneOf og ovenstående bliver kaldt med et objekt der altid er true,
+
+    ],
+        '[min, max] filter value for field ${0} must be a date in one of the formats ' +
+        "[yyyy-MM-dd, yyyy-MM-dd HH:mm:ss, ISO_8601_COMPLIANT, UNIX_TIMESTAMP]");
+    t([23,24]).each(typeValueValidator)
 
     return;
 
@@ -112,50 +126,53 @@ try {
     console.error(e);
 }
 
+function testPerson() {
+
+    let person = { name: "John", age: 54, ssn: undefined };
+
+    let test = Validator.createOnErrorThrowValidator('Person validation error');
 
 
-let person = { name: "John", age: 54, ssn: undefined };
-
-let test = Validator.createOnErrorThrowValidator('Person validation error');
-
-
-/*test(person).fulfillAllOf((person) => [
-    person.is.anObject('person must be an object'),
-    person.prop('name').fulfillAllOf((name) => [
-        name.is.aString('${PATH} must be a string'),
-        name.transform((name) => name.trim()).isNot.empty('${PATH} cannot be empty')
-    ]),
-    person.prop('age').is.aNumber('${PATH} must be a number'),
-    person.prop('ssn').optional.fulfillAllOf((ssn) => [
-        ssn.is.aString('${PATH} must be a string or undefined'),
-        ssn.does.match(/^\d{6}-?\d{4}$/, '${PATH} must match xxxxxx-xxxx')
-    ])
-]);*/
+    /*test(person).fulfillAllOf((person) => [
+        person.is.anObject('person must be an object'),
+        person.prop('name').fulfillAllOf((name) => [
+            name.is.aString('${PATH} must be a string'),
+            name.transform((name) => name.trim()).isNot.empty('${PATH} cannot be empty')
+        ]),
+        person.prop('age').is.aNumber('${PATH} must be a number'),
+        person.prop('ssn').optional.fulfillAllOf((ssn) => [
+            ssn.is.aString('${PATH} must be a string or undefined'),
+            ssn.does.match(/^\d{6}-?\d{4}$/, '${PATH} must match xxxxxx-xxxx')
+        ])
+    ]);*/
 
 
-test(person).fulfillAllOf(person => [
-    person.is.anObject(),
-    person.fulfillAllOf(person => [
+    test(person).fulfillAllOf(person => [
         person.is.anObject(),
-    ])
-], "bang")
+        person.fulfillAllOf(person => [
+            person.is.anObject(),
+        ])
+    ], "bang")
 
-//problemet er måske at vi i conditionally laver en noopValidationResult object??
-test(person).fulfillAllOf(person => [
-    person.conditionally(person => person.is.equalTo(person.value)).prop('name').fulfillAllOf(name => [
-        name.is.aNumber("${CURRENT_PATH} must be a int"),
-    ])
-]);
+    //problemet er måske at vi i conditionally laver en noopValidationResult object??
+    test(person).fulfillAllOf(person => [
+        person.conditionally(person => person.is.equalTo(person.value)).prop('name').fulfillAllOf(name => [
+            name.is.aNumber("${CURRENT_PATH} must be a int"),
+        ])
+    ]);
 
-test(person).fulfillAllOf(person => [
-    person.conditionally(() => true).prop('name').fulfillAllOf(name => [
-        name.is.aString("name must be a sintr"),
-        name.is.aNumber('Name must be a number')
-    ])
-]);
+    test(person).fulfillAllOf(person => [
+        person.conditionally(() => true).prop('name').fulfillAllOf(name => [
+            name.is.aString("name must be a sintr"),
+            name.is.aNumber('Name must be a number')
+        ])
+    ]);
 
-console.log(test.result.isValid());
-console.log(test.result.getAllErrors())
+    console.log(test.result.isValid());
+    console.log(test.result.getAllErrors());
+}
+
+//testPerson()
 
 /*for (let i = 0; i < 100; i++) {
 

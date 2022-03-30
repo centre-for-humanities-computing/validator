@@ -447,10 +447,12 @@ class ValidatorContext {
      * @see {@link #fulfill}, {@link #fulfillAllOf}
      */
     fulfillOneOf(predicates, errorMessage, messageArgs) {
-        this.#validatorCallbackContext.enableShortCircuitStickyOn(true);
         if (_.isFunction(predicates)) {
             predicates = predicates(this.#validator);
         }
+        // important that we wait until after we have called the predicates function above (if present) as
+        // this will use the same context which can result in the context short-circuiting premature
+        this.#validatorCallbackContext.enableShortCircuitStickyOn(true);
 
         if (Debug.enabled) {
             this.#printDebug(`${this.fulfillOneOf.name}<start>`, undefined, [], Debug.indent.BEGIN);
@@ -513,14 +515,17 @@ class ValidatorContext {
      * @see {@link #fulfill}, {@link #fulfillOneOf}
      */
     fulfillAllOf(predicates, errorMessage, messageArgs) {
+        if (_.isFunction(predicates)) {
+            predicates = predicates(this.#validator);
+        }
+        // important that we wait until after we have called the predicates function above (if present) as
+        // this will use the same context which can result in the context short-circuiting premature
         this.#validatorCallbackContext.enableShortCircuitStickyOn(false);
+
         if (Debug.enabled) {
             this.#printDebug(`${this.fulfillAllOf.name}<start>`, undefined, [], Debug.indent.BEGIN);
         }
 
-        if (_.isFunction(predicates)) {
-            predicates = predicates(this.#validator);
-        }
         if (!Array.isArray(predicates)) {
             this.#throwArgumentError(`The argument "predicates" must be an array or a function returning an array`);
         }
