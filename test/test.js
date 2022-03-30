@@ -12,8 +12,8 @@ try {
     ]);
 
     let typeValueValidator = (date) => date.optional.fulfillOneOf((date) => [
-        (d) => console.log(d.is.anArray()),
-        date.is.anInteger(), // da denne er true short circuitter fullfillOneOf og ovenstående bliver kaldt med et objekt der altid er true,
+        date.fulfill(d => console.log(d.is.anArray())),
+        date.is.anInteger() // da denne er true short circuitter fullfillOneOf og ovenstående bliver kaldt med et objekt der altid er true,
 
     ],
         '[min, max] filter value for field ${0} must be a date in one of the formats ' +

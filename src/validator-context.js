@@ -419,27 +419,23 @@ class ValidatorContext {
      * let test = Validator.create('Validation error:');
      * let name = "John";
      * test(name).fulfillOneOf((name) => [
-     *     () => name.value.length > 1,    // user defined predicate
-     *     () => name.does.match(/\W+/)    // using the existing validator context
+     *     name.value.length > 1,    // user defined predicate
+     *     name.does.match(/\W+/)    // using the existing validator context
      * ], 'Name must have length > 1 or not include \w characters');
      *
      * // combining multiple tests. We don't even need to pass in an initial value
      * test().fulfillOneOf([
-     *     () => test(name.length).is.aNumber(), // create a new test and include the boolean result
-     *     () => test(name).does.match(/\W+/),   // create a new test and include the boolean result
-     *     () => 2 > 1,                    // anything evaluating to a boolean is fine
-     *     () => true
+     *     test(name.length).is.aNumber(), // create a new test and include the boolean result
+     *     test(name).does.match(/\W+/),   // create a new test and include the boolean result
+     *     2 > 1,                    // anything evaluating to a boolean is fine
+     *     true
      * ], 'weird validation did not pass');
      *
      * // OBS it is important not to pass in an error message to the inner predicates because they would then
      * // throw an error or break depending on the mode of the validator and the remaining predicates would not be tested,
      * // which they should in fulfillOnOf
      *
-     * // OBS OBS for short circuit on a false predicate to work as expected (no more predicates are tested after a predicate resolves to true)
-     * // each predicate should either be a function or the result of a call to a method of a ValidatorContext
-     *
-     * @param {function(Validator)[]|function(Validator):(function(Validator)|boolean)[]} predicates  an array of predicate functions, or a function returning an array of predicate functions or predicate results
-     * of, predicate functions returning a boolean.
+     * @param {boolean[]|function(Validator):boolean[]} predicates  an array of predicate results, or a function returning an array of predicate results
      * Use the passed in validator to add further predicates for the current value
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
      * @param {string|number|(string|number)[]} [messageArgs] values for placeholders in the errorMessage
@@ -447,12 +443,11 @@ class ValidatorContext {
      * @see {@link #fulfill}, {@link #fulfillAllOf}
      */
     fulfillOneOf(predicates, errorMessage, messageArgs) {
+        this.#validatorCallbackContext.enableShortCircuitStickyOn(true);
         if (_.isFunction(predicates)) {
             predicates = predicates(this.#validator);
         }
-        // important that we wait until after we have called the predicates function above (if present) as
-        // this will use the same context which can result in the context short-circuiting premature
-        this.#validatorCallbackContext.enableShortCircuitStickyOn(true);
+
 
         if (Debug.enabled) {
             this.#printDebug(`${this.fulfillOneOf.name}<start>`, undefined, [], Debug.indent.BEGIN);
@@ -465,7 +460,7 @@ class ValidatorContext {
         let success = false;
         for (let predicate of predicates) {
             if (_.isFunction(predicate)) {
-                success = predicate(this.#validator);
+                throw new Error('a function is not a valid predicate result');
             } else {
                 success = !!predicate;
             }
@@ -488,26 +483,22 @@ class ValidatorContext {
      * let test = Validator.create('Validation error:', Validator.mode.ON_ERROR_BREAK);
      * let name = "John";
      * test(name).fulfillAllOf(name) => [
-     *     () => name.is.aString(),
-     *     () => name.is.equalTo("John")
+     *     name.is.aString(),
+     *     name.is.equalTo("John")
      * ], 'Name must be a string and have the value "John"');
      *
      * // combining multiple tests. We don't even need to pass in an initial value
      * test().fulfillOneOf([
-     *     () => test(name.length).is.aNumber(), // create a new test and include the boolean result
-     *     () => test(name).does.match(/\W+/),   // create a new test and include the boolean result
-     *     () => 2 > 1,                    // anything evaluating to a boolean is fine
-     *     () => true
+     *     test(name.length).is.aNumber(), // create a new test and include the boolean result
+     *     test(name).does.match(/\W+/),   // create a new test and include the boolean result
+     *     2 > 1,                    // anything evaluating to a boolean is fine
+     *     true
      * ], 'weird validation did not pass');
      *
      * // OBS we can add a general error message which relates to all tests in the array. If so it is important not
      * // to pass in an error message to the inner predicates because they would then throw an error or break depending on the mode of the validator
      *
-     * // OBS OBS for short circuit on a false predicate to work as expected (no more predicates are tested after a predicate resolves to true)
-     * // each predicate should either be a function or the result of a call to a method of a ValidatorContext
-     *
-     * @param {function(Validator)[]|function(Validator):(function(Validator)|boolean)[]} predicates an array of, or a function returning an array
-     * of, predicate functions returning a boolean.
+     * @param {boolean[]|function(Validator):boolean[]} predicates an array of predicate results, or a function returning an array of predicate results
      * Use the passed in validator to add further predicates for the current value
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
      * @param {string|number|(string|number)[]} [messageArgs] values for placeholders in the errorMessage
@@ -515,12 +506,10 @@ class ValidatorContext {
      * @see {@link #fulfill}, {@link #fulfillOneOf}
      */
     fulfillAllOf(predicates, errorMessage, messageArgs) {
+        this.#validatorCallbackContext.enableShortCircuitStickyOn(false);
         if (_.isFunction(predicates)) {
             predicates = predicates(this.#validator);
         }
-        // important that we wait until after we have called the predicates function above (if present) as
-        // this will use the same context which can result in the context short-circuiting premature
-        this.#validatorCallbackContext.enableShortCircuitStickyOn(false);
 
         if (Debug.enabled) {
             this.#printDebug(`${this.fulfillAllOf.name}<start>`, undefined, [], Debug.indent.BEGIN);
@@ -533,7 +522,7 @@ class ValidatorContext {
         let success = true;
         for (let predicate of predicates) {
             if (_.isFunction(predicate)) {
-                success = predicate(this.#validator);
+                throw new Error('a function is not a valid predicate result');
             } else {
                 success = !!predicate;
             }
