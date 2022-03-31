@@ -424,7 +424,7 @@ class ValidatorContext {
      * ], 'Name must have length > 1 or not include \w characters');
      *
      * // combining multiple tests. We don't even need to pass in an initial value
-     * test().fulfillOneOf([
+     * test().fulfillOneOf(() => [
      *     test(name.length).is.aNumber(), // create a new test and include the boolean result
      *     test(name).does.match(/\W+/),   // create a new test and include the boolean result
      *     2 > 1,                    // anything evaluating to a boolean is fine
@@ -435,7 +435,7 @@ class ValidatorContext {
      * // throw an error or break depending on the mode of the validator and the remaining predicates would not be tested,
      * // which they should in fulfillOnOf
      *
-     * @param {boolean[]|function(Validator):boolean[]} predicates  an array of predicate results, or a function returning an array of predicate results
+     * @param {function(Validator):boolean[]} predicates a function returning an array of predicate results.
      * Use the passed in validator to add further predicates for the current value
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
      * @param {string|number|(string|number)[]} [messageArgs] values for placeholders in the errorMessage
@@ -444,23 +444,24 @@ class ValidatorContext {
      */
     fulfillOneOf(predicates, errorMessage, messageArgs) {
         this.#validatorCallbackContext.enableShortCircuitStickyOn(true);
-        if (_.isFunction(predicates)) {
-            predicates = predicates(this.#validator);
+        if (!_.isFunction(predicates)) {
+            this.#throwArgumentError(`The argument "predicates" must be a function returning an array`);
         }
 
+        let predicateArray = predicates(this.#validator);
+
+        if (!Array.isArray(predicateArray)) {
+            this.#throwArgumentError(`The returned value from "predicates" must be an array`);
+        }
 
         if (Debug.enabled) {
             this.#printDebug(`${this.fulfillOneOf.name}<start>`, undefined, [], Debug.indent.BEGIN);
         }
 
-        if (!Array.isArray(predicates)) {
-            this.#throwArgumentError(`The argument "predicates" must be an array or a function returning an array`);
-        }
-
         let success = false;
-        for (let predicate of predicates) {
+        for (let predicate of predicateArray) {
             if (_.isFunction(predicate)) {
-                throw new Error('a function is not a valid predicate result');
+                this.#throwArgumentError('a function is not a valid predicate result');
             } else {
                 success = !!predicate;
             }
@@ -498,7 +499,7 @@ class ValidatorContext {
      * // OBS we can add a general error message which relates to all tests in the array. If so it is important not
      * // to pass in an error message to the inner predicates because they would then throw an error or break depending on the mode of the validator
      *
-     * @param {boolean[]|function(Validator):boolean[]} predicates an array of predicate results, or a function returning an array of predicate results
+     * @param {function(Validator):boolean[]} predicates a function returning an array of predicate results.
      * Use the passed in validator to add further predicates for the current value
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
      * @param {string|number|(string|number)[]} [messageArgs] values for placeholders in the errorMessage
@@ -507,22 +508,24 @@ class ValidatorContext {
      */
     fulfillAllOf(predicates, errorMessage, messageArgs) {
         this.#validatorCallbackContext.enableShortCircuitStickyOn(false);
-        if (_.isFunction(predicates)) {
-            predicates = predicates(this.#validator);
+        if (!_.isFunction(predicates)) {
+            this.#throwArgumentError(`The argument "predicates" must be a function returning an array`);
+        }
+
+        let predicateArray = predicates(this.#validator);
+
+        if (!Array.isArray(predicateArray)) {
+            this.#throwArgumentError(`The returned value from "predicates" must be an array`);
         }
 
         if (Debug.enabled) {
             this.#printDebug(`${this.fulfillAllOf.name}<start>`, undefined, [], Debug.indent.BEGIN);
         }
 
-        if (!Array.isArray(predicates)) {
-            this.#throwArgumentError(`The argument "predicates" must be an array or a function returning an array`);
-        }
-
         let success = true;
-        for (let predicate of predicates) {
+        for (let predicate of predicateArray) {
             if (_.isFunction(predicate)) {
-                throw new Error('a function is not a valid predicate result');
+                this.#throwArgumentError('a function is not a valid predicate result');
             } else {
                 success = !!predicate;
             }
