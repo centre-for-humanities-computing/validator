@@ -10,7 +10,11 @@ module.exports.joinPropPaths = function(...elements) {
             continue;
         }
         if (result.length > 0) {
-            result += '.' + element;
+            if (element.startsWith('[')) {
+                result += element;
+            } else {
+                result += '.' + element;
+            }
         } else {
             result = element;
         }

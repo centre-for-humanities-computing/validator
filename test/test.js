@@ -18,16 +18,15 @@ try {
     ],
         '[min, max] filter value for field ${0} must be a date in one of the formats ' +
         "[yyyy-MM-dd, yyyy-MM-dd HH:mm:ss, ISO_8601_COMPLIANT, UNIX_TIMESTAMP]");
-    t([23,24]).each(typeValueValidator)
+    t([23,24], 'basePath').each(typeValueValidator)
 
-    return;
 
 
     let pers = {
-        name: 4,
+        name: 'peer',
         age: 19,
         address: {
-            zip: '7000'
+            zip: '8000'
         }
     };
     let zipCodes = ['8000', '9000'];

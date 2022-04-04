@@ -459,7 +459,7 @@ class Validator {
         }
 
         if (Debug.enabled) {
-            this.#printDebug('{.}', `${this.prop.name}[${path}]`, `${path}=${Debug.instance.pathStr(childValue)}`);
+            this.#printDebug('{.}', `${this.prop.name}["${path}"]`, `${path}=${Debug.instance.pathStr(childValue)}`);
         }
 
         let validator = this.#createChildValidator(validatorContext, childValue, fullPropPath, path);
