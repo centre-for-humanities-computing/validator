@@ -475,7 +475,6 @@ class ValidatorContext {
         if (Debug.enabled) {
             this.#printDebug(`${this.fulfillOneOf.name}<end>`, success, [], Debug.indent.END);
         }
-
         return this.#handleError(success, errorMessage, messageArgs);
     }
 

@@ -212,18 +212,19 @@ class Validator {
         this.#validatorContextDone(validatorContext);
     }
 
-    #validatorContextDone = (validatorContext, success = true, errorMessage) => {
-        if (!success && !this.#shortCircuit()) {
-            this.#validatorState.validationResult._addFailedPath(this.#errorContextValuePath, errorMessage);
-            this.#validatorSharedState.failedPaths.push(this.#errorContextValuePath);
-        }
-        if (this.#contextShortCircuit.sticky.length > 0) {
-            let stickyContext = this.#contextShortCircuit.sticky[this.#contextShortCircuit.sticky.length - 1];
-            if (!stickyContext.fulfilled && stickyContext.fulfillValue === success) {
-                stickyContext.fulfilled = true;
+    #validatorContextDone = (validatorContext, success = undefined, errorMessage) => {
+        if (success !== undefined) { // important that we allow undefined for e.g. prop() which just used this to reset the context
+            if (!success && !this.#shortCircuit()) {
+                this.#validatorState.validationResult._addFailedPath(this.#errorContextValuePath, errorMessage);
+                this.#validatorSharedState.failedPaths.push(this.#errorContextValuePath);
+            }
+            if (this.#contextShortCircuit.sticky.length > 0) {
+                let stickyContext = this.#contextShortCircuit.sticky[this.#contextShortCircuit.sticky.length - 1];
+                if (!stickyContext.fulfilled && stickyContext.fulfillValue === success) {
+                    stickyContext.fulfilled = true;
+                }
             }
         }
-
         this.#reset(validatorContext);
     }
 
@@ -388,7 +389,7 @@ class Validator {
      * @returns {boolean} <code>true</code> if all elements passed the predicate test otherwise <code>false</code>
      */
     each(predicate, errorMessage, messageArgs) {
-        // we should always activate the validatorContext and end end it with validatorContextDone
+        // we should always activate the validatorContext and end it with validatorContextDone
         // to make sure reset() works correctly and the context is returned to the contextPool
         let validatorContext = this.#getValidatorContext(false);
         if (this.#istShortCircuitValidatorContext(validatorContext)) { // getValidatorContext() resets shortCircuitValidatorContexts for us
@@ -427,7 +428,7 @@ class Validator {
             if (Debug.enabled) {
                 this.#printDebug('{@}', `${this.each.name}<end>`, '', Debug.indent.END);
             }
-            this.#validatorContextDone(validatorContext);
+            this.#validatorContextDone(validatorContext, success);
         }
         return success;
     }
@@ -463,7 +464,9 @@ class Validator {
         }
 
         let validator = this.#createChildValidator(validatorContext, childValue, fullPropPath, path);
-        this.#validatorContextDone(validatorContext); // important to call this to make sure reset() is called and the context is returned to the contextPool, because we are leaving this context and enter a child validator
+        // important to call this to make sure reset() is called and the context is returned to the contextPool, because we are leaving this context and enter a child validator
+        // IMPORT that we pass undefined as success so we don't modify short circuit state etc. as getting a prop is NOT a predicate
+        this.#validatorContextDone(validatorContext, undefined);
         return validator;
     }
 
@@ -503,7 +506,9 @@ class Validator {
         }
 
         let validator = this.#createChildValidator(validatorContext, transformedValue);
-        this.#validatorContextDone(validatorContext);
+        // important to call this to make sure reset() is called and the context is returned to the contextPool, because we are leaving this context and enter a child validator
+        // IMPORT that we pass undefined as success so we don't modify short circuit state etc. as getting a prop is NOT a predicate
+        this.#validatorContextDone(validatorContext, undefined);
         return validator;
     }
 
