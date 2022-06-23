@@ -526,7 +526,10 @@ class ValidatorContext {
             if (_.isFunction(predicate)) {
                 this.#throwArgumentError('a function is not a valid predicate result');
             } else {
-                success = !!predicate;
+                let predicateSuccess = !!predicate;
+                if (!predicateSuccess) {
+                    success = false;
+                }
             }
             // on mode = ON_ERROR_NEXT_PATH we need to let the validator handle it so it can collect errors for all paths (not required in fulfillOneOf as it only needs to fulfill one predicate)
             if (!success && this.#validatorState.mode !== sharedConstants.mode.ON_ERROR_NEXT_PATH) {
