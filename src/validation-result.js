@@ -81,12 +81,13 @@ class ValidationResult {
      * @private
      */
     _addFailedPath(path, message) {
+        if (!message) {
+            throw new Error('a "message" is required to fail a path');
+        }
         if (!this.#errors.has(path)) {
             this.#errors.set(path, []);
         }
-        if (message) {
-            this.#errors.get(path).push(message);
-        }
+        this.#errors.get(path).push(message);
     }
 
     toString() {
