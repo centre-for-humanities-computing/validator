@@ -213,9 +213,10 @@ The different paths and values in the current validation context can be referenc
 placeholders:
 
 - `${VALUE}` - the value currently being testet
-- `${PATH}` - the full path of the current value under test including `errorPrefixPath` if supplied
+- `${PATH}` - the full path of the current value under test including `errorPrefixPath` and `errorContextPaths` if supplied
+- `${PATHx}` - the full path at index `x` of the current value under test when multiple `errorContextPaths` is supplied using `Validator.errorContext()`
 - `${CURRENT_PATH}` - the path for the current value under test
-- `${PARENT_PATH}` - the parent of `${CURRENT_PATH}`
+- `${PARENT_PATH}` - the full parent path of `${CURRENT_PATH}`
 
 ```js
 let person = { name: "Peter", age: 41 };
@@ -232,6 +233,16 @@ test(person.name, 'name').fulfillAllOf(name => [
     name.is.aString('${PATH} must be a string but was ${VALUE}'),
     name.prop('length').is.inRange(4, 25, 'The ${CURRENT_PATH} of ${PARENT_PATH} must be 4 - 25 but was ${VALUE}')
 ]);
+
+// test values together and add the error for both paths if the test fails
+test(person).errorContext('name', 'age').fulfillOneOf(person => [
+   person.prop('name').isNot.nil(),
+   person.prop('age').isNot.nil()     
+], 'At least one of ${PATH0} or ${PATH1} must have a value');
+// if the test fails both path will have the error
+console.log(test.result.getErrors('name'));
+console.log(test.result.getErrors('age'));
+
 ```
 
 ## Debugging
@@ -260,6 +271,7 @@ Debug messages can be toggled on and off by calling `Validator.debug(true|false)
 - `each(predicate, [errorMessage, [messageArgs]]):boolean` - validate each element in the `iterable` against the predicate
 - `transform(tranformer):Validator` - transform the current value into something else, e.g. making a `string` lowercase
 - `prop(path):Validator` - get a `Validator` for the `path` relative to the current context value (typically an object)
+- `errorContext(...contextPath)` - adds one or more error context paths to the current validator context making it possible change which path(s) should fail on error
 - `fulfill(predicate):ValidatorContext` - alias for `does.fulfill()`
 - `fulfillOneOf(predicates):ValidatorContext` - alias for `does.fulfillOneOf()`
 - `fulfillAllOf(predicates):ValidatorContext` - alias for `does.fulfillAllOf()`
