@@ -59,7 +59,7 @@ function test() {
     test(obj).fulfillAllOf(o => [
         o.prop('materials').is.anArray('"${PATH}" must be an array'),
         o.prop('manufacturingProcessDescription').fulfill(notEmptyString, '"${PATH}" must be a string and cannot be empty'),
-        o.errorContext('society').fulfillOneOf(o => [
+        o.errorContext('society', 'customSociety').fulfillOneOf(o => [
             o.prop('society').isNot.nil(),
             o.prop('customSociety').fulfill(notEmptyString),
         ], 'One of "society" or "customSociety" must be filled out'),
@@ -82,7 +82,7 @@ function test() {
         ], '"${PATH}" must be a valid email or empty'),
         o.prop('toolSize').fulfill(notEmptyString, '"${PATH}" must be a string and cannot be empty'),
         o.prop('observationYears').fulfill(notEmptyString, '"${PATH}" must be a string and cannot be empty'),
-        o.errorContext('contextsOfUse').fulfillOneOf(o => [
+        o.errorContext('contextsOfUse', 'customContextsOfUse').fulfillOneOf(o => [
             o.prop('contextsOfUse').fulfillAllOf(contextsOfUse => [
                 contextsOfUse.is.anArray(),
                 contextsOfUse.prop('length').is.greaterThan(0),
@@ -95,7 +95,7 @@ function test() {
         o.prop('accuracyIntegrity').fulfill(booleanAndTrue, '"${PATH}" must be true'),
         o.prop('authorApproved').fulfill(booleanAndTrue, '"${PATH}" must be true'),
         o.prop('noCopyrightInfringement').fulfill(booleanAndTrue, '"${PATH}" must be true'),
-        o.errorContext('imageOwnership').fulfillOneOf(o => [
+        o.errorContext('imageOwnership', 'imagePermission').fulfillOneOf(o => [
             o.prop('imageOwnership').fulfill(booleanAndTrue),
             o.prop('imagePermission').fulfill(booleanAndTrue)
         ], 'One of "imageOwnership" or "imagePermission" must be true'),

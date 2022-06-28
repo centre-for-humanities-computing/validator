@@ -65,8 +65,8 @@ class ValidatorContext {
         return this.#validatorState.contextValueCurrentPath;
     }
 
-    get #errorContextValuePath() {
-        return this.#validatorState.errorContextValuePath;
+    get #errorContextValuePaths() {
+        return this.#validatorState.errorContextValuePaths;
     }
 
     /**
@@ -585,16 +585,19 @@ class ValidatorContext {
                 if (messageArgs.length > 0 || fullMessage.match(PLACEHOLDER_PRE_TEST_PATTERN)) {
                     fullMessage = fullMessage.replace(PLACEHOLDER_PATTERN, (match, group1) => messageArgs[group1] + ''); // make sure we return a string
                     fullMessage = fullMessage.replace(PLACEHOLDER_CONTEXT_VALUE_PATTERN, this.#contextValue);
-                    if (this.#errorContextValuePath) {
-                        fullMessage = fullMessage.replace(PLACEHOLDER_CONTEXT_PATH_PATTERN, this.#errorContextValuePath);
-                        fullMessage = fullMessage.replace(PLACEHOLDER_CONTEXT_PARENT_PATH_PATTERN, utils.getParentPath(this.#errorContextValuePath, this.#contextValueCurrentPath));
+                    if (this.#errorContextValuePaths.length > 0) {
+                        for (let errorContextValuePath of this.#errorContextValuePaths) {
+                            fullMessage = fullMessage.replace(PLACEHOLDER_CONTEXT_PATH_PATTERN, errorContextValuePath);
+                            fullMessage = fullMessage.replace(PLACEHOLDER_CONTEXT_PARENT_PATH_PATTERN, utils.getParentPath(errorContextValuePath, this.#contextValueCurrentPath));
+                        }
+
                     }
                     if (this.#contextValueCurrentPath) {
                         fullMessage = fullMessage.replace(PLACEHOLDER_CONTEXT_CURRENT_PATH_PATTERN, this.#contextValueCurrentPath);
                     }
                 }
                 if (this.#validatorState.mode === sharedConstants.mode.ON_ERROR_THROW) {
-                    let error = new ValidationError(fullMessage, this.#errorContextValuePath);
+                    let error = new ValidationError(fullMessage, this.#errorContextValuePaths.join('|'));
                     Error.captureStackTrace(error, this.#handleError); // exclude this method from stacktrace
                     throw error;
                 }
@@ -618,7 +621,7 @@ class ValidatorContext {
             success = !success;
         }
         let iconStr = success === undefined ? '[ ]' : success ? '[V]' : '[-]';
-        let pathStr = Debug.instance.pathStr(this.#errorContextValuePath);
+        let pathStr = Debug.instance.pathStr(this.#errorContextValuePaths.join('|'));
         let valueStr = Debug.instance.valueToStr(this.#contextValue);
         let methodArgsStr = Debug.instance.methodArgsToStr(methodArgs);
         let methodPrefix = this.#notContext ? '!' : '';
