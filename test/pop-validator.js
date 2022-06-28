@@ -31,7 +31,7 @@ let obj = {
     pathways: [],
     mechanisms: [],
     contextsOfUse: [], // ENTEN contextsOfUse (length > 0) ELLER customContextsOfUse skal have en værdi ([]object)
-    customContextsOfUse: 'sdsd', // (string)
+    customContextsOfUse: 'sds', // (string)
     report: 'sds', // required (string)
     // Permissions
     ethicallyCollected: true, // required true (bool)
@@ -89,7 +89,7 @@ function test() {
                 contextsOfUse.each(elem => elem.is.anObject())
             ]),
             o.prop('customContextsOfUse').fulfill(notEmptyString)
-        ], '"contextsOfUse" must have a length > 0 and contain objects or "customContextsOfUse" must be filled out'),
+        ], '"${PATH0}" must have a length > 0 and contain objects or "${PATH1}" must be filled out'),
         o.prop('report').fulfill(notEmptyString, '"${PATH}" must be a string and cannot be empty'),
         o.prop('ethicallyCollected').fulfill(booleanAndTrue, '"${PATH}" must be true'),
         o.prop('accuracyIntegrity').fulfill(booleanAndTrue, '"${PATH}" must be true'),
@@ -98,10 +98,9 @@ function test() {
         o.errorContext('imageOwnership', 'imagePermission').fulfillOneOf(o => [
             o.prop('imageOwnership').fulfill(booleanAndTrue),
             o.prop('imagePermission').fulfill(booleanAndTrue)
-        ], 'One of "imageOwnership" or "imagePermission" must be true'),
+        ], 'One of "${PATH0}" or "${PATH1}" must be true'),
         o.prop('permissionDetails').fulfill(notEmptyString, '"${PATH}" must be a string and cannot be empty')
     ]);
-
 
     console.log(test.result.getAllErrors());
     for (let propName of Object.keys(obj)) {
