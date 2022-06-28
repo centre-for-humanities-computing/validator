@@ -27,10 +27,10 @@ module.exports.joinPropPaths = function(...elements) {
  * @param {string} path the path to get the parent for
  * @returns {string}
  */
-module.exports.getParentPath = function(fullPath, path) {
-    let parentPath = fullPath.substr(0, fullPath.length - path.length);
-    if (parentPath.endsWith('.')) {
-        parentPath = parentPath.substr(0, parentPath.length - 1);
+module.exports.getParentPath = function(fullPath) {
+    let lastDot = fullPath.lastIndexOf('.');
+    if (lastDot === -1) {
+        return "";
     }
-    return parentPath;
+    return fullPath.substring(0, lastDot);
 };

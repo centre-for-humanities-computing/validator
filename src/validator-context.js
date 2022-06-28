@@ -13,9 +13,9 @@ const PLACEHOLDER_PRE_TEST_PATTERN = /(?<!\\)\${.+?}/;
 const PLACEHOLDER_PATTERN = /(?<!\\)\${(\d+)}/g;
 const PLACEHOLDER_CONTEXT_VALUE_PATTERN = /(?<!\\)\${VALUE}/g;
 const PLACEHOLDER_CONTEXT_PATH_PATTERN = /(?<!\\)\${PATH}/g;
+const PLACEHOLDER_CONTEXT_PATH_INDEX_PATTERN = /(?<!\\)\${PATH(\d+)}/g;
 const PLACEHOLDER_CONTEXT_CURRENT_PATH_PATTERN = /(?<!\\)\${CURRENT_PATH}/g;
 const PLACEHOLDER_CONTEXT_PARENT_PATH_PATTERN = /(?<!\\)\${PARENT_PATH}/g;
-
 
 class ValidatorContext {
 
@@ -586,11 +586,14 @@ class ValidatorContext {
                     fullMessage = fullMessage.replace(PLACEHOLDER_PATTERN, (match, group1) => messageArgs[group1] + ''); // make sure we return a string
                     fullMessage = fullMessage.replace(PLACEHOLDER_CONTEXT_VALUE_PATTERN, this.#contextValue);
                     if (this.#errorContextValuePaths.length > 0) {
-                        for (let errorContextValuePath of this.#errorContextValuePaths) {
-                            fullMessage = fullMessage.replace(PLACEHOLDER_CONTEXT_PATH_PATTERN, errorContextValuePath);
-                            fullMessage = fullMessage.replace(PLACEHOLDER_CONTEXT_PARENT_PATH_PATTERN, utils.getParentPath(errorContextValuePath, this.#contextValueCurrentPath));
+                        let primaryErrorContextValuePath = this.#errorContextValuePaths[0];
+                        fullMessage = fullMessage.replace(PLACEHOLDER_CONTEXT_PATH_PATTERN, primaryErrorContextValuePath);
+                        fullMessage = fullMessage.replace(PLACEHOLDER_CONTEXT_PARENT_PATH_PATTERN, utils.getParentPath(primaryErrorContextValuePath));
+                        if (this.#errorContextValuePaths.length > 1) { // makes i possible to reference ${PATHx}
+                            for (let i = 0; i < this.#errorContextValuePaths.length; i++) {
+                                fullMessage = fullMessage.replace(PLACEHOLDER_CONTEXT_PATH_INDEX_PATTERN, (match, group1) => this.#errorContextValuePaths[group1]);
+                            }
                         }
-
                     }
                     if (this.#contextValueCurrentPath) {
                         fullMessage = fullMessage.replace(PLACEHOLDER_CONTEXT_CURRENT_PATH_PATTERN, this.#contextValueCurrentPath);

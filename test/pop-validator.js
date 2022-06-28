@@ -62,7 +62,7 @@ function test() {
         o.errorContext('society', 'customSociety').fulfillOneOf(o => [
             o.prop('society').isNot.nil(),
             o.prop('customSociety').fulfill(notEmptyString),
-        ], 'One of "society" or "customSociety" must be filled out'),
+        ], 'One of "${PATH0}" or "${PATH1}" must be filled out'),
         o.prop('society').optional.is.anObject('"${PATH}" must be an object'),
         o.prop('customSociety').optional.fulfill(notEmptyString, '"${PATH}" must be a string and cannot be empty'),
         o.prop('continent').fulfill(notEmptyString, '"${PATH}" must be a string and cannot be empty'),

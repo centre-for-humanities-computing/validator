@@ -530,13 +530,15 @@ class Validator {
      * The path can be whatever makes sense and multiple paths can be set as well making it possible to fail multiple
      * paths if the result of this validator context fails.
      *
+     * The full paths can be referenced in the error message with ${PATHx}.
+     *
      * @example
      * let test = Validator.create();
      * let person = { email: '', username: 'john' };
      * test(person).errorContext('email', 'username').fulfillOneOf((name) => [ // make a new error context called emailAndUsername
      *      name.isNot.empty(),
      *      email.isNot.empty()
-     * ], '"email" or "username" must be filled out');
+     * ], '"${PATH0}" or "${PATH1}" must be filled out');
      *
      * // the result will have mapped errors to ['email' => '"email" or "username" must be filled out'] and ['username' => '"email" or "username" must be filled out']
      * instead of ['' => '"email" or "username" must be filled out']
