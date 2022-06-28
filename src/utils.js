@@ -24,13 +24,23 @@ module.exports.joinPropPaths = function(...elements) {
 
 /**
  * @param {string} fullPath the full path
- * @param {string} path the path to get the parent for
+ * @param {string} currentPath the current path to get the parent for
  * @returns {string}
  */
-module.exports.getParentPath = function(fullPath) {
-    let lastDot = fullPath.lastIndexOf('.');
-    if (lastDot === -1) {
-        return "";
+module.exports.getParentPath = function(fullPath, currentPath) {
+    if (fullPath.endsWith(currentPath)) {
+        let dotCorrection = 0;
+        if (fullPath.length > currentPath.length && fullPath[fullPath.length - 1 - currentPath.length] === '.') {
+            dotCorrection = 1;
+        }
+        return fullPath.substring(0, fullPath.length - currentPath.length - dotCorrection);
+    } else { // in some cases the fullPath can differ from the currentPath because of errorContextPath modifications, in these cases just target nearest "."
+        let lastDot = fullPath.lastIndexOf('.');
+        if (lastDot === -1) {
+            return "";
+        }
+        return fullPath.substring(0, lastDot);
     }
-    return fullPath.substring(0, lastDot);
 };
+
+console.log(module.exports.getParentPath('a.d[0].c', 'd'))

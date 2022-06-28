@@ -588,7 +588,7 @@ class ValidatorContext {
                     if (this.#errorContextValuePaths.length > 0) {
                         let primaryErrorContextValuePath = this.#errorContextValuePaths[0];
                         fullMessage = fullMessage.replace(PLACEHOLDER_CONTEXT_PATH_PATTERN, primaryErrorContextValuePath);
-                        fullMessage = fullMessage.replace(PLACEHOLDER_CONTEXT_PARENT_PATH_PATTERN, utils.getParentPath(primaryErrorContextValuePath));
+                        fullMessage = fullMessage.replace(PLACEHOLDER_CONTEXT_PARENT_PATH_PATTERN, utils.getParentPath(primaryErrorContextValuePath, this.#contextValueCurrentPath));
                         if (this.#errorContextValuePaths.length > 1) { // makes i possible to reference ${PATHx}
                             for (let i = 0; i < this.#errorContextValuePaths.length; i++) {
                                 fullMessage = fullMessage.replace(PLACEHOLDER_CONTEXT_PATH_INDEX_PATTERN, (match, group1) => this.#errorContextValuePaths[group1]);
