@@ -42,5 +42,3 @@ module.exports.getParentPath = function(fullPath, currentPath) {
         return fullPath.substring(0, lastDot);
     }
 };
-
-console.log(module.exports.getParentPath('a.d[0].c', 'd'))
