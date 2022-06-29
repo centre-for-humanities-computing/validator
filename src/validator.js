@@ -7,7 +7,7 @@ const { ValidationError } = require('./validation-error');
 const sharedConstants = require('./shared-constants');
 const { Debug } = require('./debug');
 const utils = require('./utils');
-// const { RuleSet } = require('./rule-set'); THIS IS IMPORTED AT THE BUTTON OF THIS MODULE TO PREVENT NODE WARNING ON CIRCULAR DEPENDENCIES
+const { RuleSet } = require('./rule-set');
 
 const POOL_MAX_SIZE = 10;
 
@@ -855,4 +855,4 @@ class Validator {
 
 module.exports = { Validator };
 
-const { RuleSet } = require('./rule-set'); // put here to avoid circular dependency problem
+// const { RuleSet } = require('./rule-set'); // put here to avoid circular dependency problem

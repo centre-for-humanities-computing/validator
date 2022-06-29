@@ -1,7 +1,8 @@
 const _ = require("lodash");
 const { ValidationResult } = require('./validation-result');
 const { ValidationError } = require('./validation-error');
-const { Validator } = require('./validator');
+// const { Validator } = require('./validator'); // THIS IS IMPORTED AT THE BUTTON OF THIS MODULE TO PREVENT NODE WARNING ON CIRCULAR DEPENDENCIES
+
 /**
  * Create a set of reusable rules associated with one or more paths.
  */
@@ -227,4 +228,6 @@ class RuleSet {
 }
 
 module.exports = { RuleSet };
+
+const { Validator } = require('./validator'); // put here to avoid circular dependency problem
 
