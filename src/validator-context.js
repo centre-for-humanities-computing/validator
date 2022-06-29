@@ -8,7 +8,7 @@ const utils = require('./utils');
 const INTEGER_STRING_PATTERN = /^-?\d+$/;
 const FLOAT_STRING_PATTERN = /^-?\d+(\.\d+)?$/;
 
-// a ${NUMBER} not preceded by a \ (so we can escape placeholders)
+// a ${NUMBER} not preceded by a \ (so we can escape placeholders) without lookbehind could be written like /([^\\]|^)(\${PATH})/g where group-2 then would be the match
 const PLACEHOLDER_PRE_TEST_PATTERN = /(?<!\\)\${.+?}/;
 const PLACEHOLDER_PATTERN = /(?<!\\)\${(\d+)}/g;
 const PLACEHOLDER_CONTEXT_VALUE_PATTERN = /(?<!\\)\${VALUE}/g;
