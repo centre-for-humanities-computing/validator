@@ -488,12 +488,20 @@ class Validator {
     }
 
     /**
-     * @returns {*} the value this validator i testing
+     * @returns {*} the value this validator is testing
      */
     get value() {
         let value = this.#contextValue; // get the value before resetting
         this.#noopContext();
         return value;
+    }
+
+    /**
+     *
+     * @returns {string} the current path of the value being testet
+     */
+    get contextValueCurrentPath() {
+        return this.#contextValueCurrentPath;
     }
 
     /**

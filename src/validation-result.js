@@ -4,6 +4,14 @@ class ValidationResult {
     #errors = new Map();
 
     /**
+     * The errors paths for all registered errors
+     * @returns {IterableIterator<any>}
+     */
+    errorPaths() {
+        return this.#errors.keys();
+    }
+
+    /**
      * Get the first error for the given path.
      * <p>If no error message is provided for the tests use {@link isValid} or {@link isPathValid} instead.</p>
      *
