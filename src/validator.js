@@ -498,10 +498,10 @@ class Validator {
 
     /**
      *
-     * @returns {string} the current path of the value being testet
+     * @returns {string} the full path of the value being testet
      */
-    get contextValueCurrentPath() {
-        return this.#contextValueCurrentPath;
+    get contextValuePath() {
+        return this.#contextValuePath;
     }
 
     /**
