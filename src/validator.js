@@ -556,7 +556,7 @@ class Validator {
      * @example
      * let test = Validator.create();
      * let person = { email: '', username: 'john' };
-     * test(person).errorContext('email', 'username').fulfillOneOf((name) => [ // make a new error context called emailAndUsername
+     * test(person).errorContext('email', 'username').fulfillOneOf((name) => [
      *      name.isNot.empty(),
      *      email.isNot.empty()
      * ], '"${PATH0}" or "${PATH1}" must be filled out');
