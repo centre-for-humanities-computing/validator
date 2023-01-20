@@ -556,9 +556,9 @@ class Validator {
      * @example
      * let test = Validator.create();
      * let person = { email: '', username: 'john' };
-     * test(person).errorContext('email', 'username').fulfillOneOf((name) => [
-     *      name.isNot.empty(),
-     *      email.isNot.empty()
+     * test(person).errorContext('email', 'username').fulfillOneOf((person) => [
+     *      person.prop('email').isNot.empty(),
+     *      person.prop('username').isNot.empty()
      * ], '"${PATH0}" or "${PATH1}" must be filled out');
      *
      * // the result will have mapped errors to ['email' => '"email" or "username" must be filled out'] and ['username' => '"email" or "username" must be filled out']
