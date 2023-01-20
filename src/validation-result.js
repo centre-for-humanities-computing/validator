@@ -12,8 +12,7 @@ class ValidationResult {
     }
 
     /**
-     * Get the first error for the given path.
-     * <p>If no error message is provided for the tests use {@link isValid} or {@link isPathValid} instead.</p>
+     * Get the first error message for the given path.
      *
      * @param {string} [path=""] the path to get the error for, the path must be relative to the root object under validation
      * @returns {string|undefined}
@@ -25,8 +24,7 @@ class ValidationResult {
     }
 
     /**
-     * Get the all error for the given path.
-     * <p>If no error message is provided for the tests use {@link isValid} or {@link isPathValid} instead.</p>
+     * Get all error messages for the given path.
      *
      * @param {string} [path=""] the path to get the error for, the path must be relative to the root object under validation
      * @returns {string[]}
@@ -43,8 +41,7 @@ class ValidationResult {
     }
 
     /**
-     * Get all errors for all paths.
-     * <p>If no error message is provided for the tests use {@link isValid} or {@link isPathValid} instead.</p>
+     * Get all error messages for all paths.
      *
      * @returns {string[]}
      * @see isValid
@@ -60,9 +57,8 @@ class ValidationResult {
 
     /**
      * Test if everything is valid.
-     * This does purely rely on if all tests passed or not and not whether an error message was supplied.
      *
-     * @returns {boolean} <code>true</code> if no errors otherwise <code>false</code>
+     * @returns {boolean} <code>true</code> if no error messages exists otherwise <code>false</code>
      */
     isValid() {
         return this.#errors.size === 0;
@@ -70,10 +66,9 @@ class ValidationResult {
 
     /**
      * Test if the given path is valid.
-     * This does purely rely on if all tests passed or not and not whether an error message was supplied.
      *
      * @param {string} path the path to test if valid, the path must be relative to the root object under validation
-     * @returns {boolean} <code>true</code> if no errors for the given path otherwise <code>false</code>
+     * @returns {boolean} <code>true</code> if no error messages exists for the given path otherwise <code>false</code>
      */
     isPathValid(path) {
         return !this.#errors.has(path);
