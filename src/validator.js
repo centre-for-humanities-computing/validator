@@ -456,6 +456,9 @@ class Validator {
      * @returns {Validator}
      */
     prop(path) {
+        if (!_.isString(path)) {
+            throw new Error('path for prop() must be a string');
+        }
         let validatorContext = this.#getValidatorContext(false);
         let fullPropPath = utils.joinPropPaths(this.#contextValuePath, path);
         let childValue;
