@@ -1,3 +1,6 @@
 const { Validator } = require('./validator');
 const { ValidationError } = require('./validation-error');
-module.exports = { Validator, ValidationError };
+const { ValidationResult } = require('./validation-result')
+const { RuleSet } = require('./rule-set')
+
+module.exports = { Validator, ValidationError, ValidationResult, RuleSet };

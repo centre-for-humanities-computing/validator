@@ -317,14 +317,14 @@ class ValidatorContext {
     }
 
     /**
-     * @param {*[]|Set<*>} values an array or Set of values to test against
+     * @param {*[]|Set<*>|Map<*, *>} values an array, Set or Map of values to test against
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
      * @param {string|number|(string|number)[]} [messageArgs] values for placeholders in the errorMessage
      * @returns {boolean} the result of the predicate
      */
     in(values, errorMessage, messageArgs) {
-        if (!Array.isArray(values) && !_.isSet(values)) {
-            this.#throwArgumentError(`The argument for "values" must be an array or a Set but was: "${typeof values}"`);
+        if (!Array.isArray(values) && !_.isSet(values) && !_.isMap(values)) {
+            this.#throwArgumentError(`The argument for "values" must be an array, Set or Map but was: "${typeof values}"`);
         }
         let success = false;
         if (Array.isArray(values)) {
@@ -334,7 +334,7 @@ class ValidatorContext {
                     break;
                 }
             }
-        } else { // must be a Set
+        } else { // must be a Set or Map
             success = values.has(this.#contextValue);
         }
 

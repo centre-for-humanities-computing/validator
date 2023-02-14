@@ -14,7 +14,7 @@ let obj = {
     manufacturerKin: null,
     risk: null,
     imageCaption: 'sds',
-    continent: 'sds', // required (string)
+    continent: null, // required (string)
     composite: null,
     social: null,
     materialDetail: '',

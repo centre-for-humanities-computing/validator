@@ -101,7 +101,7 @@ class Validator {
 
     #reset(validatorContext) {
         if (!validatorContext) {
-            throw new Error('Internal Validator error, validatorContext must be passed to #reset()');
+            throw new Error('Internal Validator error, a validatorContext must be passed to #reset()');
         }
 
         this.#contextShortCircuit.fulfilled = false;
@@ -160,7 +160,13 @@ class Validator {
         return this.#validatorState.mode;
     }
 
-    #getValidatorContext(notContext) {
+    /**
+     *
+     * @param {boolean} notContext set to <code>true</code> if this is a notContext otherwise <code>false</code>
+     * @param {boolean} [resetShortCircuitContext=true] should shortCircuit contexts be reset automatically?
+     * @returns {*}
+     */
+    #getValidatorContext(notContext, resetShortCircuitContext = true) {
         let validatorContext;
         if (this.#shortCircuit()) {
             validatorContext = Validator.#shortCircuitFulfilledValidatorContext;
@@ -172,7 +178,7 @@ class Validator {
         if (!this.#rootValidatorContext) {
             this.#rootValidatorContext = validatorContext;
         }
-        if (this.#shortCircuit()) {
+        if (this.#shortCircuit() && resetShortCircuitContext) {
             // reset immediately, we still need to set the rootContext first though for reset to work correctly
             this.#reset(validatorContext);
         }
@@ -210,7 +216,7 @@ class Validator {
 
     #noopContext() {
         // get and end it right away, we still need to do this for reset() to work correctly
-        let validatorContext = this.#getValidatorContext(false);
+        let validatorContext = this.#getValidatorContext(false, false); // validatorContextDone will reset the context
         this.#validatorContextDone(validatorContext);
     }
 
@@ -397,7 +403,7 @@ class Validator {
         // we should always activate the validatorContext and end it with validatorContextDone
         // to make sure reset() works correctly and the context is returned to the contextPool
         let validatorContext = this.#getValidatorContext(false);
-        if (this.#istShortCircuitValidatorContext(validatorContext)) { // getValidatorContext() resets shortCircuitValidatorContexts for us
+        if (this.#istShortCircuitValidatorContext(validatorContext)) { // getValidatorContext() resets shortCircuitValidatorContexts for us so ok to just return right away when short-circuit
             return true; // just fulfill right away
         }
 
@@ -456,22 +462,22 @@ class Validator {
      * @returns {Validator}
      */
     prop(path) {
-        if (!_.isString(path)) {
-            throw new Error('path for prop() must be a string');
-        }
-        let validatorContext = this.#getValidatorContext(false);
-        let fullPropPath = utils.joinPropPaths(this.#contextValuePath, path);
-        let childValue;
-        if (!_.isNil(this.#contextValue)) {
-            childValue = this.#contextValue[path];
-        }
-        if (childValue === undefined) { // lodash get() is a little slow, so only use it if needed
-            // if parent is optional and nil, _.get() will return undefined, which is fine because createChildValidator sets optional() if parent i optional
-            childValue = _.get(this.#contextValue, path);
-        }
+        let validatorContext = this.#getValidatorContext(false, false);
 
-        if (Debug.enabled) {
-            this.#printDebug('{.}', `${this.prop.name}["${path}"]`, `${path}=${Debug.instance.pathStr(childValue)}`);
+        let childValue;
+        let fullPropPath = utils.joinPropPaths(this.#contextValuePath, path);
+        if (!this.#istShortCircuitValidatorContext(validatorContext)) {
+            if (!_.isNil(this.#contextValue)) {
+                childValue = this.#contextValue[path];
+            }
+            if (childValue === undefined) { // lodash get() is a little slow, so only use it if needed
+                // if parent is optional and nil, _.get() will return undefined, which is fine because createChildValidator sets optional() if parent i optional
+                childValue = _.get(this.#contextValue, path);
+            }
+
+            if (Debug.enabled) {
+                this.#printDebug('{.}', `${this.prop.name}["${path}"]`, `${path}=${Debug.instance.pathStr(childValue)}`);
+            }
         }
 
         let validator = this.#createChildValidator(validatorContext, childValue, fullPropPath, path);
@@ -482,12 +488,20 @@ class Validator {
     }
 
     /**
-     * @returns {*} the value this validator i testing
+     * @returns {*} the value this validator is testing
      */
     get value() {
         let value = this.#contextValue; // get the value before resetting
         this.#noopContext();
         return value;
+    }
+
+    /**
+     *
+     * @returns {string} the full path of the value being testet
+     */
+    get contextValuePath() {
+        return this.#contextValuePath;
     }
 
     /**
@@ -507,18 +521,22 @@ class Validator {
             Validator.#throwArgumentError('The argument passed to transform must be a function');
         }
 
-        let validatorContext = this.#getValidatorContext(false);
-        let transformedValue = transformer(this.#contextValue);
-        // we expect that the transformation is used to just transform the current value, so even though it is possible
-        // to return everything, transform should only be used to create transformation of what was at the given path
+        let validatorContext = this.#getValidatorContext(false, false);
+        let transformedValue;
+        if (!this.#istShortCircuitValidatorContext(validatorContext)) {
+            // we expect that the transformation is used to just transform the current value, so even though it is possible
+            // to return everything, transform should only be used to create transformation of what was at the given path
+            transformedValue = transformer(this.#contextValue);
 
-        if (Debug.enabled) {
-            this.#printDebug('{>}', this.transform.name, `${Debug.instance.valueToStr(this.#contextValue)} -> ${Debug.instance.valueToStr(transformedValue)}`);
+            if (Debug.enabled) {
+                this.#printDebug('{>}', this.transform.name, `${Debug.instance.valueToStr(this.#contextValue)} -> ${Debug.instance.valueToStr(transformedValue)}`);
+            }
         }
 
+        // on short circuit we just pass in an undefined value
         let validator = this.#createChildValidator(validatorContext, transformedValue);
         // important to call this to make sure reset() is called and the context is returned to the contextPool, because we are leaving this context and enter a child validator
-        // IMPORT that we pass undefined as success so we don't modify short circuit state etc. as getting a prop is NOT a predicate
+        // IMPORTANT that we pass undefined as success so we don't modify short circuit state etc. as getting a prop is NOT a predicate
         this.#validatorContextDone(validatorContext, undefined);
         return validator;
     }
@@ -538,9 +556,9 @@ class Validator {
      * @example
      * let test = Validator.create();
      * let person = { email: '', username: 'john' };
-     * test(person).errorContext('email', 'username').fulfillOneOf((name) => [ // make a new error context called emailAndUsername
-     *      name.isNot.empty(),
-     *      email.isNot.empty()
+     * test(person).errorContext('email', 'username').fulfillOneOf((person) => [
+     *      person.prop('email').isNot.empty(),
+     *      person.prop('username').isNot.empty()
      * ], '"${PATH0}" or "${PATH1}" must be filled out');
      *
      * // the result will have mapped errors to ['email' => '"email" or "username" must be filled out'] and ['username' => '"email" or "username" must be filled out']
@@ -556,7 +574,7 @@ class Validator {
             }
         }
 
-        let validatorContext = this.#getValidatorContext(false);
+        let validatorContext = this.#getValidatorContext(false, false); // context will be reset when we call validatorContextDone
 
         let validator = this.#createChildValidator(validatorContext, this.#contextValue, this.#contextValuePath, this.#contextValueCurrentPath, errorContextPath);
         // important to call this to make sure reset() is called and the context is returned to the contextPool, because we are leaving this context and enter a child validator
