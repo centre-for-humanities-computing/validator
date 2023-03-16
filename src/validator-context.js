@@ -138,6 +138,19 @@ class ValidatorContext {
     }
 
     /**
+     * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
+     * @param {string|number|(string|number)[]} [messageArgs] values for placeholders in the errorMessage
+     * @returns {boolean} the result of the predicate
+     */
+    aFunction(errorMessage, messageArgs) {
+        let success = _.isFunction(this.#contextValue);
+        if (Debug.enabled) {
+            this.#printDebug(this.aFunction.name, success);
+        }
+        return this.#handleError(success, errorMessage, messageArgs);
+    }
+
+    /**
      * A string representing an float
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
      * @param {string|number|(string|number)[]} [messageArgs] values for placeholders in the errorMessage
