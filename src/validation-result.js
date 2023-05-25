@@ -5,7 +5,7 @@ class ValidationResult {
 
     /**
      * The errors paths for all registered errors
-     * @returns {IterableIterator<any>}
+     * @returns {IterableIterator<string>}
      */
     errorPaths() {
         return this.#errors.keys();

@@ -78,7 +78,7 @@ could use an `ON_ERROR_BREAK` `Validator`.
 
 ```js
 function validateUserForm(user) {
-    let test = Validator.createOnErrorBreakValidator();
+    let test = Validator.createOnErrorNextPathValidator();
     test(user).fulfillAllOf(user => [
         user.prop('username').fulfillAllOf(username => [
             username.is.aString('Username must be a string'),
@@ -95,6 +95,10 @@ function validateUserForm(user) {
         // or
         console.log(test.result.getError('username'));
         console.log(test.result.getError('age'));
+        //
+        for (let path of test.errorPaths()) {
+            console.log(test.result.getError(path));
+        }
     }
 }
 ```
@@ -314,12 +318,10 @@ returns a `boolean`.
 
 
 ## ValidationResult Overview
-NOTE: If a test for at path do not provide an error message  use 
-`isValid()` and `isPathValid()` to test if the path is valid or not. 
-
 - `getError(path):string` - get the first error for the given path
 - `getErrors(path):string[]` - get all errors for the given path
 - `getAllErrors():string[]` - get all errors
+- `errorPaths():Iterable<string>` - the paths with errors
 - `isValid():boolean` - `true` of there is no errors otherwise `false`
 - `isPathValid(path):boolean` - `true` if the given path is valid otherwise `false`
 - `reset()` - resets the validation result. (not relevant in the context of a RuleSet as this always creates a new instance for every test) 
