@@ -62,11 +62,12 @@ function validateUserForm(username, age) {
         age.is.inRange(0, 120, 'Age must be in range 0 - 120')
     ]);
     // show the errors to the user
-    if (!test.result.isValid()) {
-        console.log(test.result.getAllErrors());
+    let validationResult = Validator.validationResult(test);
+    if (!validationResult.isValid()) {
+        console.log(validationResult.getAllErrors());
         // or
-        console.log(test.result.getError('username'));
-        console.log(test.result.getError('age'));
+        console.log(validationResult.getError('username'));
+        console.log(validationResult.getError('age'));
     }
 }
 ````
@@ -90,14 +91,15 @@ function validateUserForm(user) {
         ])
     ]);
     // show the errors to the user
-    if (!test.result.isValid()) {
-        console.log(test.result.getAllErrors());
+    let validationResult = Validator.validationResult(test);
+    if (!validationResult.isValid()) {
+        console.log(validationResult.getAllErrors());
         // or
-        console.log(test.result.getError('username'));
-        console.log(test.result.getError('age'));
+        console.log(result.getError('username'));
+        console.log(result.getError('age'));
         //
-        for (let path of test.errorPaths()) {
-            console.log(test.result.getError(path));
+        for (let path of validationResult.errorPaths()) {
+            console.log(validationResult.getError(path));
         }
     }
 }
@@ -244,15 +246,16 @@ test(person).errorContext('name', 'age').fulfillOneOf(person => [
    person.prop('age').isNot.nil()     
 ], 'At least one of ${PATH0} or ${PATH1} must have a value');
 // if the test fails both path will have the error
-console.log(test.result.getErrors('name'));
-console.log(test.result.getErrors('age'));
+let validationResult = Validator.validationResult(test);
+console.log(validationResult.getErrors('name'));
+console.log(validationResult.getErrors('age'));
 
 ```
 
 ## Debugging
 Debug messages can be toggled on and off by calling `Validator.debug(true|false)`.
 
-## Validator Factory Methods
+## Validator Factory and Static Methods
 - `Validator.create(erorPrefix, mode):testFunction` - Creates a new validation context with the given mode. 
   The returned "test" function gives access to the verb context 
   which return the predicate used for performing the actual tests
@@ -263,6 +266,8 @@ Debug messages can be toggled on and off by calling `Validator.debug(true|false)
 - `Validator.createOnErrorThrowRuleSet(errorPrefix):RuleSet` - Creates a `RuleSet` which throws an `ValidationError` if a test fails
 - `Validator.createOnErrorBreakRuleSet(errorPrefix):RuleSet` - Creates a `RuleSet` which breaks if a test fails
 - `Validator.createOnErrorNextPathRuleSet(errorPrefix):RuleSet` - Creates a `RuleSet` which moves on to the next path if a test fails
+- `Validator.validationResult(testFunction)` - get the `ValidationResult` of the test function
+- `Validator.debug(true|false)` - enable / disable debugging messages
 
 ## Validator Overview
 - `does:ValidatorContext`
@@ -315,7 +320,6 @@ returns a `boolean`.
 - `isValueValid(value, [path]):boolean` - test if the value is valid. The path or paths to test can be optional passed in as the second argument
 - `validate(object, [[path, [isObject]]):ValidationResult` - validate the object which depending on the mode of the `RuleSet` will produce a `ValidationResult` with errors or throw an `ValidationError`if the object is not valid
 - `validateValue(value, [path]):ValidationResult` - validate the value which depending on the mode of the `RuleSet` will produce a `ValidationResult` with errors or throw an `ValidationError`if the object is not valid
-
 
 ## ValidationResult Overview
 - `getError(path):string` - get the first error for the given path

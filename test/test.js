@@ -140,13 +140,13 @@ function run() {
         console.error(e);
     }
 }
-run();
+// run();
 
 function testPerson() {
 
     let person = { name: "John", age: 54, ssn: undefined };
 
-    let test = Validator.createOnErrorThrowValidator('Person validation error');
+    let test = Validator.createOnErrorNextPathValidator('Person validation error');
 
 
     /*test(person).fulfillAllOf((person) => [
@@ -173,7 +173,7 @@ function testPerson() {
     //problemet er måske at vi i conditionally laver en noopValidationResult object??
     test(person).fulfillAllOf(person => [
         person.conditionally(person => person.is.equalTo(person.value)).prop('name').fulfillAllOf(name => [
-            name.is.aNumber("${CURRENT_PATH} must be a int"),
+            name.is.aString("${CURRENT_PATH} must be a int"),
         ])
     ]);
 
@@ -184,11 +184,12 @@ function testPerson() {
         ])
     ]);
 
-    console.log(test.result.isValid());
-    console.log(test.result.getAllErrors());
+    let result = Validator.validationResult(test);
+    console.log(result.isValid());
+    console.log(result.getAllErrors());
 }
 
-//testPerson()
+testPerson()
 
 /*for (let i = 0; i < 100; i++) {
 

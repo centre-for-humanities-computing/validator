@@ -15,6 +15,15 @@ const PRIVATE_CONSTRUCTOR_KEY = {};
 
 const MODE_VALUES = new Set(Object.values(sharedConstants.mode));
 
+/**
+ * The test function
+ * @typedef {object} TestFunction
+ * @param {*} [value] the value to test
+ * @param {string} [errorBasePath=""] prefix path for the error message placeholder "${PATH}" and error messages in {@link ValidationResult}
+ * @returns {Validator}
+ *
+ */
+
 /*
 * note to self
 * When returning something else than "this" to the user the chain is broken for this validator
@@ -720,7 +729,7 @@ class Validator {
      *
      * @param {string} errorPrefix a prefix to prepend to every error created by this validator
      * @param {string} mode the [mode]{@link Validator.mode} for this validator
-     * @return {function(value:*, errorBasePath:string=): Validator}
+     * @returns {function(value:*, errorBasePath:string=): Validator}
      * @see {@link ValidationResult}
      * @see {@link Validator.createOnErrorThrowValidator}
      * @see {@link Validator.createOnErrorBreakValidator}
@@ -733,7 +742,7 @@ class Validator {
     /**
      * Creates a validator which throws an {@link ValidationError} if a test fails
      * @param {string} errorPrefix a prefix to prepend to every error thrown by this validator
-     * @return {function(value:*, errorBasePath:string=): Validator}
+     * @returns {TestFunction}
      * @see {@link Validator.create} for examples of usage
      * @see {@link Validator.mode}
      */
@@ -744,7 +753,7 @@ class Validator {
     /**
      * Creates a validator which aborts the remaining tests if a test fails
      * @param {string} errorPrefix a prefix to prepend to every error created by this validator
-     * @return {function(value:*, errorBasePath:string=): Validator}
+     * @returns {TestFunction}
      * @see {@link Validator.create} for examples of usage
      * @see {@link Validator.mode}
      */
@@ -755,7 +764,7 @@ class Validator {
     /**
      * Creates a validator which continuous to test the next path if a test fails
      * @param {string} errorPrefix a prefix to prepend to every created thrown by this validator
-     * @return {function(value:*, errorBasePath:string=): Validator}
+     * @returns {TestFunction}
      * @see {@link Validator.create} for examples of usage
      * @see {@link Validator.mode}
      */
@@ -793,7 +802,7 @@ class Validator {
      *
      * @param {string} errorPrefix a prefix to prepend to every error created by this validator
      * @param {string} mode the [mode]{@link Validator.mode} for this validator
-     * @return {RuleSet}
+     * @returns {RuleSet}
      * @see {@link RuleSet}
      * @see {@link ValidationResult}
      * @see {@link Validator.createOnErrorThrowRuleSet}
@@ -807,7 +816,7 @@ class Validator {
     /**
      * Creates a validator which throws an {@link ValidationError} if a test fails
      * @param {string} errorPrefix a prefix to prepend to every error thrown by this validator
-     * @return {RuleSet}
+     * @returns {RuleSet}
      * @see {@link Validator.createRuleSet} for examples of usage
      * @see {@link Validator.mode}
      */
@@ -818,7 +827,7 @@ class Validator {
     /**
      * Creates a rule-set which aborts the remaining tests if a test fails
      * @param {string} errorPrefix a prefix to prepend to every error created by this validator
-     * @return {RuleSet}
+     * @returns {RuleSet}
      * @see {@link Validator.createRuleSet} for examples of usage
      * @see {@link Validator.mode}
      */
@@ -829,12 +838,23 @@ class Validator {
     /**
      * Creates a rule-set which continuous to test the next path if a test fails
      * @param {string} errorPrefix a prefix to prepend to every error created by this validator
-     * @return {RuleSet}
+     * @returns {RuleSet}
      * @see {@link Validator.createRuleSet} for examples of usage
      * @see {@link Validator.mode}
      */
     static createOnErrorNextPathRuleSet(errorPrefix = '') {
         return Validator.createRuleSet(errorPrefix, Validator.mode.ON_ERROR_NEXT_PATH);
+    }
+
+    /**
+     * Get the validation result of the test function.
+     *
+     * The validation result can also be accessed directly using testFunction.result
+     * @param {TestFunction} testFunction
+     * @returns {ValidationResult}
+     */
+    static validationResult(testFunction) {
+        return testFunction['result'];
     }
 
     static debug(enable = true) {
@@ -846,6 +866,7 @@ class Validator {
      *
      * @param errorPrefix
      * @param mode
+     * @returns {TestFunction}
      */
     static #testFunction(errorPrefix, mode) {
         if (!MODE_VALUES.has(mode)) {
@@ -853,12 +874,6 @@ class Validator {
         }
         let validationResult = new ValidationResult();
 
-        /**
-         * The test function
-         * @param {*} [value] the value to test
-         * @param {string} [errorBasePath=""] prefix path for the error message placeholder "${PATH}" and error messages in {@link ValidationResult}
-         * @returns {Validator}
-         */
         let test = (value, errorBasePath = "") => {
             let validator = Validator.#instance(mode, value, "", "", errorPrefix, errorBasePath, validationResult);
             return validator;
