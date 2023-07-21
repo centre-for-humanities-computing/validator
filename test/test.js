@@ -5,6 +5,7 @@ function run() {
     try {
         Validator.debug(true);
         let t = Validator.createOnErrorThrowValidator();
+
         t(2).doesNot.aString();
         let o = {
             t: [
@@ -218,5 +219,11 @@ testPerson()
     console.timeEnd('t')
 }*/
 
+function testMessageArgs() {
+    let t = Validator.createOnErrorThrowValidator();
+    t(3).is.identicalTo(2, 'no not ${0} ${1}', [[9, 2], 2]);
+}
+
+//testMessageArgs();
 
 

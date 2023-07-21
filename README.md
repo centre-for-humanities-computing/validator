@@ -207,7 +207,14 @@ test('Peter').fulfillAllOf(peter => [
 
 ### Arguments
 
-Arguments for error messages can be passed in as an array of values and be referenced by their index number.
+Arguments for error messages can be passed in as a single value (if only one is needed) or as an array of values and be
+referenced by their index number.
+
+`string`, `number` and `array` or `Set` of `string` and `number` is 
+allowed. `array` and `Set` of values will be inserted in `JSON` format e.g. `["string", 3, 4, "string2"`].
+When passing an `array` of values it must always be passed in a surrounding `array` even if only a single
+argument is needed to be able to distinguish between an `array` of arguments and an `array` of values.
+
 ```js
 let person = { name: "Peter", age: 41 };
 let test = Validator.createOnErrorNextPathValidator('Person error');
