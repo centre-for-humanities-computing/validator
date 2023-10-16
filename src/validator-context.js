@@ -210,7 +210,7 @@ class ValidatorContext {
      * @returns {boolean} the result of the predicate
      */
     anObject(errorMessage, messageArgs) {
-        let success = _.isObject(this.#contextValue);
+        let success = _.isPlainObject(this.#contextValue);
         if (Debug.enabled) {
             this.#printDebug(this.anObject.name, success);
         }
