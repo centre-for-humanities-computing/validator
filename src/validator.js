@@ -15,15 +15,6 @@ const PRIVATE_CONSTRUCTOR_KEY = {};
 
 const MODE_VALUES = new Set(Object.values(sharedConstants.mode));
 
-/**
- * The test function
- * @typedef {object} TestFunction
- * @param {*} [value] the value to test
- * @param {string} [errorBasePath=""] prefix path for the error message placeholder "${PATH}" and error messages in {@link ValidationResult}
- * @returns {Validator}
- *
- */
-
 /*
 * note to self
 * When returning something else than "this" to the user the chain is broken for this validator
@@ -42,15 +33,16 @@ class Validator {
         fulfilledPredicate() {
             return true;
         },
-        get: function(target, prop, receiver) {
+        get: function(/*target, prop, receiver*/) {
             return this.fulfilledPredicate; // make all methods of ValidatorContext() return true
         }
     });
+
     static #noopValidationResult = new Proxy(new ValidationResult(), {
         noopFunc: function() {
 
         },
-        get: function(target, prop, receiver) {
+        get: function(/*target, prop, receiver*/) {
             return this.noopFunc;
         }
     })
@@ -233,6 +225,7 @@ class Validator {
         if (success !== undefined) { // important that we allow undefined for e.g. prop() which just used this to reset the context
             if (!success && !this.#shortCircuit() && errorMessage) {
                 for (let errorContextValuePath of this.#errorContextValuePaths) {
+                    // noinspection JSAccessibilityCheck
                     this.#validatorState.validationResult._addFailedPath(errorContextValuePath, errorMessage);
                     this.#validatorSharedState.failedPaths.push(errorContextValuePath);
                 }
@@ -665,11 +658,6 @@ class Validator {
     }
 
     /**
-     * @typedef {function(value:*, errorBasePath:string):Validator} testFunction
-     * @property {ValidationResult} result the result of the performed tests
-     */
-
-    /**
      * Creates a new validation context. The returned "test" function gives access to the verb context which return the
      * predicate used for performing the actual test.
      *
@@ -729,7 +717,7 @@ class Validator {
      *
      * @param {string} errorPrefix a prefix to prepend to every error created by this validator
      * @param {string} mode the [mode]{@link Validator.mode} for this validator
-     * @returns {function(value:*, errorBasePath:string=): Validator}
+     * @returns {function(value:*, errorBasePath?:string):Validator}
      * @see {@link ValidationResult}
      * @see {@link Validator.createOnErrorThrowValidator}
      * @see {@link Validator.createOnErrorBreakValidator}
@@ -742,7 +730,7 @@ class Validator {
     /**
      * Creates a validator which throws an {@link ValidationError} if a test fails
      * @param {string} errorPrefix a prefix to prepend to every error thrown by this validator
-     * @returns {TestFunction}
+     * @returns {function(value:*, errorBasePath?:string):Validator}
      * @see {@link Validator.create} for examples of usage
      * @see {@link Validator.mode}
      */
@@ -753,7 +741,7 @@ class Validator {
     /**
      * Creates a validator which aborts the remaining tests if a test fails
      * @param {string} errorPrefix a prefix to prepend to every error created by this validator
-     * @returns {TestFunction}
+     * @returns {function(value:*, errorBasePath?:string):Validator}
      * @see {@link Validator.create} for examples of usage
      * @see {@link Validator.mode}
      */
@@ -764,7 +752,7 @@ class Validator {
     /**
      * Creates a validator which continuous to test the next path if a test fails
      * @param {string} errorPrefix a prefix to prepend to every created thrown by this validator
-     * @returns {TestFunction}
+     * @returns {function(value:*, errorBasePath?:string):Validator}
      * @see {@link Validator.create} for examples of usage
      * @see {@link Validator.mode}
      */
@@ -850,7 +838,7 @@ class Validator {
      * Get the validation result of the test function.
      *
      * The validation result can also be accessed directly using testFunction.result
-     * @param {TestFunction} testFunction
+     * @param {function(value:*, errorBasePath?:string):Validator} testFunction
      * @returns {ValidationResult}
      */
     static validationResult(testFunction) {
@@ -861,12 +849,10 @@ class Validator {
         Debug.enable(enable);
     }
 
-    // the two return types is simply to trick jsDoc to accept that the returned function has a property
     /**
-     *
      * @param errorPrefix
      * @param mode
-     * @returns {TestFunction}
+     * @returns {function(value:*, errorBasePath?:string):Validator}
      */
     static #testFunction(errorPrefix, mode) {
         if (!MODE_VALUES.has(mode)) {
@@ -874,14 +860,15 @@ class Validator {
         }
         let validationResult = new ValidationResult();
 
-        let test = (value, errorBasePath = "") => {
-            let validator = Validator.#instance(mode, value, "", "", errorPrefix, errorBasePath, validationResult);
-            return validator;
-        };
         /**
-         * @type {ValidationResult}
-         * @property result
+         * @param {*} value the value to test
+         * @param {string=""} errorBasePath the base path for this error
+         * @returns {Validator}
          */
+        let test = (value, errorBasePath = "") => {
+            return Validator.#instance(mode, value, "", "", errorPrefix, errorBasePath, validationResult);
+        };
+
         test.result = validationResult;
         return test;
     }

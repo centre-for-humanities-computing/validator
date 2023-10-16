@@ -1,4 +1,5 @@
 const utils = require('./utils');
+const { ValidationResult } = require('./validation-result');
 
 class ValidatorInternalState {
 
@@ -75,6 +76,9 @@ class ValidatorInternalState {
         return paths;
     }
 
+    /**
+     * @returns {ValidationResult}
+     */
     get validationResult() {
         return this.#validationResult;
     }

@@ -6,6 +6,7 @@ function run() {
         Validator.debug(true);
         let t = Validator.createOnErrorThrowValidator();
 
+        t(2).doesNot.aString();
         let o = {
             t: [
                 {c: 2},
@@ -28,7 +29,7 @@ function run() {
 
         let typeValueValidator = (date) => date.optional.fulfillOneOf((date) => [
             //date.fulfill(d => console.log(d.is.anArray())),
-            date.is.anInteger() // da denne er true short circuitter fullfillOneOf og ovenstående bliver kaldt med et objekt der altid er true,
+            date.is.anInteger() // da denne er true short circuitter fulfillOneOf og ovenstående bliver kaldt med et objekt der altid er true,
 
         ],
             '[min, max] filter value for field ${0} must be a date in one of the formats ' +
@@ -218,5 +219,11 @@ testPerson()
     console.timeEnd('t')
 }*/
 
+function testMessageArgs() {
+    let t = Validator.createOnErrorThrowValidator();
+    t(3).is.identicalTo(2, 'no not ${0} ${1}', [[9, 2], 2]);
+}
+
+//testMessageArgs();
 
 

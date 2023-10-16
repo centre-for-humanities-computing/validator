@@ -17,6 +17,20 @@ const PLACEHOLDER_CONTEXT_PATH_INDEX_PATTERN = /(?<!\\)\${PATH(\d+)}/g;
 const PLACEHOLDER_CONTEXT_CURRENT_PATH_PATTERN = /(?<!\\)\${CURRENT_PATH}/g;
 const PLACEHOLDER_CONTEXT_PARENT_PATH_PATTERN = /(?<!\\)\${PARENT_PATH}/g;
 
+/**
+ * The values to insert at the placeholders in the message string.
+ *
+ * A single placeholder can just be passed in as a single argument (except for array values, see below).
+ * Multiple placeholders must be passed in as an array of the values to insert.
+ *
+ * To insert an array as a placeholder value it must always be passed in enclosed in an array to be able to
+ * distinguish between array literals and multiple placeholder values.
+ *
+ * Array values and Set's will be inserted as an array-like structure enclosed in square brackets, e.g. ["string", 2].
+ *
+ * @typedef {string|number|Set<string|number>|(string|number|(string|number)[]|Set<string|number>)[]} MessageArgs
+ */
+
 class ValidatorContext {
 
     #name;
@@ -72,7 +86,7 @@ class ValidatorContext {
     /**
      * @param {*} otherValue the value to compare this value to using strict comparison (===).
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
-     * @param {string|number|(string|number)[]} [messageArgs] values for placeholders in the errorMessage
+     * @param {MessageArgs} [messageArgs] values for placeholders in the errorMessage
      * @returns {boolean} the result of the predicate
      */
     identicalTo(otherValue, errorMessage, messageArgs) {
@@ -86,7 +100,7 @@ class ValidatorContext {
     /**
      * @param {*} otherValue the value to compare this value to. For complex types like objects, arrays, sets, maps etc. a deep comparison is performed.
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
-     * @param {string|number|(string|number)[]} [messageArgs] values for placeholders in the errorMessage
+     * @param {MessageArgs} [messageArgs] values for placeholders in the errorMessage
      * @returns {boolean} the result of the predicate
      * @see {@link https://lodash.com/docs/4.17.15#isEqual}
      */
@@ -113,7 +127,7 @@ class ValidatorContext {
 
     /**
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
-     * @param {string|number|(string|number)[]} [messageArgs] values for placeholders in the errorMessage
+     * @param {MessageArgs} [messageArgs] values for placeholders in the errorMessage
      * @returns {boolean} the result of the predicate
      */
     anArray(errorMessage, messageArgs) {
@@ -126,7 +140,7 @@ class ValidatorContext {
 
     /**
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
-     * @param {string|number|(string|number)[]} [messageArgs] values for placeholders in the errorMessage
+     * @param {MessageArgs} [messageArgs] values for placeholders in the errorMessage
      * @returns {boolean} the result of the predicate
      */
     aBoolean(errorMessage, messageArgs) {
@@ -139,7 +153,7 @@ class ValidatorContext {
 
     /**
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
-     * @param {string|number|(string|number)[]} [messageArgs] values for placeholders in the errorMessage
+     * @param {MessageArgs} [messageArgs] values for placeholders in the errorMessage
      * @returns {boolean} the result of the predicate
      */
     aFunction(errorMessage, messageArgs) {
@@ -153,7 +167,7 @@ class ValidatorContext {
     /**
      * A string representing an float
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
-     * @param {string|number|(string|number)[]} [messageArgs] values for placeholders in the errorMessage
+     * @param {MessageArgs} [messageArgs] values for placeholders in the errorMessage
      * @returns {boolean} the result of the predicate
      */
     aFloatString(errorMessage, messageArgs) {
@@ -166,7 +180,7 @@ class ValidatorContext {
 
     /**
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
-     * @param {string|number|(string|number)[]} [messageArgs] values for placeholders in the errorMessage
+     * @param {MessageArgs} [messageArgs] values for placeholders in the errorMessage
      * @returns {boolean} the result of the predicate
      */
     anInteger(errorMessage, messageArgs) {
@@ -180,7 +194,7 @@ class ValidatorContext {
     /**
      * A string representing an integer
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
-     * @param {string|number|(string|number)[]} [messageArgs] values for placeholders in the errorMessage
+     * @param {MessageArgs} [messageArgs] values for placeholders in the errorMessage
      * @returns {boolean} the result of the predicate
      */
     anIntegerString(errorMessage, messageArgs) {
@@ -193,7 +207,7 @@ class ValidatorContext {
 
     /**
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
-     * @param {string|number|(string|number)[]} [messageArgs] values for placeholders in the errorMessage
+     * @param {MessageArgs} [messageArgs] values for placeholders in the errorMessage
      * @returns {boolean} the result of the predicate
      */
     aNumber(errorMessage, messageArgs) {
@@ -206,7 +220,7 @@ class ValidatorContext {
 
     /**
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
-     * @param {string|number|(string|number)[]} [messageArgs] values for placeholders in the errorMessage
+     * @param {MessageArgs} [messageArgs] values for placeholders in the errorMessage
      * @returns {boolean} the result of the predicate
      */
     anObject(errorMessage, messageArgs) {
@@ -219,7 +233,7 @@ class ValidatorContext {
 
     /**
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
-     * @param {string|number|(string|number)[]} [messageArgs] values for placeholders in the errorMessage
+     * @param {MessageArgs} [messageArgs] values for placeholders in the errorMessage
      * @returns {boolean} the result of the predicate
      */
     aString(errorMessage, messageArgs) {
@@ -232,7 +246,7 @@ class ValidatorContext {
 
     /**
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
-     * @param {string|number|(string|number)[]} [messageArgs] values for placeholders in the errorMessage
+     * @param {MessageArgs} [messageArgs] values for placeholders in the errorMessage
      * @returns {boolean} the result of the predicate
      */
     empty(errorMessage, messageArgs) {
@@ -246,7 +260,7 @@ class ValidatorContext {
     /**
      * @param {number} value the value this value should be less than
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
-     * @param {string|number|(string|number)[]} [messageArgs] values for placeholders in the errorMessage
+     * @param {MessageArgs} [messageArgs] values for placeholders in the errorMessage
      * @returns {boolean} the result of the predicate
      */
     lessThan(value, errorMessage, messageArgs) {
@@ -263,7 +277,7 @@ class ValidatorContext {
     /**
      * @param {number} value the value this value should be less than or equal to
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
-     * @param {string|number|(string|number)[]} [messageArgs] values for placeholders in the errorMessage
+     * @param {MessageArgs} [messageArgs] values for placeholders in the errorMessage
      * @returns {boolean} the result of the predicate
      */
     lessThanOrEqualTo(value, errorMessage, messageArgs) {
@@ -280,7 +294,7 @@ class ValidatorContext {
     /**
      * @param {number} value the value this value should be greater than
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
-     * @param {string|number|(string|number)[]} [messageArgs] values for placeholders in the errorMessage
+     * @param {MessageArgs} [messageArgs] values for placeholders in the errorMessage
      * @returns {boolean} the result of the predicate
      */
     greaterThan(value, errorMessage, messageArgs) {
@@ -297,7 +311,7 @@ class ValidatorContext {
     /**
      * @param {number} value the value this value should be greater than or equal to
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
-     * @param {string|number|(string|number)[]} [messageArgs] values for placeholders in the errorMessage
+     * @param {MessageArgs} [messageArgs] values for placeholders in the errorMessage
      * @returns {boolean} the result of the predicate
      */
     greaterThanOrEqualTo(value, errorMessage, messageArgs) {
@@ -315,7 +329,7 @@ class ValidatorContext {
      * @param {number} start the range start (inclusive)
      * @param {number} end the range end (inclusive)
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
-     * @param {string|number|(string|number)[]} [messageArgs] values for placeholders in the errorMessage
+     * @param {MessageArgs} [messageArgs] values for placeholders in the errorMessage
      * @returns {boolean} the result of the predicate
      */
     inRange(start, end, errorMessage, messageArgs) {
@@ -332,7 +346,7 @@ class ValidatorContext {
     /**
      * @param {*[]|Set<*>|Map<*, *>} values an array, Set or Map of values to test against
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
-     * @param {string|number|(string|number)[]} [messageArgs] values for placeholders in the errorMessage
+     * @param {MessageArgs} [messageArgs] values for placeholders in the errorMessage
      * @returns {boolean} the result of the predicate
      */
     in(values, errorMessage, messageArgs) {
@@ -361,7 +375,7 @@ class ValidatorContext {
     /**
      * @param {string} startStr the string the contextValue should start with
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
-     * @param {string|number|(string|number)[]} [messageArgs] values for placeholders in the errorMessage
+     * @param {MessageArgs} [messageArgs] values for placeholders in the errorMessage
      * @returns {boolean} the result of the predicate
      */
     startWith(startStr, errorMessage, messageArgs) {
@@ -380,7 +394,7 @@ class ValidatorContext {
     /**
      * @param {string} endStr the string the contextValue should end with
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
-     * @param {string|number|(string|number)[]} [messageArgs] values for placeholders in the errorMessage
+     * @param {MessageArgs} [messageArgs] values for placeholders in the errorMessage
      * @returns {boolean} the result of the predicate
      */
     endWith(endStr, errorMessage, messageArgs) {
@@ -410,7 +424,7 @@ class ValidatorContext {
      *
      * @param {function(Validator)|boolean} predicate a predicate function which returns a boolean or the results of a predicate. Use the passed in validator context to get access to the predicates of this validator
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
-     * @param {string|number|(string|number)[]} [messageArgs] values for placeholders in the errorMessage
+     * @param {MessageArgs} [messageArgs] values for placeholders in the errorMessage
      * @returns {boolean} the result of the predicate
      */
     fulfill(predicate, errorMessage, messageArgs) {
@@ -451,7 +465,7 @@ class ValidatorContext {
      * @param {function(Validator):boolean[]} predicates a function returning an array of predicate results.
      * Use the passed in validator to add further predicates for the current value
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
-     * @param {string|number|(string|number)[]} [messageArgs] values for placeholders in the errorMessage
+     * @param {MessageArgs} [messageArgs] values for placeholders in the errorMessage
      * @returns {boolean} the result of the predicate
      * @see {@link #fulfill}, {@link #fulfillAllOf}
      */
@@ -514,7 +528,7 @@ class ValidatorContext {
      * @param {function(Validator):boolean[]} predicates a function returning an array of predicate results.
      * Use the passed in validator to add further predicates for the current value
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
-     * @param {string|number|(string|number)[]} [messageArgs] values for placeholders in the errorMessage
+     * @param {MessageArgs} [messageArgs] values for placeholders in the errorMessage
      * @returns {boolean} the result of the predicate
      * @see {@link #fulfill}, {@link #fulfillOneOf}
      */
@@ -544,7 +558,7 @@ class ValidatorContext {
                     success = false;
                 }
             }
-            // on mode = ON_ERROR_NEXT_PATH we need to let the validator handle it so it can collect errors for all paths (not required in fulfillOneOf as it only needs to fulfill one predicate)
+            // on mode = ON_ERROR_NEXT_PATH we need to let the validator handle it, so it can collect errors for all paths (not required in fulfillOneOf as it only needs to fulfill one predicate)
             if (!success && this.#validatorState.mode !== sharedConstants.mode.ON_ERROR_NEXT_PATH) {
                 break;
             }
@@ -561,7 +575,7 @@ class ValidatorContext {
     /**
      * @param {RegExp} regex the regular expression to test the value against
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
-     * @param {string|number|(string|number)[]} [messageArgs] values for placeholders in the errorMessage
+     * @param {MessageArgs} [messageArgs] values for placeholders in the errorMessage
      * @returns {boolean} the result of the predicate
      */
     match(regex, errorMessage, messageArgs) {
@@ -578,16 +592,21 @@ class ValidatorContext {
     /**
      * @param {boolean} success
      * @param {string} [errorMessage] the error message. If defined and the result is false an error with the message will be thrown
-     * @param {string|number|(string|number)[]} [messageArgs]
+     * @param {MessageArgs} [messageArgs]
      * @return {boolean}
      */
     #handleError(success, errorMessage, messageArgs = []) {
         if (this.#notContext) {
             success = !success;
         }
-        if (!success && !Array.isArray(messageArgs)) {
-            messageArgs = [messageArgs];
+        if (!success) {
+            if (!Array.isArray(messageArgs)) {
+                messageArgs = [messageArgs];
+            }
+            messageArgs = messageArgs.map(messageArgsToString);
         }
+
+
 
         let fullMessage;
 
@@ -596,7 +615,7 @@ class ValidatorContext {
                 fullMessage = this.#validatorState.getFullErrorMessage(errorMessage);
 
                 if (messageArgs.length > 0 || fullMessage.match(PLACEHOLDER_PRE_TEST_PATTERN)) {
-                    fullMessage = fullMessage.replace(PLACEHOLDER_PATTERN, (match, group1) => messageArgs[group1] + ''); // make sure we return a string
+                    fullMessage = fullMessage.replace(PLACEHOLDER_PATTERN, (match, group1) => messageArgs[group1]);
                     fullMessage = fullMessage.replace(PLACEHOLDER_CONTEXT_VALUE_PATTERN, this.#contextValue);
                     if (this.#errorContextValuePaths.length > 0) {
                         let primaryErrorContextValuePath = this.#errorContextValuePaths[0];
@@ -649,6 +668,20 @@ class ValidatorContext {
         }
     }
 
+}
+
+function messageArgsToString(val) {
+    if (val instanceof Set) {
+        val = Array.from(val);
+    }
+    if (Array.isArray(val)) {
+        val = JSON.stringify(val, null, 1)
+            .replaceAll('\n', '')
+            .replace('[ ', '[');
+    } else {
+        val = val + ""; // make sure it is a string
+    }
+    return val;
 }
 
 module.exports = { ValidatorContext };
