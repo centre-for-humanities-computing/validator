@@ -28,7 +28,7 @@ class RuleSet {
      *
      * // Values not known at the time the rule is created can be referenced by the second parameter "context".
      * // The argument for "context" should then be passed in during validation.
-     * ruleSet.addRule('country', (country, acceptedCountries) => country.isNot.in(acceptedCountries, '${VALUE} is not current on our list if countries'));
+     * ruleSet.addRule('country', (country, acceptedCountries) => country.isNot.in(acceptedCountries, "${VALUE} is not current on our list if countries"));
      *
      * @param {string} path the path for the rule. An empty string is considered the default rule.
      * @param {function(Validator, context?:*)} rule the rule which will be called when validating this path. "context" is an optional argument which can be passed in during validation.
@@ -56,7 +56,7 @@ class RuleSet {
      * ruleSet.addRule('', (person) => person.is.anObject('a person must be an object');
      * ruleSet.addRule('name', (name) => name.is.aString('"${PATH}" must be a string');
      * ruleSet.addRule('age', (age) => age.is.aNumber('"${PATH}" must be a number');
-     * ruleSet.addRule('country', (country, acceptedCountries) => country.isNot.in(acceptedCountries, '${VALUE} is not current on our list if countries'));
+     * ruleSet.addRule('country', (country, acceptedCountries) => country.isNot.in(acceptedCountries, "${VALUE} is not current on our list if countries"));
      *
      * let person = { name: "John", age: 43, country: 'Denmark'};
      * let acceptedCountries = ['Denmark', 'Japan'];
@@ -69,10 +69,10 @@ class RuleSet {
      * @param {string|string[]} [path] the path(s) to validate. If path is undefined all rules will be validated against the object
      * @param {*} [context] a context object which should be passed to the rules
      * @return {boolean}
-     * @see {@link #isValueValid}
-     * @see {@link #validate}
-     * @see {@link #validateValue}
-     * @see {@link #addRule}
+     * @see isValueValid
+     * @see validate
+     * @see validateValue
+     * @see addRule
      */
     isValid(object, path, context) {
         let result = false;
@@ -97,7 +97,7 @@ class RuleSet {
      *     name.does.match(/\w+/, '"${PATH}" must only contain [a-Z_0-9]')
      * ]);
      * ruleSet.addRule('age', (age) => age.is.aNumber('"${PATH}" must be a number'));
-     * ruleSet.addRule('country', (country, acceptedCountries) => country.isNot.in(acceptedCountries, '${VALUE} is not current on our list if countries'));
+     * ruleSet.addRule('country', (country, acceptedCountries) => country.isNot.in(acceptedCountries, "${VALUE} is not current on our list if countries"));
      *
      * let name = 'john';
      * let age = 43;
@@ -112,9 +112,9 @@ class RuleSet {
      * @param {string|string[]} [path] the path(s) to validate. If path is undefined all rules will be validated against the value
      * @param {*} [context] a context object which should be passed to the rules
      * @return {boolean}
-     * @see {@link #isValidObject}
-     * @see {@link #validate}
-     * @see {@link #validateValue}
+     * @see isValidObject
+     * @see validate
+     * @see validateValue
      */
     isValueValid(value, path, context) {
         let result = false;
@@ -134,7 +134,7 @@ class RuleSet {
      * ruleSet.addRule('', (person) => person.is.anObject('a person must be an object');
      * ruleSet.addRule('name', (name) => name.is.aString('"${PATH}" must be a string');
      * ruleSet.addRule('age', (age) => age.is.aNumber('"${PATH}" must be a number');
-     * ruleSet.addRule('country', (country, acceptedCountries) => country.isNot.in(acceptedCountries, '${VALUE} is not current on our list if countries'));
+     * ruleSet.addRule('country', (country, acceptedCountries) => country.isNot.in(acceptedCountries, "${VALUE} is not current on our list if countries"));
      *
      * let person = { name: "John", age: 43, country: 'Denmark'};
      * let acceptedCountries = ['Denmark', 'Japan'];
@@ -153,9 +153,9 @@ class RuleSet {
      * @param {boolean} isObject should be <code>true</code> if the object should be considered an object with "paths" to validate
      * and <code>false</code> if the object is to be considered a single value to validate
      * @returns {ValidationResult}
-     * @see {@link #validateValue}
-     * @see {@link #isValueValid}
-     * @see {@link #isValid}
+     * @see validateValue
+     * @see isValueValid
+     * @see isValid
      */
     validate(object, path = undefined, context, isObject = true) {
         let rules;
@@ -197,7 +197,7 @@ class RuleSet {
      * let ruleSet = Validator.createOnErrorNextPathRuleSet();
      * ruleSet.addRule('name', (name) => name.is.aString('"${PATH}" must be a string');
      * ruleSet.addRule('age', (age) => age.is.aNumber('"${PATH}" must be a number');
-     * ruleSet.addRule('country', (country, acceptedCountries) => country.isNot.in(acceptedCountries, '${VALUE} is not current on our list if countries'));
+     * ruleSet.addRule('country', (country, acceptedCountries) => country.isNot.in(acceptedCountries, "${VALUE} is not current on our list if countries"));
      *
      * let name = 'john';
      * let age = 43;

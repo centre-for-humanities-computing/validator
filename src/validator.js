@@ -281,7 +281,7 @@ class Validator {
 
     /**
      * @returns {ValidatorContext} the predicate context for this verb
-     * @see {@link #does}
+     * @see does
      */
     get is() {
         return this.#getValidatorContext(false);
@@ -289,7 +289,7 @@ class Validator {
 
     /**
      * @returns {ValidatorContext} the predicate context for this verb
-     * @see {@link #is}
+     * @see is
      */
     get does() {
         return this.#getValidatorContext(false);
@@ -297,7 +297,7 @@ class Validator {
 
     /**
      * @returns {ValidatorContext} the predicate context for this verb
-     * @see {@link #doNot}
+     * @see doesNot
      */
     get isNot() {
         return this.#getValidatorContext(true);
@@ -305,7 +305,7 @@ class Validator {
 
     /**
      * @returns {ValidatorContext} the predicate context for this verb
-     * @see {@link #isNot}
+     * @see isNot
      */
     get doesNot() {
         return this.#getValidatorContext(true);
@@ -319,14 +319,14 @@ class Validator {
      *
      * @example
      * let person = null;
-     * // the below tests will only be performed is person i defined
+     * // the below tests will only be performed if person is defined
      * test(person).optional.fulfillAllOf((person) => [
      *      person.is.anObject('person must be an object'),
      *      person.prop("name").fulfillAllOf((name) => [
      *          name.is.aString('"${PATH}" must be a string'),
      *          name.does.match(/\w+/, '"${PATH}" must only contain [a-Z_0-9]')
      *      ]),
-     *      // will only be tested if person is defined and person.age is defined
+     *      // will only be tested if person is defined and <code>person.age</code> is defined
      *      test(person).optional.prop("age").optional.is.aNumber('"${PATH}" must be a number')
      * ]);
      *
@@ -345,14 +345,14 @@ class Validator {
     /**
      * Only evaluate the following tests if this predicate is fulfilled.
      *
-     * If the predicate is a function the function is passed an instance of an Validator with the current element.
+     * If the predicate is a function the function is passed an instance of a Validator with the current element.
      *
      * @example
      * let person = { name: "John", age: 54 };
      * test(person).fulfillAllOf((person) => [
      *      person.is.anObject('person must be an object'),
      *      person.conditionally((person) => person.prop('name').is.equalTo('Eric')).fulfill(
-     *          person.prop('age').is.greaterThan(50, 'Age must be greater that 50 for persons named Eric')
+     *          person.prop('age').is.greaterThan(50, "Age must be greater than 50 for persons named Eric")
      *      )
      * ]);
      *
@@ -381,7 +381,7 @@ class Validator {
     /**
      * Tests the predicate against each element of the iterable.
      *
-     * If the predicate is a function the function is passed an instance of an Validator with the current element.
+     * If the predicate is a function the function is passed an instance of a Validator with the current element.
      *
      * @example
      * let numbers = [1, 2, "three", 4];
@@ -389,8 +389,8 @@ class Validator {
      *      'The element must be a number but was "${VALUE}"');
      * // we can get the actual value if we need it
      * test(numbers).each((number) => number.value  !== 10 && number.value > 7,
-     *      'The number cannot 10 and must be greater than 7');
-     * // for more fine grained error message add the error message to the individual test
+     *      "The number cannot 10 and must be greater than 7");
+     * // for a more fine-grained error message add the error message to the individual test.
      * test(numbers).each((number) => number.fulfillAllOf((number) => [
      *      number.is.aNumber('The element must be a number but was "${VALUE}"'),
      *      number.is.inRange(1, 10, 'The element must be in the range [1, 10] was "${VALUE}"'),
@@ -409,7 +409,7 @@ class Validator {
             return true; // just fulfill right away
         }
 
-        if (_.isNil(this.#contextValue) || !(Symbol.iterator in this.#contextValue)) { // nothing to iterate over, if nothing to test we cannot known, so return false
+        if (_.isNil(this.#contextValue) || !(Symbol.iterator in this.#contextValue)) { // nothing to iterate over, if nothing to test we cannot know the result, so return false
             Validator.#throwArgumentError('the value must be iterable to use each()');
         }
 
@@ -434,7 +434,7 @@ class Validator {
                 if (!predicateSuccess) {
                     success = false;
                 }
-                // on mode = ON_ERROR_NEXT_PATH we need to let the validator handle it so it can collect errors for all paths
+                // on mode = ON_ERROR_NEXT_PATH we need to let the validator handle it, so it can collect errors for all paths
                 if (!success && this.#validatorState.mode !== sharedConstants.mode.ON_ERROR_NEXT_PATH) {
                     break;
                 }
@@ -452,7 +452,7 @@ class Validator {
     /**
      * @example
      * let person = { name: "John" }
-     * let test = Validator.create('Person validation error:');
+     * let test = Validator.create("Person validation error:");
      * test(person).fulfillAllOf((person) => [
      *      person.is.anObject(),
      *      person.prop('name').fulfillAllOf((name) => [
@@ -487,7 +487,7 @@ class Validator {
 
         let validator = this.#createChildValidator(validatorContext, childValue, fullPropPath, path);
         // important to call this to make sure reset() is called and the context is returned to the contextPool, because we are leaving this context and enter a child validator
-        // IMPORTANT that we pass undefined as success so we don't modify short circuit state etc. as getting a prop is NOT a predicate
+        // IMPORTANT that we pass undefined as success, so we don't modify short circuit state etc. as getting a prop is NOT a predicate
         this.#validatorContextDone(validatorContext, undefined);
         return validator;
     }
@@ -541,7 +541,7 @@ class Validator {
         // on short circuit we just pass in an undefined value
         let validator = this.#createChildValidator(validatorContext, transformedValue);
         // important to call this to make sure reset() is called and the context is returned to the contextPool, because we are leaving this context and enter a child validator
-        // IMPORTANT that we pass undefined as success so we don't modify short circuit state etc. as getting a prop is NOT a predicate
+        // IMPORTANT that we pass undefined as success, so we don't modify short circuit state etc. as getting a prop is NOT a predicate
         this.#validatorContextDone(validatorContext, undefined);
         return validator;
     }
@@ -583,7 +583,7 @@ class Validator {
 
         let validator = this.#createChildValidator(validatorContext, this.#contextValue, this.#contextValuePath, this.#contextValueCurrentPath, errorContextPath);
         // important to call this to make sure reset() is called and the context is returned to the contextPool, because we are leaving this context and enter a child validator
-        // IMPORTANT that we pass undefined as success so we don't modify short circuit state etc. as getting a prop is NOT a predicate
+        // IMPORTANT that we pass undefined as success, so we don't modify short circuit state etc. as getting a prop is NOT a predicate
         this.#validatorContextDone(validatorContext, undefined);
         return validator;
 
@@ -661,10 +661,10 @@ class Validator {
      * Creates a new validation context. The returned "test" function gives access to the verb context which return the
      * predicate used for performing the actual test.
      *
-     * If a error message is passed to a test predicate it add it to the result if the predicate is not fulfilled.
+     * If na error message is passed to a test predicate it adds it to the result if the predicate is not fulfilled.
      * Every predicate returns a boolean with the result of the test.
      *
-     * Error message string can use placeholders which will be substituted when the error i thrown
+     * Error message string can use placeholders which will be substituted when the error is thrown
      *
      * @example
      * let test = Validator.create('Validation error:', Validator.mode.ON_ERROR_BREAK);
@@ -676,9 +676,9 @@ class Validator {
      * test(name).fulfillAllOf((name) => [
      *      name.value.length > 1,
      *      name.does.match(/\w+/)
-     * ], 'Name must have length > 1 and only contain letters');
+     * ], "Name must have length > 1 and only contain letters");
      *
-     * // when testing individual values (or objects) an errorPathPrefix can be passed in a second argument to the the test-function.
+     * // when testing individual values (or objects) an errorPathPrefix can be passed in a second argument to the test-function.
      * // the errorPathPrefix will be used a prefix for the path in validation result and for ${PATH} placeholders (see below) in error messages.
      * // This makes it possible to collect errors from multiple values without having them in an object and still be able to tell them appart
      *
@@ -689,7 +689,7 @@ class Validator {
      * console.log(test.result.getError('age'));
      *
      * // validate properties of an object
-     * test(person).prop("age").is.aNumber('${PATH} must be an string');
+     * test(person).prop("age").is.aNumber("${PATH} must be a string");
      * test(person).fulfillAllOf((person) => [
      *      person.is.anObject('person must be an object'),
      *      person.prop("name").fulfillAllOf((name) => [
@@ -718,10 +718,10 @@ class Validator {
      * @param {string} errorPrefix a prefix to prepend to every error created by this validator
      * @param {string} mode the [mode]{@link Validator.mode} for this validator
      * @returns {function(value:*, errorBasePath?:string):Validator}
-     * @see {@link ValidationResult}
-     * @see {@link Validator.createOnErrorThrowValidator}
-     * @see {@link Validator.createOnErrorBreakValidator}
-     * @see {@link Validator.createOnErrorNextPathValidator}
+     * @see ValidationResult
+     * @see Validator.createOnErrorThrowValidator
+     * @see Validator.createOnErrorBreakValidator
+     * @see Validator.createOnErrorNextPathValidator
      */
     static create(errorPrefix = '', mode = Validator.mode.ON_ERROR_THROW) {
         return Validator.#testFunction(errorPrefix, mode);
@@ -732,7 +732,7 @@ class Validator {
      * @param {string} errorPrefix a prefix to prepend to every error thrown by this validator
      * @returns {function(value:*, errorBasePath?:string):Validator}
      * @see {@link Validator.create} for examples of usage
-     * @see {@link Validator.mode}
+     * @see Validator.mode
      */
     static createOnErrorThrowValidator(errorPrefix = '') {
         return Validator.#testFunction(errorPrefix, Validator.mode.ON_ERROR_THROW);
@@ -743,7 +743,7 @@ class Validator {
      * @param {string} errorPrefix a prefix to prepend to every error created by this validator
      * @returns {function(value:*, errorBasePath?:string):Validator}
      * @see {@link Validator.create} for examples of usage
-     * @see {@link Validator.mode}
+     * @see Validator.mode
      */
     static createOnErrorBreakValidator(errorPrefix = '') {
         return Validator.#testFunction(errorPrefix, Validator.mode.ON_ERROR_BREAK);
@@ -754,7 +754,7 @@ class Validator {
      * @param {string} errorPrefix a prefix to prepend to every created thrown by this validator
      * @returns {function(value:*, errorBasePath?:string):Validator}
      * @see {@link Validator.create} for examples of usage
-     * @see {@link Validator.mode}
+     * @see Validator.mode
      */
     static createOnErrorNextPathValidator(errorPrefix = '') {
         return Validator.#testFunction(errorPrefix, Validator.mode.ON_ERROR_NEXT_PATH);
@@ -791,11 +791,11 @@ class Validator {
      * @param {string} errorPrefix a prefix to prepend to every error created by this validator
      * @param {string} mode the [mode]{@link Validator.mode} for this validator
      * @returns {RuleSet}
-     * @see {@link RuleSet}
-     * @see {@link ValidationResult}
-     * @see {@link Validator.createOnErrorThrowRuleSet}
-     * @see {@link Validator.createOnErrorBreakRuleSet}
-     * @see {@link Validator.createOnErrorNextPathRuleSet}
+     * @see RuleSet
+     * @see ValidationResult
+     * @see Validator.createOnErrorThrowRuleSet
+     * @see Validator.createOnErrorBreakRuleSet
+     * @see Validator.createOnErrorNextPathRuleSet
      */
     static createRuleSet(errorPrefix = '', mode = Validator.mode.ON_ERROR_THROW) {
         return new RuleSet(errorPrefix, mode, Validator.create);
@@ -806,7 +806,7 @@ class Validator {
      * @param {string} errorPrefix a prefix to prepend to every error thrown by this validator
      * @returns {RuleSet}
      * @see {@link Validator.createRuleSet} for examples of usage
-     * @see {@link Validator.mode}
+     * @see Validator.mode
      */
     static createOnErrorThrowRuleSet(errorPrefix = '') {
         return Validator.createRuleSet(errorPrefix, Validator.mode.ON_ERROR_THROW);
@@ -817,7 +817,7 @@ class Validator {
      * @param {string} errorPrefix a prefix to prepend to every error created by this validator
      * @returns {RuleSet}
      * @see {@link Validator.createRuleSet} for examples of usage
-     * @see {@link Validator.mode}
+     * @see Validator.mode
      */
     static createOnErrorBreakRuleSet(errorPrefix = '') {
         return Validator.createRuleSet(errorPrefix, Validator.mode.ON_ERROR_BREAK);
@@ -828,7 +828,7 @@ class Validator {
      * @param {string} errorPrefix a prefix to prepend to every error created by this validator
      * @returns {RuleSet}
      * @see {@link Validator.createRuleSet} for examples of usage
-     * @see {@link Validator.mode}
+     * @see Validator.mode
      */
     static createOnErrorNextPathRuleSet(errorPrefix = '') {
         return Validator.createRuleSet(errorPrefix, Validator.mode.ON_ERROR_NEXT_PATH);
@@ -837,7 +837,7 @@ class Validator {
     /**
      * Get the validation result of the test function.
      *
-     * The validation result can also be accessed directly using testFunction.result
+     * The validation result can also be accessed directly using <code>testFunction.result</code>
      * @param {function(value:*, errorBasePath?:string):Validator} testFunction
      * @returns {ValidationResult}
      */

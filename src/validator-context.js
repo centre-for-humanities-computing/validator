@@ -102,7 +102,7 @@ class ValidatorContext {
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
      * @param {MessageArgs} [messageArgs] values for placeholders in the errorMessage
      * @returns {boolean} the result of the predicate
-     * @see {@link https://lodash.com/docs/4.17.15#isEqual}
+     * @see https://lodash.com/docs/4.17.15#isEqual
      */
     equalTo(otherValue, errorMessage, messageArgs) {
         let success = _.isEqual(this.#contextValue, otherValue);
@@ -224,7 +224,7 @@ class ValidatorContext {
      * @returns {boolean} the result of the predicate
      */
     anObject(errorMessage, messageArgs) {
-        let success = _.isPlainObject(this.#contextValue);
+        let success = _.isObjectLike(this.#contextValue) && !Array.isArray(this.#contextValue); // use isArray to test for arrays
         if (Debug.enabled) {
             this.#printDebug(this.anObject.name, success);
         }
@@ -415,7 +415,7 @@ class ValidatorContext {
      * let test = Validator.create('Validation error:');
      * let name = "John";
      * // user defined predicate
-     * test(name).fulfill((name) => name.is.aString() && name.value.length > 1, 'Name must be a string and must have length > 1');
+     * test(name).fulfill((name) => name.is.aString() && name.value.length > 1, "Name must be a string and must have length > 1");
      * // using the existing validator context.
      * test(name).does.fulfill((name) => name.is.aString(), 'Name must be a string');
      *
@@ -448,7 +448,7 @@ class ValidatorContext {
      * test(name).fulfillOneOf((name) => [
      *     name.value.length > 1,    // user defined predicate
      *     name.does.match(/\W+/)    // using the existing validator context
-     * ], 'Name must have length > 1 or not include \w characters');
+     * ], "Name must have length > 1 or not include \w characters");
      *
      * // combining multiple tests. We don't even need to pass in an initial value
      * test().fulfillOneOf(() => [
@@ -467,7 +467,8 @@ class ValidatorContext {
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
      * @param {MessageArgs} [messageArgs] values for placeholders in the errorMessage
      * @returns {boolean} the result of the predicate
-     * @see {@link #fulfill}, {@link #fulfillAllOf}
+     * @see fulfill
+     * @see fulfillAllOf
      */
     fulfillOneOf(predicates, errorMessage, messageArgs) {
         this.#validatorCallbackContext.enableShortCircuitStickyOn(true);
@@ -530,7 +531,8 @@ class ValidatorContext {
      * @param {string} [errorMessage] the error message. If defined and the predicate is not fulfilled an error with the message will be thrown
      * @param {MessageArgs} [messageArgs] values for placeholders in the errorMessage
      * @returns {boolean} the result of the predicate
-     * @see {@link #fulfill}, {@link #fulfillOneOf}
+     * @see fulfill
+     * @see fulfillOneOf
      */
     fulfillAllOf(predicates, errorMessage, messageArgs) {
         this.#validatorCallbackContext.enableShortCircuitStickyOn(false);
