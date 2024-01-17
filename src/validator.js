@@ -60,7 +60,7 @@ class Validator {
 
     #name;
     /**
-     * @type ValidatorInternalState
+     * @type {ValidatorInternalState}
      */
     #validatorState;
     #validatorSharedState;
