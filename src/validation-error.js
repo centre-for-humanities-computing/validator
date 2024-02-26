@@ -1,19 +1,18 @@
-
 class ValidationError extends Error {
 
     #path;
 
     /**
-     * @param {string} message the error message
-     * @param {string} path the path for the error
+     * @param {string} message - The error message.
+     * @param {string} path The path for the error.
      */
     constructor(message, path) {
         super(message);
-        this.#path = path
+        this.#path = path;
     }
 
     /**
-     * @returns {string} the path of the error
+     * @returns {string} The path of the error.
      */
     get path() {
         return this.#path;

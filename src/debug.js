@@ -1,5 +1,4 @@
-const {ValidatorInternalState} = require("./validator-internal-state");
-const _ = require("lodash");
+const { isMap, isObject, isSet, isString } = require('./type-predicates');
 
 class Debug {
 
@@ -42,13 +41,13 @@ class Debug {
     valueToStr(value) {
         if (Array.isArray(value)) {
             return '[Array]';
-        } else if (value instanceof Set) {
+        } else if (isSet(value)) {
             return '[Set]';
-        } else if (value instanceof Map) {
+        } else if (isMap(value)) {
             return '[Map]';
-        } else if (_.isObject(value)) {
+        } else if (isObject(value)) {
             return '[Object]';
-        } else if (_.isString(value)) {
+        } else if (isString(value)) {
             return `"${value}"`;
         }
         return value;

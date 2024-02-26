@@ -70,7 +70,7 @@ class ValidatorInternalState {
             paths.push(utils.joinPropPaths(this.#errorBasePath, this.#contextValuePath));
         } else {
             for (let errorContextPath of this.#errorContextPaths) {
-                paths.push(utils.joinPropPaths(this.#errorBasePath, this.#contextValuePath, errorContextPath))
+                paths.push(utils.joinPropPaths(this.#errorBasePath, this.#contextValuePath, errorContextPath));
             }
         }
         return paths;

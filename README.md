@@ -1,14 +1,17 @@
 # Validator
 
-A fluent validator API for validating function arguments, form-data etc. 
+A fluent validator API for validating function arguments, form-data etc.
 
 ## Installation
+
 ```
 npm install @chcaa/validator
 ```
 
 ## Getting Started
+
 Import the module and create a new `Validator` (see examples further down for different kinds of validators).
+
 ```js
 const { Validator } = require('@chcaa/validator');
 let test = Validator.createOnErrorThrowValidator();
@@ -23,18 +26,20 @@ test(person.name).fulfillAllOf(name => [
 // or make a set of reusable rules
 let ruleSet = Validator.createOnErrorNextPathRuleSet();
 ruleSet.addRule('name', (name) => name.fulfillAllOf(name => [
-  name.is.aString('"name" must be a string'),
-  name.is.equalTo('Peter', '"name" must be "Peter"')
+    name.is.aString('"name" must be a string'),
+    name.is.equalTo('Peter', '"name" must be "Peter"')
 ]));
 
 let validationResult = ruleSet.validate(person);
 console.log(validationResult.getAllErrors());
 
 ```
+
 See also the JsDoc for each method for further examples.
 
 ## Test Function Arguments
-If an argument does not meet the requirements we want to throw a `ValidationError` so we 
+
+If an argument does not meet the requirements we want to throw a `ValidationError` so we
 create a `Validator` which throws an error when a test fails.
 
 ```js
@@ -46,6 +51,7 @@ function add(x, y) {
 ```
 
 ## Test Form Data and Objects
+
 When testing form data we would like to be able to gather information and show it to the user. We can then
 create a `Validator` which just breaks if a test fails instead of throwing an Error. To keep
 the error messages separated in the `ValidationResult` we supply an `errorPrefixPath` as the second argument to `test`.
@@ -72,10 +78,10 @@ function validateUserForm(username, age) {
 }
 ````
 
-The data from above could also be validated as an object instead of individual values, we then make use of 
+The data from above could also be validated as an object instead of individual values, we then make use of
 a `Validator` in `ON_ERROR_NEXT_PATH` mode to move on to the next path when a test fails, so we can gather
-information about all paths. If we only wanted the error message for the first path which failed we 
-could use an `ON_ERROR_BREAK` `Validator`. 
+information about all paths. If we only wanted the error message for the first path which failed we
+could use an `ON_ERROR_BREAK` `Validator`.
 
 ```js
 function validateUserForm(user) {
@@ -106,15 +112,16 @@ function validateUserForm(user) {
 ```
 
 ## Reusing Rules
-Rules can be stored and reused using a `RuleSet`. 
+
+Rules can be stored and reused using a `RuleSet`.
 
 For objects a single set of rules for a whole object can be applied using `Validator.prop()` to access
-each property, as the examples above, but it is more performant and sometimes easier to read 
+each property, as the examples above, but it is more performant and sometimes easier to read
 if rules are divided by each property and added separately.
 
 ```js
 let ruleSet = Validator.createOnErrorBreakRuleSet();
-ruleSet.addRule('username', (username) => username.fulfillAllOf(username => [
+ruleSet.addRule('username', username => username.fulfillAllOf(username => [
     username.is.aString('Username must be a string'),
     username.does.match(/\w{4, 25}/, "Username must only contain a-zA-Z0-9_ and have a length of 4-25 characters")
 ]));
@@ -141,7 +148,7 @@ console.log(validationResult.getErrors('age')); // all errors for path
 
 // we can also test individual paths 
 if (ruleSet.isValid(user, 'age')) {
-  // do something
+    // do something
 }
 // or validate and get a result only for a single path
 validationResult = ruleSet.validate(user, 'age');
@@ -152,9 +159,10 @@ validationResult = ruleSet.validateValue(23, 'age');
 ```
 
 ### Supplying Values not Known at the Time of Rule Creation
+
 When creating rules for reuse some values may not be known at the time the rule is created because they are unknown, change
-regularly. Or we could want to create a generic set of rules which can be used in different contexts. 
-"Context" values can be passed in to a rule at validation time and referenced by the rule by adding a second 
+regularly. Or we could want to create a generic set of rules which can be used in different contexts.
+"Context" values can be passed in to a rule at validation time and referenced by the rule by adding a second
 parameter to the rule function as shown in the below example.
 
 ```js
@@ -178,14 +186,18 @@ ruleSet.validate(user, undefined, reservedUsernames);
 ```
 
 ## Error Messages
+
 Error messages can be supplied for the individual test and as combined messages for `fulfill()`, `fulfillAllOf()`, `fulfillOneOf()` and `each()`.
 
 Individual messages is supplied as an argument to the test:
+
 ```js
 let test = Validator.createOnErrorBreakValidator();
 test('Peter').is.equalTo('Peter', `"Peter" must be equal to "Peter"`);
 ```
+
 Combined messages is supplied as a second argument to e.g. `fulfillAllOf()`:
+
 ```js
 let test = Validator.createOnErrorBreakValidator();
 test('Peter').fulfillAllOf(peter => [
@@ -193,9 +205,11 @@ test('Peter').fulfillAllOf(peter => [
     peter.is.equalTo('Peter')
 ], '"Peter" must be a string and be equal to "Peter"');
 ```
+
 When using combined messages it is important not to add individual messages as well as these will overrule the combined message.
 
 All error messages for the same `Validator` can have the same prefix which can be provided when creating the `Validator`.
+
 ```js
 let test = Validator.createOnErrorBreakValidator('Name error');
 test('Peter').fulfillAllOf(peter => [
@@ -204,13 +218,12 @@ test('Peter').fulfillAllOf(peter => [
 ]);
 ```
 
-
 ### Arguments
 
 Arguments for error messages can be passed in as a single value (if only one is needed) or as an array of values and be
 referenced by their index number.
 
-`string`, `number` and `array` or `Set` of `string` and `number` is 
+`string`, `number` and `array` or `Set` of `string` and `number` is
 allowed. `array` and `Set` of values will be inserted in `JSON` format e.g. `["string", 3, 4, "string2"`].
 When passing an `array` of values it must always be passed in a surrounding `array` even if only a single
 argument is needed to be able to distinguish between an `array` of arguments and an `array` of values.
@@ -222,6 +235,7 @@ test(person).prop('age').is.inRange(18, 99, 'The age must be in range ${0} - ${1
 ```
 
 ### Context Placeholders
+
 The different paths and values in the current validation context can be referenced in the error messages using the following
 placeholders:
 
@@ -249,8 +263,8 @@ test(person.name, 'name').fulfillAllOf(name => [
 
 // test values together and add the error for both paths if the test fails
 test(person).errorContext('name', 'age').fulfillOneOf(person => [
-   person.prop('name').isNot.nil(),
-   person.prop('age').isNot.nil()     
+    person.prop('name').isNot.nil(),
+    person.prop('age').isNot.nil()
 ], 'At least one of ${PATH0} or ${PATH1} must have a value');
 // if the test fails both path will have the error
 let validationResult = Validator.validationResult(test);
@@ -260,53 +274,58 @@ console.log(validationResult.getErrors('age'));
 ```
 
 ## Debugging
+
 Debug messages can be toggled on and off by calling `Validator.debug(true|false)`.
 
 ## Validator Factory and Static Methods
-- `Validator.create(erorPrefix, mode):testFunction` - Creates a new validation context with the given mode. 
-  The returned "test" function gives access to the verb context 
-  which return the predicate used for performing the actual tests
-- `Validator.createOnErrorThrowValidator(errorPrefix):testFunction` - Creates a new validation context which throws an `ValidationError` if a test fails
-- `Validator.createOnErrorBreakValidator(errorPrefix):testFunction` - Creates a new validation context which breaks if a test fails
-- `Validator.createOnErrorNextPathValidator(errorPrefix):testFunction` - Creates a new validation context which moves on to the next path if a test fails
+
+- `Validator.create(erorPrefix, mode):testFunction` - Creates a new validator with the given mode.
+  The returned "test" function gives access to the verb context which return the predicate used for performing the actual tests
+- `Validator.createOnErrorThrowValidator(errorPrefix):testFunction` - Creates a new validator which throws an `ValidationError` if a test fails
+- `Validator.createOnErrorBreakValidator(errorPrefix):testFunction` - Creates a new validator which breaks if a test fails
+- `Validator.createOnErrorNextPathValidator(errorPrefix):testFunction` - Creates a new validator which moves on to the next path if a test fails
 - `Validator.createRuleSet(errorPrefix):RuleSet` - Creates a `RuleSet` with the given mode
-- `Validator.createOnErrorThrowRuleSet(errorPrefix):RuleSet` - Creates a `RuleSet` which throws an `ValidationError` if a test fails
-- `Validator.createOnErrorBreakRuleSet(errorPrefix):RuleSet` - Creates a `RuleSet` which breaks if a test fails
-- `Validator.createOnErrorNextPathRuleSet(errorPrefix):RuleSet` - Creates a `RuleSet` which moves on to the next path if a test fails
+- `Validator.createOnErrorThrowRuleSet(errorPrefix):RuleSet` - Creates a new `RuleSet` which throws an `ValidationError` if a test fails
+- `Validator.createOnErrorBreakRuleSet(errorPrefix):RuleSet` - Creates a new `RuleSet` which breaks if a test fails
+- `Validator.createOnErrorNextPathRuleSet(errorPrefix):RuleSet` - Creates a new `RuleSet` which moves on to the next path if a test fails
 - `Validator.validationResult(testFunction)` - get the `ValidationResult` of the test function
 - `Validator.debug(true|false)` - enable / disable debugging messages
 
 ## Validator Overview
+
 - `does:ValidatorContext`
 - `doesNot:ValidatorContext`
 - `is:ValidatorContext`
 - `isNot:ValidatorContext`
-- `optional:Validator` - only validate the following predicates if the current value i not `nil`
+- `optional:Validator` - only validate the following predicates if the current value is *not* `nil`
 - `value:*` - returns the actual value for this context
-- `conditionally(predicate(validator)):Validator` - only validate the following predicates if the predicate is fulfilled
+- `conditionally(predicate(validator)):Validator` - only validate the following tests if the passed in predicate is fulfilled
 - `each(predicate, [errorMessage, [messageArgs]]):boolean` - validate each element in the `iterable` against the predicate
 - `transform(tranformer):Validator` - transform the current value into something else, e.g. making a `string` lowercase
 - `prop(path):Validator` - get a `Validator` for the `path` relative to the current context value (typically an object)
-- `errorContext(...contextPath)` - adds one or more error context paths to the current validator context making it possible change which path(s) should fail on error
+- `errorContext(...contextPath)` - adds one or more error context paths to the current validator context making it possible change which path(s) should fail on
+  error
 - `fulfill(predicate):ValidatorContext` - alias for `does.fulfill()`
 - `fulfillOneOf(predicates):ValidatorContext` - alias for `does.fulfillOneOf()`
 - `fulfillAllOf(predicates):ValidatorContext` - alias for `does.fulfillAllOf()`
 
 ## ValidatorContext Overview
+
 All methods take an optional `errorMessage` and `messageArgs` as the last two arguments and all methods
 returns a `boolean`.
 
 - `anArray()`
 - `aBoolean()`
 - `aFloatString()`
+- `aFunction()`
 - `anInteger()`
 - `anIntegerString()`
 - `aNumber()`
 - `anObject()`
 - `aString()`
 - `empty()`
-- `equalTo(otherValue)`
 - `endWith(endStr)`
+- `equalTo(otherValue)`
 - `fulfill(predicate)`
 - `fulfillAllOf(predicates)`
 - `fulfillOneOf(predicates)`
@@ -322,13 +341,18 @@ returns a `boolean`.
 - `startWith(startStr)`
 
 ## RuleSet Overview
+
 - `addRule(path, rule):RuleSet` - add a rule for the given to the `RuleSet` in the form of a function which will be called when rule is tested
-- `isValid(object, [path]):boolean` - test if the property paths of the object is valid. The path or paths to test can be optional passed in as the second argument
+- `isValid(object, [path]):boolean` - test if the property paths of the object is valid. The path or paths to test can be optional passed in as the second
+  argument
 - `isValueValid(value, [path]):boolean` - test if the value is valid. The path or paths to test can be optional passed in as the second argument
-- `validate(object, [[path, [isObject]]):ValidationResult` - validate the object which depending on the mode of the `RuleSet` will produce a `ValidationResult` with errors or throw an `ValidationError`if the object is not valid
-- `validateValue(value, [path]):ValidationResult` - validate the value which depending on the mode of the `RuleSet` will produce a `ValidationResult` with errors or throw an `ValidationError`if the object is not valid
+- `validate(object, [[path, [isObject]]):ValidationResult` - validate the object which depending on the mode of the `RuleSet` will produce a `ValidationResult`
+  with errors or throw an `ValidationError`if the object is not valid
+- `validateValue(value, [path]):ValidationResult` - validate the value which depending on the mode of the `RuleSet` will produce a `ValidationResult` with
+  errors or throw an `ValidationError`if the object is not valid
 
 ## ValidationResult Overview
+
 - `getError(path):string` - get the first error for the given path
 - `getErrors(path):string[]` - get all errors for the given path
 - `getAllErrors():string[]` - get all errors

@@ -1,8 +1,7 @@
 /**
- *
  * @param {...string} elements
  */
-module.exports.joinPropPaths = function(...elements) {
+module.exports.joinPropPaths = function (...elements) {
     // we do it manually instead og using filter and Array.join(), this is faster
     let result = '';
     for (let element of elements) {
@@ -27,7 +26,7 @@ module.exports.joinPropPaths = function(...elements) {
  * @param {string} currentPath the current path to get the parent for
  * @returns {string}
  */
-module.exports.getParentPath = function(fullPath, currentPath) {
+module.exports.getParentPath = function (fullPath, currentPath) {
     if (fullPath.endsWith(currentPath)) {
         let dotCorrection = 0;
         if (fullPath.length > currentPath.length && fullPath[fullPath.length - 1 - currentPath.length] === '.') {

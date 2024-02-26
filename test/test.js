@@ -1,5 +1,4 @@
 const { Validator } = require('../src/validator');
-const _ = require('lodash');
 
 function run() {
     try {
@@ -9,8 +8,8 @@ function run() {
         t(2).doesNot.aString();
         let o = {
             t: [
-                {c: 2},
-                {a: 2}
+                { c: 2 },
+                { a: 2 }
             ]
         };
 
@@ -21,21 +20,19 @@ function run() {
         ])), 'fail');
 
 
-
         let isEmptyStringRule = (arg) => arg.fulfillAllOf((arg) => [false,
             /*arg.is.aString(),
             arg.fulfill(arg => arg.value.trim() === '') // is empty*/
         ]);
 
         let typeValueValidator = (date) => date.optional.fulfillOneOf((date) => [
-            //date.fulfill(d => console.log(d.is.anArray())),
-            date.is.anInteger() // da denne er true short circuitter fulfillOneOf og ovenstående bliver kaldt med et objekt der altid er true,
+                //date.fulfill(d => console.log(d.is.anArray())),
+                date.is.anInteger() // da denne er true short circuitter fulfillOneOf og ovenstående bliver kaldt med et objekt der altid er true,
 
-        ],
+            ],
             '[min, max] filter value for field ${0} must be a date in one of the formats ' +
             "[yyyy-MM-dd, yyyy-MM-dd HH:mm:ss, ISO_8601_COMPLIANT, UNIX_TIMESTAMP]");
-        t([23,24], 'basePath').each(typeValueValidator)
-
+        t([23, 24], 'basePath').each(typeValueValidator);
 
 
         let pers = {
@@ -57,7 +54,7 @@ function run() {
         ruleSet.addRule('age', (age) => age.fulfillAllOf((age) => [
             age.is.anInteger('${PATH} must be an integer'),
             age.is.inRange(18, 99, 'age must be in range ${0} - ${1}', [18, 99])
-        ]))
+        ]));
         ruleSet.addRule('address.zip', (zip, zipCodes) => zip.is.in(zipCodes, '${PATH} in not a valid zip-code'));
 
         ruleSet.validate(pers, undefined, zipCodes);
@@ -79,51 +76,50 @@ function run() {
         test.result.isValid();*/
 
 
+        /* let name = "";
+         test(name).isNot.nil('Name cannot be null or undefined');
+         test(name).is.aString('Name must be a string');
+         test(name).optional.fulfillAllOf((name) => [
+                 name.is.aString(),
+                 name.does.match(/\w+/)
+             ],
+             'Name must have length > 1 and only contain letters'
+         );
 
-       /* let name = "";
-        test(name).isNot.nil('Name cannot be null or undefined');
-        test(name).is.aString('Name must be a string');
-        test(name).optional.fulfillAllOf((name) => [
-                name.is.aString(),
-                name.does.match(/\w+/)
-            ],
-            'Name must have length > 1 and only contain letters'
-        );
+         test(name).fulfillAllOf((name) => [
+             name.is.aString(),
+             name.is.aNumber('must be a number'),
+             name.is.in(['John', 'Michael'])
+         ], 'The name must be a string and one of "John" or "Michael"');
 
-        test(name).fulfillAllOf((name) => [
-            name.is.aString(),
-            name.is.aNumber('must be a number'),
-            name.is.in(['John', 'Michael'])
-        ], 'The name must be a string and one of "John" or "Michael"');
-
-        let numbers = [1, 2, 3, 4, 5, 6, 7, 8];
-        //test(numbers).each((element) => element.is.aNumber(), 'Must be a number but was "${VALUE}"');
+         let numbers = [1, 2, 3, 4, 5, 6, 7, 8];
+         //test(numbers).each((element) => element.is.aNumber(), 'Must be a number but was "${VALUE}"');
 
 
-        test(numbers).optional.each((number) => number.fulfillAllOf((number) => [
-            number.is.aNumber('The element must be a number but was "${VALUE}"'),
-            number.is.inRange(1, 10, 'The element must be in the range [1, 10] but was "${VALUE}"'),
-        ]));
+         test(numbers).optional.each((number) => number.fulfillAllOf((number) => [
+             number.is.aNumber('The element must be a number but was "${VALUE}"'),
+             number.is.inRange(1, 10, 'The element must be in the range [1, 10] but was "${VALUE}"'),
+         ]));
 
-    */
+     */
 
-     /*
-        console.time("t");
-       let person = { name: "", age: "54" };
-        for (let i = 0; i < 100000; i++) {
+        /*
+           console.time("t");
+          let person = { name: "", age: "54" };
+           for (let i = 0; i < 100000; i++) {
 
-        test(person, 'person').fulfillAllOf((person) => [
-            person.is.anObject('person must be an object'),
-            person.prop('name').fulfillAllOf((name) => [
-                name.is.aString('"${PATH}" must be a string'),
-                name.does.match(/\w+/, '"${PATH}" must only contain [a-Z_0-9]'),
-                name.is.equalTo('ding', "${PATH} must be 'ding'")
-            ]),
-            person.prop("age").optional.is.aNumber('"${PATH}" must be a number')
-        ]);
-        }
-        console.timeEnd("t")
-    */
+           test(person, 'person').fulfillAllOf((person) => [
+               person.is.anObject('person must be an object'),
+               person.prop('name').fulfillAllOf((name) => [
+                   name.is.aString('"${PATH}" must be a string'),
+                   name.does.match(/\w+/, '"${PATH}" must only contain [a-Z_0-9]'),
+                   name.is.equalTo('ding', "${PATH} must be 'ding'")
+               ]),
+               person.prop("age").optional.is.aNumber('"${PATH}" must be a number')
+           ]);
+           }
+           console.timeEnd("t")
+       */
         //test(person).prop('name').prop('length').is.equalTo(4, "${CURRENT_PATH} of ${PATH} must have en length of 1");
 
 
@@ -135,12 +131,12 @@ function run() {
             )
         ]);
         //console.log(test.result.getAllErrors());
-        return;
 
     } catch (e) {
         console.error(e);
     }
 }
+
 // run();
 
 function testPerson() {
@@ -169,7 +165,7 @@ function testPerson() {
         person.fulfillAllOf(person => [
             person.is.anObject(),
         ])
-    ], "bang")
+    ], "bang");
 
     //problemet er måske at vi i conditionally laver en noopValidationResult object??
     test(person).fulfillAllOf(person => [
@@ -190,34 +186,7 @@ function testPerson() {
     console.log(result.getAllErrors());
 }
 
-testPerson()
-
-/*for (let i = 0; i < 100; i++) {
-
-    console.time('t');
-
-    if (!_.isObject(person)) {
-        throw new Error('person must be an object');
-    }
-    if (!_.isString(person.name)) {
-        throw new Error('name must a string')
-    }
-    if (person.name.trim() === '') {
-        throw new Error('name cannot be empty');
-    }
-    if (!_.isNumber(person.age)) {
-        throw new Error('age must be a number');
-    }
-    if (person.ssn !== undefined) {
-        if (!_.isString(person.ssn)) {
-            throw new Error('ssn must be a string');
-        }
-        if (!person.ssn.match(/^\d{6}-?\d{4}$/)) {
-            throw new Error('ssn must match xxxxxx-xxxx')
-        }
-    }
-    console.timeEnd('t')
-}*/
+testPerson();
 
 function testMessageArgs() {
     let t = Validator.createOnErrorThrowValidator();

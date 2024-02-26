@@ -2,8 +2,10 @@ const _ = require("lodash");
 const { ValidationResult } = require('./validation-result');
 const { ValidationError } = require('./validation-error');
 const { Validator } = require('./validator');
+const { isString } = require('./type-predicates');
+
 /**
- * Create a set of reusable rules associated with one or more paths.
+ * A set of reusable rules associated with one or more paths.
  */
 class RuleSet {
 
@@ -35,7 +37,7 @@ class RuleSet {
      * @returns {RuleSet}
      */
     addRule(path, rule) {
-        if (!_.isString(path)) {
+        if (!isString(path)) {
             throw new Error("path must be a string");
         }
         if (!rule) {
@@ -44,7 +46,7 @@ class RuleSet {
         if (this.#rules.has(path)) {
             throw new Error(`Rule for path '${path}' is already defined`);
         }
-        this.#rules.set(path, {rule, path});
+        this.#rules.set(path, { rule, path });
         return this;
     }
 
@@ -188,7 +190,8 @@ class RuleSet {
                 rule.rule(test(object, rule.path), context);
             }
         }
-        return test.result;
+
+        return Validator.validationResult(test);
     }
 
     /**
@@ -218,7 +221,7 @@ class RuleSet {
      * @returns {ValidationResult}
      */
     validateValue(value, path, context) {
-        return this.validate(value, path, context,false);
+        return this.validate(value, path, context, false);
     }
 
     static #throwArgumentError(message) {

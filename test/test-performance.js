@@ -1,5 +1,4 @@
 const { Validator } = require('../src/validator');
-const _ = require('lodash');
 const nameGenerator = require('random-name');
 
 /*
@@ -7,7 +6,7 @@ const nameGenerator = require('random-name');
 * We perform a little slower than Joi, but still ok
 * */
 
-const iterations = 100000;
+const iterations = 100_000;
 
 function getTestObj() {
     let first = nameGenerator.first();
@@ -17,7 +16,7 @@ function getTestObj() {
         name: full,
         email: "john.doe@company.space",
         firstName: first,
-        phone: "" + Math.round(Math.random() * 1000000),
+        phone: "" + Math.round(Math.random() * 1_000_000),
         age: 18 + Math.round(Math.random() * 80)
     };
 }
@@ -44,10 +43,9 @@ function testJoi() {
         let obj = testObjects[i];
         constraints.validate(obj);
     }
-    console.timeEnd('joi\t\t')
+    console.timeEnd('joi\t\t');
 
 }
-
 
 
 function testFastest() {
@@ -71,12 +69,12 @@ function testFastest() {
 
     let check = v.compile(constraints);
 
-    console.time('fastest\t\t')
+    console.time('fastest\t\t');
     for (let i = 0; i < iterations; i++) {
         let obj = testObjects[i];
         let res = check(obj);
     }
-    console.timeEnd('fastest\t\t')
+    console.timeEnd('fastest\t\t');
 }
 
 function testSelf() {
@@ -96,7 +94,7 @@ function testSelf() {
     ]));
 
 
-    console.time('self\t\t')
+    console.time('self\t\t');
 
     for (let i = 0; i < iterations; i++) {
         let obj = testObjects[i];
@@ -115,8 +113,8 @@ function testSelf() {
             ])
         ]);*/
     }
-    console.timeEnd('self\t\t')
-    console.log(test.result.getAllErrors())
+    console.timeEnd('self\t\t');
+    console.log(Validator.validationResult(test).getAllErrors());
 }
 
 testJoi();
