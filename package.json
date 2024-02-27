@@ -3,6 +3,7 @@
   "version": "1.6.0",
   "description": "A fluent validation API for validating arguments, form-data etc.",
   "author": "Peter B. Vahlstrup",
+  "license": "ISC",
   "keywords": [
     "validation",
     "validator",
@@ -16,14 +17,6 @@
   "files": [
     "/src/**"
   ],
-  "bugs": {
-    "url": "https://github.com/centre-for-humanities-computing/validator/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/centre-for-humanities-computing/validator.git"
-  },
-  "license": "ISC",
   "dependencies": {
     "lodash": "^4.17.21"
   },

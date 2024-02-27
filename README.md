@@ -14,6 +14,7 @@ Import the module and create a new `Validator` (see examples further down for di
 
 ```js
 import { Validator } from '@chcaa/validator';
+
 let test = Validator.createOnErrorThrowValidator();
 
 let person = {
@@ -115,7 +116,7 @@ function validateUserForm(user) {
 
 Rules can be stored and reused using a `RuleSet`.
 
-For objects, a single set of rules for a whole object can be applied using `Validator.prop()` to access
+For objects, a single set of rules for a whole object can be applied using `Validator#prop()` to access
 each property, as the examples above, but it is more performant and sometimes easier to read
 if rules are divided by each property and added separately.
 
@@ -224,7 +225,7 @@ Arguments for error messages can be passed in as a single value (if only one is 
 referenced by their index number.
 
 `string`, `number`, and `array` or `Set` of `string` and `number` is
-allowed. An `array` and `Set` of values will be inserted in `JSON` format e.g. `["string", 3, 4, "string2"`].
+allowed. An `array` and `Set` of values will be inserted in `JSON` format e.g. `["string", 3, 4, "string2"]`.
 When passing an `array` of values it must always be passed in a surrounding `array`, even if only a single
 argument is needed, to be able to distinguish between an `array` of arguments and an `array` of values.
 
@@ -303,7 +304,8 @@ Debug messages can be toggled on and off by calling `Validator.debug(true|false)
 - `each(predicate, [errorMessage, [messageArgs]]): boolean` - validate each element in the `iterable` against the predicate
 - `transform(tranformer): Validator` - transform the current value into something else, e.g. making a `string` lowercase
 - `prop(path): Validator` - get a `Validator` for the `path` relative to the current context value (typically an object)
-- `errorContext(...contextPath)` - adds one or more error context paths to the current validator context making it possible to change which path(s) should fail on error
+- `errorContext(...contextPath)` - adds one or more error context paths to the current validator context making it possible to change which path(s) should fail
+  on error
 - `fulfill(predicate): ValidatorContext` - alias for `does.fulfill()`
 - `fulfillOneOf(predicates): ValidatorContext` - alias for `does.fulfillOneOf()`
 - `fulfillAllOf(predicates): ValidatorContext` - alias for `does.fulfillAllOf()`
@@ -345,7 +347,8 @@ return a `boolean`.
 - `isValid(object, [path]): boolean` - test if the property paths of the object is valid. The path or paths to test can be optional passed in as the second
   argument
 - `isValueValid(value, [path]): boolean` - test if the value is valid. The path or paths to test can be optional passed in as the second argument
-- `validate(object, [[path, [isObject]]): ValidationResult` - validate the object which, depending on the mode of the `RuleSet`, will produce a `ValidationResult`
+- `validate(object, [[path, [isObject]]): ValidationResult` - validate the object which, depending on the mode of the `RuleSet`, will produce
+  a `ValidationResult`
   with errors or throw an `ValidationError`if the object is not valid
 - `validateValue(value, [path]): ValidationResult` - validate the value which depending on the mode of the `RuleSet` will produce a `ValidationResult` with
   errors or throw an `ValidationError`if the object is not valid
