@@ -37,7 +37,6 @@ async function testJoi() {
         age: Joi.number().integer().min(18).required()
     });
 
-
     console.time('joi\t\t');
     for (let i = 0; i < iterations; i++) {
         let obj = testObjects[i];
@@ -90,7 +89,6 @@ function testSelf() {
         age.is.anInteger('${PATH} must be an integer'),
         age.is.greaterThanOrEqualTo(18, '${PATH} must be >= 18, but was ${VALUE}')
     ]));
-
 
     console.time('self\t\t');
 
