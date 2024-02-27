@@ -1,45 +1,33 @@
 // performance optimization (and small changes) instead of using the ones from lodash
 
-function isBoolean(value) {
+export function isBoolean(value) {
     return value === true || value === false;
 }
 
-function isFunction(func) {
+export function isFunction(func) {
     return typeof func === 'function';
 }
 
-function isNil(value) {
+export function isNil(value) {
     return value === null || value === undefined;
 }
 
-function isMap(value) {
+export function isMap(value) {
     return value instanceof Map;
 }
 
-function isNumber(value) {
+export function isNumber(value) {
     return typeof value === 'number';
 }
 
-function isObject(value) {
+export function isObject(value) {
     return typeof value === 'object' && value !== null;
 }
 
-function isSet(value) {
+export function isSet(value) {
     return value instanceof Set;
 }
 
-function isString(value) {
+export function isString(value) {
     return typeof value === 'string';
 }
-
-
-module.exports = {
-    isBoolean,
-    isFunction,
-    isMap,
-    isNil,
-    isNumber,
-    isObject,
-    isSet,
-    isString,
-};

@@ -28,4 +28,4 @@ class ValidatorPool {
     }
 }
 
-module.exports = { ValidatorPool };
+export { ValidatorPool };

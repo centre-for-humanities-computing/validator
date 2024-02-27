@@ -1,5 +1,5 @@
-const utils = require('./utils');
-const { ValidationResult } = require('./validation-result');
+import * as utils from './utils.js';
+import { ValidationResult } from './validation-result.js';
 
 class ValidatorInternalState {
 
@@ -109,4 +109,4 @@ class ValidatorInternalState {
 
 }
 
-module.exports = { ValidatorInternalState };
+export { ValidatorInternalState };

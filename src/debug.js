@@ -1,4 +1,4 @@
-const { isMap, isObject, isSet, isString } = require('./type-predicates');
+import { isMap, isObject, isSet, isString } from './type-predicates.js';
 
 class Debug {
 
@@ -83,4 +83,4 @@ class Debug {
 
 }
 
-module.exports = { Debug };
+export { Debug };

@@ -1,4 +1,4 @@
-const { Validator } = require('../src/validator');
+import { Validator } from '../src/validator.js';
 
 let obj = {
     materials: [],

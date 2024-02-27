@@ -1,10 +1,10 @@
-const _ = require('lodash');
-const { ValidatorInternalState } = require('./validator-internal-state');
-const { ValidationError } = require('./validation-error');
-const sharedConstants = require('./shared-constants');
-const { Debug } = require('./debug');
-const utils = require('./utils');
-const { isBoolean, isFunction, isMap, isNil, isNumber, isObject, isSet, isString } = require('./type-predicates');
+import _ from 'lodash';
+import { ValidatorInternalState } from './validator-internal-state.js';
+import { ValidationError } from './validation-error.js';
+import * as sharedConstants from './shared-constants.js';
+import { Debug } from './debug.js';
+import * as utils from './utils.js';
+import { isBoolean, isFunction, isMap, isNil, isNumber, isObject, isSet, isString } from './type-predicates.js';
 
 const INTEGER_STRING_PATTERN = /^-?\d+$/;
 const FLOAT_STRING_PATTERN = /^-?\d+(?:\.\d+)?$/;
@@ -724,4 +724,4 @@ function messageArgsToString(val) {
     return val;
 }
 
-module.exports = { ValidatorContext };
+export { ValidatorContext };

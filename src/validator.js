@@ -1,14 +1,14 @@
-const _ = require('lodash');
-const { ValidatorPool } = require('./validator-pool');
-const { ValidatorContext } = require('./validator-context');
-const { ValidationResult } = require('./validation-result');
-const { ValidatorInternalState } = require('./validator-internal-state');
-const { ValidationError } = require('./validation-error');
-const sharedConstants = require('./shared-constants');
-const { Debug } = require('./debug');
-const utils = require('./utils');
-const { isFunction, isNil, isString } = require('./type-predicates');
-// const { RuleSet } = require('./rule-set'); THIS IS IMPORTED AT THE BUTTON OF THIS MODULE TO PREVENT NODE WARNING ON CIRCULAR DEPENDENCIES
+import _ from 'lodash';
+import { ValidatorPool } from './validator-pool.js';
+import { ValidatorContext } from './validator-context.js';
+import { ValidationResult } from './validation-result.js';
+import { ValidatorInternalState } from "./validator-internal-state.js";
+import { ValidationError } from "./validation-error.js";
+import * as sharedConstants from "./shared-constants.js";
+import { Debug } from "./debug.js";
+import * as utils from "./utils.js";
+import { isFunction, isNil, isString } from './type-predicates.js';
+import { RuleSet } from "./rule-set.js";
 
 const POOL_MAX_SIZE = 10;
 
@@ -30,7 +30,6 @@ function noopFunction() {
 * we need to do it explicitly because there will never be a call to an actual ValidatorContext which is normally responsible
 * for calling validatorContextDone() which returns the validator to the pool
 * */
-
 
 /**
  * The Validator class provides actions and predicate verbs for performing validation checks on the given value or object to validate.
@@ -921,6 +920,4 @@ class Validator {
 
 }
 
-module.exports = { Validator };
-
-const { RuleSet } = require('./rule-set'); // put here to avoid circular dependency problem
+export { Validator };

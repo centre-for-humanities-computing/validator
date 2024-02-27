@@ -1,5 +1,5 @@
-const { Validator } = require('../src/validator');
-const nameGenerator = require('random-name');
+import { Validator } from '../src/validator.js';
+import nameGenerator from 'random-name';
 
 /*
 * examples with different libraries and stats here: https://github.com/icebob/validator-benchmark/blob/master/suites/simple.js
@@ -26,8 +26,8 @@ for (let i = 0; i < iterations; i++) {
     testObjects[i] = getTestObj();
 }
 
-function testJoi() {
-    const Joi = require('joi');
+async function testJoi() {
+    const { default: Joi } = await import('joi');
 
     const constraints = Joi.object().keys({
         name: Joi.string().min(4).max(25).required(),
@@ -46,8 +46,8 @@ function testJoi() {
     console.timeEnd('joi\t\t');
 }
 
-function testFastest() {
-    const Validator = require('fastest-validator');
+async function testFastest() {
+    const { default: Validator } = await import('fastest-validator');
     const v = new Validator();
 
     const constraints = {

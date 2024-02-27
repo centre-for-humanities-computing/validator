@@ -1,7 +1,7 @@
 /**
  * @param {...string} elements
  */
-module.exports.joinPropPaths = function (...elements) {
+export function joinPropPaths(...elements) {
     // we do it manually instead of using filter and Array.join(), this is faster
     let result = '';
     for (let element of elements) {
@@ -19,14 +19,14 @@ module.exports.joinPropPaths = function (...elements) {
         }
     }
     return result;
-};
+}
 
 /**
  * @param {string} fullPath the full path
  * @param {string} currentPath the current path to get the parent for
  * @returns {string}
  */
-module.exports.getParentPath = function (fullPath, currentPath) {
+export function getParentPath(fullPath, currentPath) {
     if (fullPath.endsWith(currentPath)) {
         let dotCorrection = 0;
         if (fullPath.length > currentPath.length && fullPath[fullPath.length - 1 - currentPath.length] === '.') {
@@ -40,4 +40,4 @@ module.exports.getParentPath = function (fullPath, currentPath) {
         }
         return fullPath.substring(0, lastDot);
     }
-};
+}

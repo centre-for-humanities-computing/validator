@@ -1,8 +1,8 @@
-const _ = require("lodash");
-const { ValidationResult } = require('./validation-result');
-const { ValidationError } = require('./validation-error');
-const { Validator } = require('./validator');
-const { isString } = require('./type-predicates');
+import _ from 'lodash';
+import { ValidationResult } from './validation-result.js';
+import { ValidationError } from './validation-error.js';
+import { Validator } from './validator.js';
+import { isString } from './type-predicates.js';
 
 /**
  * A set of reusable rules associated with one or more paths.
@@ -229,5 +229,5 @@ class RuleSet {
     }
 }
 
-module.exports = { RuleSet };
+export { RuleSet };
 
