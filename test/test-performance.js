@@ -44,9 +44,7 @@ function testJoi() {
         constraints.validate(obj);
     }
     console.timeEnd('joi\t\t');
-
 }
-
 
 function testFastest() {
     const Validator = require('fastest-validator');

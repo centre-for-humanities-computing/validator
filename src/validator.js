@@ -174,7 +174,8 @@ class Validator {
      */
     #getValidatorContext(notContext, resetShortCircuitContext = true) {
         let validatorContext;
-        if (this.#shortCircuit()) {
+        let shortCircuit = this.#shortCircuit();
+        if (shortCircuit) {
             validatorContext = Validator.#shortCircuitFulfilledValidatorContext;
         } else {
             validatorContext = Validator.#contextPool.get();
@@ -184,7 +185,7 @@ class Validator {
         if (!this.#rootValidatorContext) {
             this.#rootValidatorContext = validatorContext;
         }
-        if (this.#shortCircuit() && resetShortCircuitContext) {
+        if (shortCircuit && resetShortCircuitContext) {
             // reset immediately, we still need to set the rootContext first though for reset to work correctly
             this.#reset(validatorContext);
         }
@@ -373,7 +374,7 @@ class Validator {
     conditionally(predicate) {
         let fulfilled;
         if (isFunction(predicate)) {
-            // we need a new validator which does not add error messages etc. to the overall context, we only need ot for the predicate result
+            // we need a new validator which does not add error messages etc. to the overall context, we only need of for the predicate result
             let validator = Validator.#instance(Validator.mode.ON_ERROR_BREAK, this.#contextValue, this.#contextValuePath, this.#contextValueCurrentPath,
                 "", "", Validator.#noopValidationResult);
             fulfilled = !!predicate(validator);
