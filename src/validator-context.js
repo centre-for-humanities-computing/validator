@@ -477,7 +477,7 @@ class ValidatorContext {
     }
 
     /**
-     * Tests if the one of the predicates are successful.
+     * Tests if one of the predicates are successful.
      *
      * @example
      * let test = Validator.create('Validation error:');
@@ -500,7 +500,7 @@ class ValidatorContext {
      * // which they should in fulfillOnOf()
      *
      * @param {function(Validator):boolean[]} predicates - A function returning an array of predicate results.
-     * Use the passed in validator to add further predicates for the current value
+     * Use the passed in validator to add further predicates for the current value.
      * @param {string} [errorMessage] - The error message to use if the predicate is not fulfilled.
      * @param {MessageArgs} [messageArgs] - The values for placeholders in the errorMessage.
      * @returns {boolean} The result of the predicate.
@@ -555,7 +555,7 @@ class ValidatorContext {
      * ], 'Name must be a string and have the value "John"');
      *
      * // combining multiple tests. We don't even need to pass in an initial value.
-     * test().fulfillOneOf([
+     * test().fulfillOneOf(() => [
      *     test(name.length).is.aNumber(), // create a new test and include the boolean result
      *     test(name).does.match(/\W+/),   // create a new test and include the boolean result
      *     2 > 1,                    // anything evaluating to a boolean is fine
@@ -566,7 +566,7 @@ class ValidatorContext {
      * // to pass in an error message to the inner predicates because they would then throw an error or break depending on the mode of the validator
      *
      * @param {function(Validator):boolean[]} predicates a function returning an array of predicate results.
-     * Use the passed in validator to add further predicates for the current value
+     * Use the passed in validator to add further predicates for the current value.
      * @param {string} [errorMessage] - The error message to use if the predicate is not fulfilled.
      * @param {MessageArgs} [messageArgs] - The values for placeholders in the errorMessage.
      * @returns {boolean} The result of the predicate.

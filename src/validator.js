@@ -227,10 +227,9 @@ class Validator {
     }
 
     #validatorContextDone = (validatorContext, success = undefined, errorMessage) => {
-        if (success !== undefined) { // important that we allow undefined for e.g. prop() which just used this to reset the context
+        if (success !== undefined) { // important that we allow undefined for e.g. prop() which just uses this to reset the context
             if (!success && !this.#shortCircuit() && errorMessage) {
                 for (let errorContextValuePath of this.#errorContextValuePaths) {
-                    // noinspection JSAccessibilityCheck
                     this.#validatorState.validationResult._addFailedPath(errorContextValuePath, errorMessage);
                     this.#validatorSharedState.failedPaths.push(errorContextValuePath);
                 }
