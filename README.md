@@ -13,8 +13,9 @@ npm install @chcaa/validator
 Import the module and create a new `Validator` (see examples further down for different kinds of validators).
 
 ```js
-const { Validator } = require('@chcaa/validator');
+import { Validator } from '@chcaa/validator';
 let test = Validator.createOnErrorThrowValidator();
+
 let person = {
     name: "Peter"
 };
@@ -32,21 +33,20 @@ ruleSet.addRule('name', (name) => name.fulfillAllOf(name => [
 
 let validationResult = ruleSet.validate(person);
 console.log(validationResult.getAllErrors());
-
 ```
 
 See also the JsDoc for each method for further examples.
 
 ## Test Function Arguments
 
-If an argument does not meet the requirements we want to throw a `ValidationError` so we
+If an argument does not meet the requirements, we want to throw a `ValidationError` so we
 create a `Validator` which throws an error when a test fails.
 
 ```js
 function add(x, y) {
     let test = Validator.createOnErrorThrowValidator('Argument error for add');
-    test(x).is.aNumber('x must be a number bus was ${VALUE}');
-    test(y).is.aNumber('y must be a number bus was ${VALUE}');
+    test(x).is.aNumber('x must be a number but was ${VALUE}');
+    test(y).is.aNumber('y must be a number but was ${VALUE}');
 }
 ```
 
@@ -54,7 +54,7 @@ function add(x, y) {
 
 When testing form data we would like to be able to gather information and show it to the user. We can then
 create a `Validator` which just breaks if a test fails instead of throwing an Error. To keep
-the error messages separated in the `ValidationResult` we supply an `errorPrefixPath` as the second argument to `test`.
+the error messages separated in the `ValidationResult`, we supply an `errorPrefixPath` as the second argument to `test`.
 
 ````js
 function validateUserForm(username, age) {
@@ -80,7 +80,7 @@ function validateUserForm(username, age) {
 
 The data from above could also be validated as an object instead of individual values, we then make use of
 a `Validator` in `ON_ERROR_NEXT_PATH` mode to move on to the next path when a test fails, so we can gather
-information about all paths. If we only wanted the error message for the first path which failed we
+information about all paths. If we only wanted the error message for the first path which failed, we
 could use an `ON_ERROR_BREAK` `Validator`.
 
 ```js
@@ -115,7 +115,7 @@ function validateUserForm(user) {
 
 Rules can be stored and reused using a `RuleSet`.
 
-For objects a single set of rules for a whole object can be applied using `Validator.prop()` to access
+For objects, a single set of rules for a whole object can be applied using `Validator.prop()` to access
 each property, as the examples above, but it is more performant and sometimes easier to read
 if rules are divided by each property and added separately.
 
@@ -137,7 +137,7 @@ let user = {
 
 // simple test if a user is valid
 if (ruleSet.isValid(user)) {
-    // do something usefull here
+    // do something useful here
 }
 
 // or get detailed validation results
@@ -160,7 +160,7 @@ validationResult = ruleSet.validateValue(23, 'age');
 
 ### Supplying Values not Known at the Time of Rule Creation
 
-When creating rules for reuse some values may not be known at the time the rule is created because they are unknown, change
+When creating rules for reuse, some values may not be known at the time the rule is created because they are unknown or change
 regularly. Or we could want to create a generic set of rules which can be used in different contexts.
 "Context" values can be passed in to a rule at validation time and referenced by the rule by adding a second
 parameter to the rule function as shown in the below example.
@@ -170,7 +170,7 @@ let ruleSet = Validator.createOnErrorBreakRuleSet();
 ruleSet.addRule('username', (username, reservedUsernames) => username.fulfillAllOf(username => [
     username.is.aString('Username must be a string'),
     username.does.match(/\w{4, 25}/, "Username must only contain a-zA-Z0-9_ and have a length of 4-25 characters"),
-    username.isNot.in(reversedUsernames, '${VALUE} is a reserved username')
+    username.isNot.in(reservedUsernames, '${VALUE} is a reserved username')
 ]));
 
 let reservedUsernames = await fetchReservedUsernames(); // fetch reserved usernamed from some server
