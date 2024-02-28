@@ -1,4 +1,4 @@
-import { Validator } from '../src/validator.js';
+import { Validator } from '../src/index.js';
 
 let obj = {
     materials: [],
@@ -77,7 +77,7 @@ function test() {
         ]),
         o.prop('citationDetails').fulfill(notEmptyString, '"${PATH}" must be a string and cannot be empty'),
         o.prop('contributorEmail').fulfillOneOf(email => [
-            email.optional.does.match(/^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/),
+            email.optional.does.match(/^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$/),
             email.is.empty()
         ], '"${PATH}" must be a valid email or empty'),
         o.prop('toolSize').fulfill(notEmptyString, '"${PATH}" must be a string and cannot be empty'),
@@ -102,10 +102,11 @@ function test() {
         o.prop('permissionDetails').fulfill(notEmptyString, '"${PATH}" must be a string and cannot be empty')
     ]);
 
-    console.log(test.result.getAllErrors());
+    let validationResult = Validator.validationResult(test);
+    console.log(validationResult.getAllErrors());
     for (let propName of Object.keys(obj)) {
-        if (!test.result.isPathValid(propName)) {
-            console.log(`"${propName}" => `, test.result.getError(propName))
+        if (!validationResult.isPathValid(propName)) {
+            console.log(`"${propName}" => `, validationResult.getError(propName));
         }
     }
 

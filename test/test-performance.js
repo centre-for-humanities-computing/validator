@@ -1,16 +1,17 @@
-import { Validator } from '../src/validator.js';
-import nameGenerator from 'random-name';
+import { Validator } from '../src/index.js';
+import Joi from 'joi';
+import FastestValidator from 'fastest-validator';
+import { faker } from '@faker-js/faker';
 
 /*
 * examples with different libraries and stats here: https://github.com/icebob/validator-benchmark/blob/master/suites/simple.js
-* We perform a little slower than Joi, but still ok
 * */
 
 const iterations = 100_000;
 
 function getTestObj() {
-    let first = nameGenerator.first();
-    let last = nameGenerator.last();
+    let first = faker.person.firstName();
+    let last = faker.person.lastName();
     let full = `${first} ${last}`;
     return {
         name: full,
@@ -26,11 +27,9 @@ for (let i = 0; i < iterations; i++) {
     testObjects[i] = getTestObj();
 }
 
-async function testJoi() {
-    const { default: Joi } = await import('joi');
-
+function testJoi() {
     const constraints = Joi.object().keys({
-        name: Joi.string().min(4).max(25).required(),
+        name: Joi.string().min(4).max(35).required(),
         email: Joi.string().required(),
         firstName: Joi.required(),
         phone: Joi.required(),
@@ -46,14 +45,13 @@ async function testJoi() {
 }
 
 async function testFastest() {
-    const { default: Validator } = await import('fastest-validator');
-    const v = new Validator();
+    const v = new FastestValidator();
 
     const constraints = {
         name: {
             type: "string",
             min: 4,
-            max: 25
+            max: 35
         },
         email: { type: "string" },
         firstName: { type: "string" },
@@ -80,12 +78,12 @@ function testSelf() {
     let ruleSet = Validator.createOnErrorNextPathRuleSet();
     ruleSet.addRule('name', (name) => name.fulfillAllOf(name => [
         name.is.aString('${PATH} must be a string'),
-        name.prop('length').is.inRange(4, 25, '${PATH} must be >= 4 and <= 25, but was ${VALUE}')
+        name.prop('length').is.inRange(4, 35, '${PATH} must be >= 4 and <= 25, but was ${VALUE}')
     ]));
-    ruleSet.addRule('email', (email) => email.is.aString('${PATH} must be a string'));
-    ruleSet.addRule('firstName', (firstName) => firstName.is.aString('${PATH} must be a string'));
-    ruleSet.addRule('phone', (phone) => phone.is.aString('${PATH} must be a string'));
-    ruleSet.addRule('age', (age) => age.fulfillAllOf(age => [
+    ruleSet.addRule('email', email => email.is.aString('${PATH} must be a string'));
+    ruleSet.addRule('firstName', firstName => firstName.is.aString('${PATH} must be a string'));
+    ruleSet.addRule('phone', phone => phone.is.aString('${PATH} must be a string'));
+    ruleSet.addRule('age', age => age.fulfillAllOf(age => [
         age.is.anInteger('${PATH} must be an integer'),
         age.is.greaterThanOrEqualTo(18, '${PATH} must be >= 18, but was ${VALUE}')
     ]));
@@ -98,7 +96,7 @@ function testSelf() {
         /*test(obj).fulfillAllOf(obj => [
             obj.prop('name').fulfillAllOf(name => [
                 name.is.aString('${PATH} must be a string'),
-                name.prop('length').is.inRange(4, 25, '${PATH} must be >= 4 and <= 25, but was ${VALUE}')
+                name.prop('length').is.inRange(4, 35, '${PATH} must be >= 4 and <= 25, but was ${VALUE}')
             ]),
             obj.prop('email').is.aString('${PATH} must be a string'),
             obj.prop('firstName').is.aString('${PATH} must be a string'),
@@ -114,5 +112,5 @@ function testSelf() {
 }
 
 testJoi();
-testFastest();
+await testFastest();
 testSelf();

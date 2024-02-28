@@ -1,4 +1,4 @@
-import { Validator } from '../src/validator.js';
+import { Validator } from '../src/index.js';
 
 function run() {
     try {
@@ -27,7 +27,7 @@ function run() {
 
         let typeValueValidator = (date) => date.optional.fulfillOneOf((date) => [
                 //date.fulfill(d => console.log(d.is.anArray())),
-                date.is.anInteger() // da denne er true short circuitter fulfillOneOf og ovenstående bliver kaldt med et objekt der altid er true,
+                date.is.anInteger() // da denne er true short circuits fulfillOneOf og ovenstående bliver kaldt med et objekt der altid er true,
 
             ],
             '[min, max] filter value for field ${0} must be a date in one of the formats ' +
@@ -44,14 +44,14 @@ function run() {
         };
         let zipCodes = ['8000', '9000'];
         let ruleSet = Validator.createOnErrorThrowRuleSet('Person object error:');
-        ruleSet.addRule('', (person) => person.fulfillAllOf((person) => [
+        ruleSet.addRule('', person => person.fulfillAllOf((person) => [
             person.is.anObject('person must be an object')
         ]));
-        ruleSet.addRule('name', (name) => name.fulfillAllOf((name) => [
+        ruleSet.addRule('name', name => name.fulfillAllOf((name) => [
             name.is.aString('${PATH} must be a string'),
             name.isNot.empty('name cannot be empty')
         ]));
-        ruleSet.addRule('age', (age) => age.fulfillAllOf((age) => [
+        ruleSet.addRule('age', age => age.fulfillAllOf((age) => [
             age.is.anInteger('${PATH} must be an integer'),
             age.is.inRange(18, 99, 'age must be in range ${0} - ${1}', [18, 99])
         ]));
@@ -79,14 +79,14 @@ function run() {
         /* let name = "";
          test(name).isNot.nil('Name cannot be null or undefined');
          test(name).is.aString('Name must be a string');
-         test(name).optional.fulfillAllOf((name) => [
+         test(name).optional.fulfillAllOf(name => [
                  name.is.aString(),
                  name.does.match(/\w+/)
              ],
              'Name must have length > 1 and only contain letters'
          );
 
-         test(name).fulfillAllOf((name) => [
+         test(name).fulfillAllOf(name => [
              name.is.aString(),
              name.is.aNumber('must be a number'),
              name.is.in(['John', 'Michael'])
@@ -96,7 +96,7 @@ function run() {
          //test(numbers).each((element) => element.is.aNumber(), 'Must be a number but was "${VALUE}"');
 
 
-         test(numbers).optional.each((number) => number.fulfillAllOf((number) => [
+         test(numbers).optional.each(number => number.fulfillAllOf(number => [
              number.is.aNumber('The element must be a number but was "${VALUE}"'),
              number.is.inRange(1, 10, 'The element must be in the range [1, 10] but was "${VALUE}"'),
          ]));
@@ -108,9 +108,9 @@ function run() {
           let person = { name: "", age: "54" };
            for (let i = 0; i < 100000; i++) {
 
-           test(person, 'person').fulfillAllOf((person) => [
+           test(person, 'person').fulfillAllOf(person => [
                person.is.anObject('person must be an object'),
-               person.prop('name').fulfillAllOf((name) => [
+               person.prop('name').fulfillAllOf(name => [
                    name.is.aString('"${PATH}" must be a string'),
                    name.does.match(/\w+/, '"${PATH}" must only contain [a-Z_0-9]'),
                    name.is.equalTo('ding', "${PATH} must be 'ding'")
@@ -124,9 +124,9 @@ function run() {
 
 
         let person = { name: "Eric", age: 49 };
-        test(person).fulfillAllOf((person) => [
+        test(person).fulfillAllOf(person => [
             person.is.anObject('person must be an object'),
-            person.conditionally((person) => person.value.name === 'Eric').fulfill(() =>
+            person.conditionally(person => person.value.name === 'Eric').fulfill(() =>
                 person.prop('age').is.greaterThan(50, 'Age must be greater that 50 for persons named Eric')
             )
         ]);
@@ -146,14 +146,14 @@ function testPerson() {
     let test = Validator.createOnErrorNextPathValidator('Person validation error');
 
 
-    /*test(person).fulfillAllOf((person) => [
+    /*test(person).fulfillAllOf(person => [
         person.is.anObject('person must be an object'),
-        person.prop('name').fulfillAllOf((name) => [
+        person.prop('name').fulfillAllOf(name => [
             name.is.aString('${PATH} must be a string'),
             name.transform((name) => name.trim()).isNot.empty('${PATH} cannot be empty')
         ]),
         person.prop('age').is.aNumber('${PATH} must be a number'),
-        person.prop('ssn').optional.fulfillAllOf((ssn) => [
+        person.prop('ssn').optional.fulfillAllOf(ssn => [
             ssn.is.aString('${PATH} must be a string or undefined'),
             ssn.does.match(/^\d{6}-?\d{4}$/, '${PATH} must match xxxxxx-xxxx')
         ])
