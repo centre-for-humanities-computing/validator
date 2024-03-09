@@ -27,6 +27,8 @@
   },
   "exports": {
     "./package.json": "./package.json",
-    ".": "./src/index.js"
+    ".": "./src/index.js",
+    "./predicate": "./src/predicate/index.js",
+    "./transform": "./src/transform/index.js"
   }
 }

@@ -361,3 +361,7 @@ return a `boolean`.
 - `isValid(): boolean` - `true` of there is no errors otherwise `false`.
 - `isPathValid(path): boolean` - `true` if the given path is valid otherwise `false`.
 - `reset()` - Reset the validation result. (Not relevant in the context of a RuleSet as this always creates a new instance for every test).
+
+[//]: # (TODO Add section for Predicate function)
+
+[//]: # (TODO Add section for Transform function)
