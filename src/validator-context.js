@@ -191,6 +191,21 @@ class ValidatorContext {
     }
 
     /**
+     * Tests if the value is an instance of the passed in constructor function.
+     * @param {function} prototype - The constructor function to test if this value is an instance of.
+     * @param {string} [errorMessage] - The error message to use if the predicate is not fulfilled.
+     * @param {MessageArgs} [messageArgs] - The values for placeholders in the errorMessage.
+     * @returns {boolean} The result of the predicate.
+     */
+    anInstanceOf(prototype, errorMessage, messageArgs) {
+        let success = this.#contextValue instanceof prototype;
+        if (Debug.enabled) {
+            this.#printDebug(this.aFloatString.name, success);
+        }
+        return this.#handleError(success, errorMessage, messageArgs);
+    }
+
+    /**
      * Tests if the value is an integer.
      * @param {string} [errorMessage] - The error message to use if the predicate is not fulfilled.
      * @param {MessageArgs} [messageArgs] - The values for placeholders in the errorMessage.
