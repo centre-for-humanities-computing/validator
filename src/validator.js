@@ -407,7 +407,7 @@ class Validator {
      * ]));
      *
      * @param {string} [errorMessage] - The error message to use if the predicate is not fulfilled.
-     * @param {string|string[]} [messageArgs] - The values for placeholders in the errorMessage.
+     * @param {MessageArgs} [messageArgs] - The values for placeholders in the errorMessage.
      *  @param {function(Validator)|boolean} predicate - A predicate function which returns a boolean or a boolean expression. Use the passed in validator context to get access to the predicates of this validator.
      * @returns {boolean} <code>true</code> if all elements passed the predicate test otherwise <code>false</code>.
      */
@@ -624,7 +624,7 @@ class Validator {
      * Alias for [does.fulfill]{@link #ValidatorContext#fulfill}.
      * @param {function(Validator)|boolean} predicate
      * @param {string} [errorMessage]
-     * @param {string|string[]} [messageArgs]
+     * @param {MessageArgs} [messageArgs]
      * @returns {boolean}
      */
     fulfill(predicate, errorMessage, messageArgs) {
@@ -635,7 +635,7 @@ class Validator {
      * Alias for [does.fulfillOneOf]{@link ValidatorContext#fulfillOneOf}.
      * @param {function(Validator)[]|function(Validator):(function(Validator)|boolean)[]} predicates
      * @param {string} [errorMessage]
-     * @param {string|string[]} [messageArgs]
+     * @param {MessageArgs} [messageArgs]
      * @returns {boolean}
      */
     fulfillOneOf(predicates, errorMessage, messageArgs) {
@@ -646,7 +646,7 @@ class Validator {
      * Alias for [does.fulfillAllOf]{@link ValidatorContext#fulfillAllOf}.
      * @param {function(Validator)[]|function(Validator):(function(Validator)|boolean)[]} predicates
      * @param {string} [errorMessage]
-     * @param {string|string[]} [messageArgs]
+     * @param {MessageArgs} [messageArgs]
      * @returns {boolean}
      */
     fulfillAllOf(predicates, errorMessage, messageArgs) {
