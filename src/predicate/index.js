@@ -14,7 +14,7 @@ export function stringTrimmedNotEmpty(str) {
 
 /**
  * A predicate function to check if a number is an integer and > 0.
- * @param int - The `Validator` instance containing the context to check.
+ * @param {Validator} int - The `Validator` instance containing the context to check.
  * @return {boolean} - `true` if the number passed the tests, otherwise `false`.
  */
 export function integerGreaterThanZero(int) {
@@ -26,7 +26,7 @@ export function integerGreaterThanZero(int) {
 
 /**
  * A predicate function to check if a number is an integer and >= 0.
- * @param int - The `Validator` instance containing the context to check.
+ * @param {Validator} int - The `Validator` instance containing the context to check.
  * @return {boolean} - `true` if the number passed the tests, otherwise `false`.
  */
 export function integerGreaterThanOrEqualZero(int) {
@@ -38,7 +38,7 @@ export function integerGreaterThanOrEqualZero(int) {
 
 /**
  * A predicate function to check if a number is > 0.
- * @param num - The `Validator` instance containing the context to check.
+ * @param {Validator} num - The `Validator` instance containing the context to check.
  * @return {boolean} - `true` if the number passed the tests, otherwise `false`.
  */
 export function numberGreaterThanZero(num) {
@@ -50,7 +50,7 @@ export function numberGreaterThanZero(num) {
 
 /**
  * A predicate function to check if a number is >= 0.
- * @param num - The `Validator` instance containing the context to check.
+ * @param {Validator} num - The `Validator` instance containing the context to check.
  * @return {boolean} - `true` if the number passed the tests, otherwise `false`.
  */
 export function numberGreaterThanOrEqualZero(num) {
