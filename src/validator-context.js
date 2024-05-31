@@ -264,6 +264,20 @@ class ValidatorContext {
     }
 
     /**
+     * Tests if the value is a `RegExp`.
+     * @param {string} [errorMessage] - The error message to use if the predicate is not fulfilled.
+     * @param {MessageArgs} [messageArgs] - The values for placeholders in the errorMessage.
+     * @returns {boolean} The result of the predicate.
+     */
+    aRegExp(errorMessage, messageArgs) {
+        let success = this.#contextValue instanceof RegExp;
+        if (Debug.enabled) {
+            this.#printDebug(this.aRegExp.name, success);
+        }
+        return this.#handleError(success, errorMessage, messageArgs);
+    }
+
+    /**
      * Tests if the value is a `string`.
      * @param {string} [errorMessage] - The error message to use if the predicate is not fulfilled.
      * @param {MessageArgs} [messageArgs] - The values for placeholders in the errorMessage.
