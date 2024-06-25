@@ -233,6 +233,14 @@ class ValidatorContext {
         return this.#handleError(success, errorMessage, messageArgs);
     }
 
+    iterable(errorMessage, messageArgs) {
+        let success = !isNil(this.#contextValue) && typeof this.#contextValue[Symbol.iterator] === 'function';
+        if (Debug.enabled) {
+            this.#printDebug(this.iterable.name, success);
+        }
+        return this.#handleError(success, errorMessage, messageArgs);
+    }
+
     /**
      * Tests if the value is a `number`.
      * @param {string} [errorMessage] - The error message to use if the predicate is not fulfilled.
