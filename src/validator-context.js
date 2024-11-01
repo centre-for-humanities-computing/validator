@@ -220,6 +220,20 @@ class ValidatorContext {
     }
 
     /**
+     * Tests if the value is a safe integer (-9.007.199.254,740.991 - 9.007.199.254,740.991).
+     * @param {string} [errorMessage] - The error message to use if the predicate is not fulfilled.
+     * @param {MessageArgs} [messageArgs] - The values for placeholders in the errorMessage.
+     * @returns {boolean} The result of the predicate.
+     */
+    aSafeInteger(errorMessage, messageArgs) {
+        let success = Number.isSafeInteger(this.#contextValue);
+        if (Debug.enabled) {
+            this.#printDebug(this.aSafeInteger.name, success);
+        }
+        return this.#handleError(success, errorMessage, messageArgs);
+    }
+
+    /**
      * Tests if the value is a string representation of an integer.
      * @param {string} [errorMessage] - The error message to use if the predicate is not fulfilled.
      * @param {MessageArgs} [messageArgs] - The values for placeholders in the errorMessage.
