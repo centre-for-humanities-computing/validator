@@ -37,6 +37,30 @@ export function integerGreaterThanOrEqualZero(int) {
 }
 
 /**
+ * Tests if the value is a safe integer and > 0.
+ * @param {Validator} int - The `Validator` instance containing the value to test.
+ * @return {boolean} - `true` if the number passed the tests, otherwise `false`.
+ */
+export function safeIntegerGreaterThanZero(int) {
+    return int.fulfillAllOf(int => [
+        int.is.anInteger(),
+        int.is.greaterThan(0)
+    ]);
+}
+
+/**
+ * Tests if the value is a safe integer and >= 0.
+ * @param {Validator} int - The `Validator` instance containing the value to test.
+ * @return {boolean} - `true` if the number passed the tests, otherwise `false`.
+ */
+export function safeIntegerGreaterThanOrEqualZero(int) {
+    return int.fulfillAllOf(int => [
+        int.is.anInteger(),
+        int.is.greaterThanOrEqualTo(0)
+    ]);
+}
+
+/**
  * Tests if the value is a number and > 0.
  * @param {Validator} num - The `Validator` instance containing the value to test.
  * @return {boolean} - `true` if the number passed the tests, otherwise `false`.
