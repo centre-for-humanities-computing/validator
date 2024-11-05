@@ -53,7 +53,7 @@ function add(x, y) {
 
 ## Test Form Data and Objects
 
-When testing form data we would like to be able to gather information and show it to the user. We can then
+When testing form data, we would like to be able to gather information and show it to the user. We can then
 create a `Validator` which just breaks if a test fails instead of throwing an Error. To keep
 the error messages separated in the `ValidationResult`, we supply an `errorPrefixPath` as the second argument to `test`.
 
@@ -163,7 +163,7 @@ validationResult = ruleSet.validateValue(23, 'age');
 
 When creating rules for reuse, some values may not be known at the time the rule is created because they are unknown or change
 regularly. Or we could want to create a generic set of rules which can be used in different contexts.
-"Context" values can be passed in to a rule at validation time and referenced by the rule by adding a second
+"Context" values can be passed-in to a rule at validation time and referenced by the rule by adding a second
 parameter to the rule function as shown in the below example.
 
 ```js
@@ -190,7 +190,7 @@ ruleSet.validate(user, undefined, reservedUsernames);
 
 Error messages can be supplied for the individual test and as combined messages for `fulfill()`, `fulfillAllOf()`, `fulfillOneOf()` and `each()`.
 
-Individual messages is supplied as an argument to the test:
+Individual messages are supplied as an argument to the test:
 
 ```js
 let test = Validator.createOnErrorBreakValidator();
@@ -207,7 +207,7 @@ test('Peter').fulfillAllOf(peter => [
 ], '"Peter" must be a string and be equal to "Peter"');
 ```
 
-When using combined messages it is important **not** to add individual messages as well as these will overrule the combined message.
+When using combined messages, it is important **not** to add individual messages as well as these will overrule the combined message.
 
 All error messages for the same `Validator` can have the same prefix which can be provided when creating the `Validator`.
 
@@ -281,7 +281,7 @@ Debug messages can be toggled on and off by calling `Validator.debug(true|false)
 ## Validator Factory and Static Methods
 
 - `Validator.create(errorPrefix, mode): testFunction` - Creates a new validator with the given mode.
-  The returned "test" function gives access to the verb context which return the predicate used for performing the actual tests.
+  The returned "test" function gives access to the verb context, which returns the predicate used for performing the actual tests.
 - `Validator.createOnErrorThrowValidator(errorPrefix): testFunction` - Creates a new validator which throws an `ValidationError` if a test fails.
 - `Validator.createOnErrorBreakValidator(errorPrefix): testFunction` - Creates a new validator which breaks if a test fails.
 - `Validator.createOnErrorNextPathValidator(errorPrefix): testFunction` - Creates a new validator which moves on to the next path if a test fails.
@@ -302,7 +302,7 @@ Debug messages can be toggled on and off by calling `Validator.debug(true|false)
 - `value: *` - The actual value for this context.
 - `conditionally(predicate(validator)): Validator` - Only validate the following tests if the passed in predicate is fulfilled.
 - `each(predicate, [errorMessage, [messageArgs]]): boolean` - Validate each element in the `iterable` against the predicate.
-- `transform(tranformer): Validator` - Transform the current value into something else, e.g. making a `string` lowercase.
+- `transform(tranformer): Validator` - Transform the current value into something else, e.g., making a `string` lowercase.
 - `prop(path): Validator` - Get a `Validator` for the `path` relative to the current context value (typically an object).
 - `errorContext(...contextPath)` - Add one or more error context paths to the current validator context making it possible to change which path(s) should fail
   on error.
@@ -343,10 +343,10 @@ return a `boolean`.
 
 ## RuleSet Overview
 
-- `addRule(path, rule): RuleSet` - Add a rule for the given to the `RuleSet` in the form of a function which will be called when rule is tested.
-- `isValid(object, [path]): boolean` - Test if the property paths of the object is valid. The path or paths to test can be optional passed in as the second
+- `addRule(path, rule): RuleSet` - Add a rule for the given path to the `RuleSet` in the form of a function which will be called when rule is tested.
+- `isValid(object, [path]): boolean` - Test if the property paths of the object are valid. The path or paths to test can be optionally passed in as the second
   argument.
-- `isValueValid(value, [path]): boolean` - Test if the value is valid. The path or paths to test can be optional passed in as the second argument.
+- `isValueValid(value, [path]): boolean` - Test if the value is valid. The path or paths to test can be optionally passed in as the second argument.
 - `validate(object, [[path, [isObject]]): ValidationResult` - Validate the object which, depending on the mode of the `RuleSet`, will produce
   a `ValidationResult` with errors or throw an `ValidationError` if the object is not valid.
 - `validateValue(value, [path]): ValidationResult` - Validate the value which depending on the mode of the `RuleSet` will produce a `ValidationResult` with

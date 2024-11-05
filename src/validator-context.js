@@ -24,7 +24,7 @@ const PLACEHOLDER_CONTEXT_PARENT_PATH_PATTERN = /(?<!\\)\${PARENT_PATH}/g;
  * A single placeholder can just be passed in as a single argument (except for array values, see below).
  * Multiple placeholders must be passed in as an array of the values to insert.
  *
- * To insert an array as a placeholder value it must always be passed in enclosed in an array to be able to
+ * To insert an array as a placeholder value, it must always be passed in enclosed in an array to be able to
  * distinguish between array literals and multiple placeholder values.
  *
  * Array values and Set's will be inserted as an array-like structure enclosed in square brackets, e.g. ["string", 2].
@@ -105,7 +105,7 @@ class ValidatorContext {
     /**
      * Tests if this value is equal to the passed in value.
      *
-     * For complex types like objects, arrays, sets, maps etc. a deep comparison is performed.
+     * For complex types like objects, arrays, sets, maps, etc. a deep comparison is performed.
      * @param {*} otherValue - The value to compare this value to.
      * @param {string} [errorMessage]  - The error message to use if the predicate is not fulfilled.
      * @param {MessageArgs} [messageArgs] - The values for placeholders in the errorMessage.
@@ -316,7 +316,7 @@ class ValidatorContext {
     /**
      * Tests if the value is considered empty.
      *
-     * Objects are considered empty if they have no own enumerable string keyed properties.
+     * Objects are considered empty if they have no own enumerable string-keyed properties.
      *
      * Array-like values such as `arguments` objects, arrays, buffers, strings are considered empty if they have a `length` of `0`.
      * Similarly, maps and sets are considered empty if they have a `size` of `0`.
@@ -425,7 +425,7 @@ class ValidatorContext {
     }
 
     /**
-     * Tests if this value is in the passed in collection of values.
+     * Tests if this value is in the passed-in collection of values.
      * @param {*[]|Set<*>|Map<*, *>} values - The array, Set or Map of values to test against.
      * @param {string} [errorMessage] - The error message to use if the predicate is not fulfilled.
      * @param {MessageArgs} [messageArgs] - The values for placeholders in the errorMessage.
@@ -461,7 +461,7 @@ class ValidatorContext {
      * @param {MessageArgs} [messageArgs] - The values for placeholders in the errorMessage.
      * @returns {boolean} The result of the predicate.
      */
-    startWith(startStr, errorMessage, messageArgs) { // method name is correct as we use i with a "does" -> name.does.startWith()
+    startWith(startStr, errorMessage, messageArgs) { // the method name is correct as we use it with a "does" -> name.does.startWith()
         if (!isString(startStr)) {
             this.#throwArgumentError(`The argument for "startStr" must be a string but was: "${typeof startStr}"`);
         }
@@ -481,7 +481,7 @@ class ValidatorContext {
      * @param {MessageArgs} [messageArgs] - The values for placeholders in the errorMessage.
      * @returns {boolean} The result of the predicate.
      */
-    endWith(endStr, errorMessage, messageArgs) { // method name is correct as we use i with a "does" -> name.does.endWith()
+    endWith(endStr, errorMessage, messageArgs) { // the method name is correct as we use it with a "does" -> name.does.endWith()
         if (!isString(endStr)) {
             this.#throwArgumentError(`The argument for "endStr" must be a string but was: "${typeof endStr}"`);
         }
@@ -505,7 +505,7 @@ class ValidatorContext {
      * // using the existing validator context.
      * test(name).does.fulfill(name => name.is.aString(), 'Name must be a string');
      *
-     * // OBS we can add a general error message which relates to the full predicate test. If so it is important NOT
+     * // OBS we can add a general error message which relates to the full predicate test. If so, it is important NOT
      * // to pass in an error message to the inner predicates because they would then throw an error or break depending on the mode of the validator
      *
      * @param {function(Validator)|boolean} predicate - A predicate function which returns a boolean or the results of a predicate.
@@ -528,21 +528,21 @@ class ValidatorContext {
     }
 
     /**
-     * Tests if one of the predicates are successful.
+     * Tests if one of the predicates is successful.
      *
      * @example
      * let test = Validator.create('Validation error:');
      * let name = "John";
      * test(name).fulfillOneOf(name => [
-     *     name.value.length > 1,    // user defined predicate
-     *     name.does.match(/\W+/)    // using the existing validator context
+     *     name.value.length > 1,          // user defined predicate
+     *     name.does.match(/\W+/)          // using the existing validator context
      * ], "Name must have length > 1 or not include \w characters");
      *
      * // combining multiple tests. We don't even need to pass in an initial value
      * test().fulfillOneOf(() => [
      *     test(name.length).is.aNumber(), // create a new test and include the boolean result
      *     test(name).does.match(/\W+/),   // create a new test and include the boolean result
-     *     2 > 1,                    // anything evaluating to a boolean is fine
+     *     2 > 1,                          // anything evaluating to a boolean is fine
      *     true
      * ], 'weird validation did not pass');
      *
@@ -613,7 +613,7 @@ class ValidatorContext {
      *     true
      * ], 'weird validation did not pass');
      *
-     * // OBS we can add a general error message which relates to all tests in the array. If so it is important NOT
+     * // OBS we can add a general error message which relates to all tests in the array. If so, it is important NOT
      * // to pass in an error message to the inner predicates because they would then throw an error or break depending on the mode of the validator
      *
      * @param {function(Validator):boolean[]} predicates a function returning an array of predicate results.
@@ -684,7 +684,7 @@ class ValidatorContext {
 
     /**
      * @param {boolean} success
-     * @param {string} [errorMessage] the error message. If defined and the result is false an error with the message will be thrown
+     * @param {string} [errorMessage] - The error message. If defined and the result is false, an error with the message will be thrown.
      * @param {MessageArgs} [messageArgs]
      * @return {boolean}
      */

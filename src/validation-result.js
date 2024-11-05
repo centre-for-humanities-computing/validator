@@ -27,7 +27,7 @@ class ValidationResult {
     /**
      * Get all error messages for the given path.
      * @param {string} [path=""] - The path to get the error for. The path must be relative to the root object under validation.
-     * @returns {string[]} An array of error messages or an empty array if no errors was found.
+     * @returns {string[]} An array of error messages or an empty array if no errors were found.
      * @see isValid
      * @see isPathValid
      */
@@ -36,13 +36,13 @@ class ValidationResult {
         if (!errors) {
             return [];
         } else {
-            return [...errors]; // copy to new array to prevent external modification
+            return [...errors]; // copy to a new array to prevent external modification
         }
     }
 
     /**
      * Get all error messages for all paths.
-     * @returns {string[]} An array of all error messages or an empty array if no errors was found.
+     * @returns {string[]} An array of all error messages or an empty array if no errors were found.
      * @see isValid
      * @see isPathValid
      */
@@ -57,7 +57,7 @@ class ValidationResult {
     /**
      * Tests if everything is valid.
      *
-     * @returns {boolean} <code>true</code> if no error messages exists otherwise <code>false</code>.
+     * @returns {boolean} `true` if no error messages exist otherwise `false`.
      */
     isValid() {
         return this.#errors.size === 0;
@@ -66,7 +66,7 @@ class ValidationResult {
     /**
      * Test if the given path is valid.
      * @param {string} path - The path to test if is valid. The path must be relative to the root object under validation.
-     * @returns {boolean} <code>true</code> if no error messages exists for the given path otherwise <code>false</code>.
+     * @returns {boolean} `true` if no error messages exist for the given path otherwise `false`.
      */
     isPathValid(path) {
         return !this.#errors.has(path);

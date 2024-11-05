@@ -33,7 +33,7 @@ class RuleSet {
      * ruleSet.addRule('country', (country, acceptedCountries) => country.isNot.in(acceptedCountries, "${VALUE} is not current on our list if countries"));
      *
      * @param {string} path the path for the rule. An empty string is considered the default rule.
-     * @param {function(Validator, context?:*)} rule the rule which will be called when validating this path. "context" is an optional argument which can be passed in during validation.
+     * @param {function(Validator, context?:*)} rule the rule which will be called when validating this path. "context" is an optional argument that can be passed in during validation.
      * @returns {RuleSet}
      */
     addRule(path, rule) {
@@ -51,7 +51,7 @@ class RuleSet {
     }
 
     /**
-     * Test if the property paths of the object is valid. In the case of an `ValidationError` <code>false</code> will be returned.
+     * Test if the property paths of the object are valid. In the case of a `ValidationError` `false` will be returned.
      *
      * @example
      * let ruleSet = Validator.createOnErrorNextPathRuleSet();
@@ -68,7 +68,7 @@ class RuleSet {
      * console.log(ruleSet.isValid(person, ['', 'name'])); // test only the rules for '' and 'name' (we don't need to pass in acceptedCountries here, as country will not be tested)
      *
      * @param object the object to validate
-     * @param {string|string[]} [path] the path(s) to validate. If path is undefined all rules will be validated against the object
+     * @param {string|string[]} [path] the path(s) to validate. If the path is undefined all rules will be validated against the object
      * @param {*} [context] a context object which should be passed to the rules
      * @return {boolean}
      * @see isValueValid
@@ -89,7 +89,7 @@ class RuleSet {
     }
 
     /**
-     * Test if the value is valid. In the case of an `ValidationError` <code>false</code> will be returned.
+     * Test if the value is valid. In the case of a `ValidationError` `false` will be returned.
      *
      * @example
      * let ruleSet = Validator.createOnErrorNextPathRuleSet();
@@ -141,7 +141,7 @@ class RuleSet {
      * let person = { name: "John", age: 43, country: 'Denmark'};
      * let acceptedCountries = ['Denmark', 'Japan'];
      *
-     * let validationResult = ruleSet.validate(person, undefined, acceptedCountries); // if "context" is not needed (acceptedCountries in this ex.) we could just call ruleSet.validate(person)
+     * let validationResult = ruleSet.validate(person, undefined, acceptedCountries); // if "context" is not needed (acceptedCountries in this ex.), we could just call ruleSet.validate(person)
      * console.log(validationResult.isValid());
      * console.log(validationResult.getAllErrors());
      * console.log(validationResult.getErrors('name'));
@@ -152,8 +152,8 @@ class RuleSet {
      * @param object
      * @param {string|string[]} [path] the path(s) to validate. If path is undefined all rules will be validated against the object
      * @param {*} [context] a context object which should be passed to the rules
-     * @param {boolean} isObject should be <code>true</code> if the object should be considered an object with "paths" to validate
-     * and <code>false</code> if the object is to be considered a single value to validate
+     * @param {boolean} isObject should be `true` if the object should be considered an object with "paths" to validate
+     * and `false` if the object is to be considered a single value to validate
      * @returns {ValidationResult}
      * @see validateValue
      * @see isValueValid
@@ -216,7 +216,7 @@ class RuleSet {
      * validationResult.validate(country, 'country', countries);
      *
      * @param value the value to validate against the rule for the path(s)
-     * @param {string|string[]} [path] the path(s) to validate. If path is undefined all rules will be validated against the value
+     * @param {string|string[]} [path] the path(s) to validate. If the path is `undefined,` all rules will be validated against the value
      * @param {*} [context] a context object which should be passed to the rules
      * @returns {ValidationResult}
      */
