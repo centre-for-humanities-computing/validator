@@ -584,7 +584,7 @@ class Validator {
      * the scope of the "correct/current" property path. Using this method, the error context path
      * used for mapping paths to errors can be modified for the current validator and child-validators
      * by adding a custom path which will be added to the error prefix path (if set).
-     * The path can be whatever makes sense and multiple paths can be set as well making it possible to fail multiple
+     * The path can be whatever makes sense, and multiple paths can be set as well, making it possible to fail multiple
      * paths if the result of this validator context fails.
      *
      * The full paths can be referenced in the error message with ${PATHx}.
@@ -633,7 +633,7 @@ class Validator {
 
     /**
      * Alias for [does.fulfillOneOf]{@link ValidatorContext#fulfillOneOf}.
-     * @param {function(Validator)[]|function(Validator):(function(Validator)|boolean)[]} predicates
+     * @param {function(Validator):boolean[]} predicates
      * @param {string} [errorMessage]
      * @param {MessageArgs} [messageArgs]
      * @returns {boolean}
@@ -644,7 +644,7 @@ class Validator {
 
     /**
      * Alias for [does.fulfillAllOf]{@link ValidatorContext#fulfillAllOf}.
-     * @param {function(Validator)[]|function(Validator):(function(Validator)|boolean)[]} predicates
+     * @param {function(Validator):boolean[]} predicates
      * @param {string} [errorMessage]
      * @param {MessageArgs} [messageArgs]
      * @returns {boolean}
@@ -689,10 +689,10 @@ class Validator {
     }
 
     /**
-     * Creates a new validator. The returned "test" function gives access to the verb context which returns the
+     * Creates a new validator. The returned "test" function gives access to the verb context, which returns the
      * predicate context used for performing the actual test.
      *
-     * If an error message is passed to a test predicate it adds it to the validation result if the predicate is not fulfilled (or throws an error in ON_ERROR_THROW mode).
+     * If an error message is passed to a test predicate, it adds it to the validation result if the predicate is not fulfilled (or throws an error in ON_ERROR_THROW mode).
      * Every predicate returns a boolean with the result of the test.
      *
      * Error message string can use placeholders which will be substituted when the error is added to the validation result or thrown.

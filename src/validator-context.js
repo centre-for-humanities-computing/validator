@@ -660,7 +660,6 @@ class ValidatorContext {
         if (Debug.enabled) {
             this.#printDebug(`${this.fulfillAllOf.name}<end>`, success, [], Debug.indent.END);
         }
-
         return this.#handleError(success, errorMessage, messageArgs);
     }
 
@@ -675,7 +674,10 @@ class ValidatorContext {
         if (!(regex instanceof RegExp)) {
             this.#throwArgumentError(`The argument "regex" must be an instance of RegEx but was: "${regex}"`);
         }
+        let lastIndex = regex.lastIndex;
         let success = regex.test(this.#contextValue);
+        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp/test#using_test_on_a_regex_with_the_global_flag
+        regex.lastIndex = lastIndex; // make sure to reset if the user passed in a regex with "g" or "y" flag
         if (Debug.enabled) {
             this.#printDebug(this.match.name, success, [regex]);
         }
@@ -724,7 +726,7 @@ class ValidatorContext {
                 }
                 if (this.#validatorState.mode === sharedConstants.mode.ON_ERROR_THROW) {
                     let error = new ValidationError(fullMessage, this.#errorContextValuePaths.join('|'));
-                    Error.captureStackTrace(error, this.#handleError); // exclude this method from stacktrace
+                    Error.captureStackTrace(error, this.#handleError); // exclude this method from the stacktrace
                     throw error;
                 }
             }

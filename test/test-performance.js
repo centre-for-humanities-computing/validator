@@ -76,7 +76,7 @@ function testSelf() {
     let test = Validator.createOnErrorNextPathValidator();
 
     let ruleSet = Validator.createOnErrorNextPathRuleSet();
-    ruleSet.addRule('name', (name) => name.fulfillAllOf(name => [
+    ruleSet.addRule('name', name => name.fulfillAllOf(name => [
         name.is.aString('${PATH} must be a string'),
         name.prop('length').is.inRange(4, 35, '${PATH} must be >= 4 and <= 25, but was ${VALUE}')
     ]));
