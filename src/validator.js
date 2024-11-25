@@ -584,7 +584,7 @@ class Validator {
      * Sometimes it is not possible, or does not make sense, to validate a property within
      * the scope of the "correct/current" property path. Using this method, the error context path
      * used for mapping paths to errors can be modified for the current validator and child-validators
-     * by adding a custom path which will be added to the error prefix path (if set).
+     * by setting a new absolute path which will be added to the error prefix path (if set).
      * The path can be whatever makes sense, and multiple paths can be set as well, making it possible to fail multiple
      * paths if the result of this validator context fails.
      *
