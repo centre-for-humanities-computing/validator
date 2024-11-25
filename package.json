@@ -1,6 +1,6 @@
 {
   "name": "@chcaa/validator",
-  "version": "2.5.0",
+  "version": "2.5.1",
   "description": "A fluent validation API for validating arguments, form-data etc.",
   "author": "Peter B. Vahlstrup",
   "license": "ISC",
