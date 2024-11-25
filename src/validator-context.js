@@ -515,11 +515,15 @@ class ValidatorContext {
      * @returns {boolean} The result of the predicate.
      */
     fulfill(predicate, errorMessage, messageArgs) {
+        // Create its own sticky context to prevent it from interfering with the sticky context of fulfillAllOf()/fulfillOneOf() when fulfill() is nested inside one of them.
+        this.#validatorCallbackContext.enableShortCircuitStickyOn(true);
         if (Debug.enabled) {
             this.#printDebug(`${this.fulfill.name}<start>`, undefined, [], Debug.indent.BEGIN);
         }
 
         let success = isFunction(predicate) ? predicate(this.#validator) : !!predicate;
+
+        this.#validatorCallbackContext.disableShortCircuitSticky();
 
         if (Debug.enabled) {
             this.#printDebug(`${this.fulfill.name}<end>`, success, [], Debug.indent.END);

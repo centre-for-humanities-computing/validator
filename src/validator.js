@@ -246,7 +246,7 @@ class Validator {
 
     #enableShortCircuitStickyOn = (successValue) => {
         /*
-        * We allow re-entrant shortCircuitSticky calls e.g.
+        * We allow re-entrant shortCircuitSticky calls e.g. ...
         * test(name).fulfillAllOf((name) => [
         *     name.is.aString(),
         *     name.fulfillAllOf(name => [
@@ -254,6 +254,7 @@ class Validator {
         *        ...
         *     ])
         * ]);
+        * ... where each creates their own context on the stack.
         * */
 
         this.#contextShortCircuit.sticky.push({
