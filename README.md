@@ -298,14 +298,15 @@ Debug messages can be toggled on and off by calling `Validator.debug(true|false)
 - `doesNot: ValidatorContext`
 - `is: ValidatorContext`
 - `isNot: ValidatorContext`
-- `optional: Validator` - Only validate the following predicates if the current value is *not* `nil`.
+- `optional: Validator` - Only validate the following predicates if the current value is *not* `nil` (`null` or `undefined`).
+- `optionalNull: Validator` - Only validate the following predicates if the current value is *not* `null`.
+- `optionalUndefined: Validator` - Only validate the following predicates if the current value is *not* `undefined`.
 - `value: *` - The actual value for this context.
 - `conditionally(predicate(validator)): Validator` - Only validate the following tests if the passed in predicate is fulfilled.
 - `each(predicate, [errorMessage, [messageArgs]]): boolean` - Validate each element in the `iterable` against the predicate.
 - `transform(tranformer): Validator` - Transform the current value into something else, e.g., making a `string` lowercase.
 - `prop(path): Validator` - Get a `Validator` for the `path` relative to the current context value (typically an object).
-- `errorContext(...contextPath)` - Add one or more error context paths to the current validator context making it possible to change which path(s) should fail
-  on error.
+- `errorContext(...contextPath)` - Rewrite the error context for the current validator context making it possible to change which path(s) should fail on error.
 - `fulfill(predicate): ValidatorContext` - Alias for `does.fulfill()`.
 - `fulfillOneOf(predicates): ValidatorContext` - Alias for `does.fulfillOneOf()`.
 - `fulfillAllOf(predicates): ValidatorContext` - Alias for `does.fulfillAllOf()`.
