@@ -363,6 +363,15 @@ return a `boolean`.
 - `isPathValid(path): boolean` - `true` if the given path is valid otherwise `false`.
 - `reset()` - Reset the validation result. (Not relevant in the context of a RuleSet as this always creates a new instance for every test).
 
+## Stack Traces
+Node.js has a default stack trace limit set to [10 frames](https://v8.dev/docs/stack-trace-api). This can cause problems 
+when validating a set of deeply nested rules as validator functions such as `fulfill()`, `fulfillAllOf()` etc. creates a new stack frame
+every time they are called.
+
+If it is not obvious to tell by the stack trace where the validation started this is typically a symptom of some frames 
+in the stack trace are missing. This can be corrected by setting `Error.stackTraceLimit = Infinity` at the start of the application.
+
+
 [//]: # (TODO Add section for Predicate function)
 
 [//]: # (TODO Add section for Transform function)
