@@ -97,8 +97,15 @@ class Validator {
             this.#validatorSharedState = validatorSharedState;
         } else {
             this.#validatorSharedState = {
-                failedPaths: []
+                failedPaths: [...validatorState.validationResult.errorPaths()]
             };
+            // include the previous failed paths, e.g., if the same test-function is invoked multiple times
+            // test(person).prop('name').is.aString('must be a string');
+            // test(person).prop('name').is.aString('must be a string');
+            // if a new context is needed, one should use Validator.createXxx()
+            if (validatorState.validationResult.isValid()) {
+                this.#validatorSharedState.failedPaths.push(...validatorState.validationResult.errorPaths());
+            }
         }
         if (shortCircuit) {
             this.#contextShortCircuit.fulfilled = true;
@@ -172,6 +179,10 @@ class Validator {
      * @returns {*}
      */
     #getValidatorContext(notContext, resetShortCircuitContext = true) {
+        if (!this.#validatorState) { // the validator has been reset
+            throw new Error('The validator is no longer active as all contexts have finished and the validator cannot be used in passive mode. '
+                + 'Create a new validator instance using the function which was returned from Validator.createXxxValidator() to get an active validator context.');
+        }
         let validatorContext;
         let shortCircuit = this.#shortCircuit();
         if (shortCircuit) {
@@ -191,7 +202,7 @@ class Validator {
         return validatorContext;
     }
 
-    #istShortCircuitValidatorContext(validatorContext) {
+    #isShortCircuitValidatorContext(validatorContext) {
         return validatorContext === Validator.#shortCircuitFulfilledValidatorContext;
     }
 
@@ -199,25 +210,28 @@ class Validator {
      * @returns {boolean}
      */
     #shortCircuit() {
-        let shortCircuitDueToModeAction = false;
+        let stickyFulfilled = (this.#contextShortCircuit.sticky.length > 0 && this.#contextShortCircuit.sticky[this.#contextShortCircuit.sticky.length - 1].fulfilled);
+
+        return this.#contextShortCircuit.fulfilled || stickyFulfilled || this.#shortCircuitDueToModeAction();
+    }
+
+    #shortCircuitDueToModeAction() {
+        let shortCircuit = false;
         if (this.#validatorSharedState.failedPaths.length > 0) {
             if (this.#mode === sharedConstants.mode.ON_ERROR_BREAK) {
-                shortCircuitDueToModeAction = true;
+                shortCircuit = true;
             } else if (this.#mode === sharedConstants.mode.ON_ERROR_NEXT_PATH) {
                 for (let failedPath of this.#validatorSharedState.failedPaths) {
                     for (let errorContextValuePath of this.#errorContextValuePaths) {
                         if (errorContextValuePath.startsWith(failedPath)) {
-                            shortCircuitDueToModeAction = true;
+                            shortCircuit = true;
                             break;
                         }
                     }
                 }
             }
         }
-
-        let stickyFulfilled = (this.#contextShortCircuit.sticky.length > 0 && this.#contextShortCircuit.sticky[this.#contextShortCircuit.sticky.length - 1].fulfilled);
-
-        return this.#contextShortCircuit.fulfilled || stickyFulfilled || shortCircuitDueToModeAction;
+        return shortCircuit;
     }
 
     #noopContext() {
@@ -278,9 +292,25 @@ class Validator {
     #createChildValidator(currentValidatorContext, contextValue, contextValuePath, contextValueCurrentPath, errorContextPaths) {
         let validatorState = this.#validatorState.cloneWith(Validator.#validatorStatePool.get(), contextValue, contextValuePath, contextValueCurrentPath, errorContextPaths);
         let validator = Validator.#validatorPool.get();
-        let shortCircuit = this.#istShortCircuitValidatorContext(currentValidatorContext) || this.#shortCircuit();
+        let shortCircuit = this.#isShortCircuitValidatorContext(currentValidatorContext) || this.#shortCircuit();
         // if the parent is short-circuited, make sure the child is as well this goes for e.g. prop()
         validator.#init(validatorState, this.#validatorSharedState, shortCircuit);
+
+        if (this.#mode === sharedConstants.mode.ON_ERROR_NEXT_PATH) {
+            if (!shortCircuit && validator.#shortCircuitDueToModeAction()) {
+                /*
+                * The parent is not short-circuited, so if the child is just after creation, something is no right.
+                * We can only end in this situation if we try to validate the prop multiple times or access it for other purposes e.g.,
+                * for a "conditionally" predicate which would give false positives as short-circuited validators always return true
+                * no matter what they test.
+                * */
+                console.warn(`The property path "${contextValueCurrentPath}" of "${contextValuePath}" has already errored (or a parent path has) and will therefore be short-circuited. `
+                    + `This means that all validation tests performed on the property will always return true and would result in false positives which should not be used. `
+                    + `If the property is needed in e.g., an conditionally predicate, create a new test context for the property.`);
+
+            }
+        }
+
         return validator;
     }
 
@@ -480,7 +510,7 @@ class Validator {
         // we should always activate the validatorContext and end it with validatorContextDone
         // to make sure reset() works correctly and the context is returned to the contextPool
         let validatorContext = this.#getValidatorContext(false);
-        if (this.#istShortCircuitValidatorContext(validatorContext)) { // getValidatorContext() resets shortCircuitValidatorContexts for us, so it is ok to just return right away when short-circuit
+        if (this.#isShortCircuitValidatorContext(validatorContext)) { // getValidatorContext() resets shortCircuitValidatorContexts for us, so it is ok to just return right away when short-circuit
             return true; // just fulfill right away
         }
 
@@ -549,7 +579,7 @@ class Validator {
 
         let childValue;
         let fullPropPath = utils.joinPropPaths(this.#contextValuePath, path);
-        if (!this.#istShortCircuitValidatorContext(validatorContext)) {
+        if (!this.#isShortCircuitValidatorContext(validatorContext)) {
             if (!isNil(this.#contextValue)) {
                 childValue = this.#contextValue[path];
             }
@@ -565,7 +595,7 @@ class Validator {
 
         let validator = this.#createChildValidator(validatorContext, childValue, fullPropPath, path);
         // important to call this to make sure reset() is called and the context is returned to the contextPool, because we are leaving this context and enter a child validator
-        // IMPORTANT that we pass undefined as success, so we don't modify short circuit state etc. as getting a prop is NOT a predicate
+        // IMPORTANT that we pass undefined as success, so we don't modify short-circuit state etc. as getting a prop is NOT a predicate
         this.#validatorContextDone(validatorContext, undefined);
         return validator;
     }
@@ -624,7 +654,7 @@ class Validator {
 
         let validatorContext = this.#getValidatorContext(false, false);
         let transformedValue;
-        if (!this.#istShortCircuitValidatorContext(validatorContext)) {
+        if (!this.#isShortCircuitValidatorContext(validatorContext)) {
             // we expect that the transformation is used to just transform the current value, so even though it is possible
             // to return everything, transform should only be used to create transformation of what was at the given path
             transformedValue = transformer(this.#contextValue);
@@ -634,10 +664,10 @@ class Validator {
             }
         }
 
-        // on short circuit we just pass in an undefined value
+        // on short-circuit we just pass in an undefined value
         let validator = this.#createChildValidator(validatorContext, transformedValue);
         // important to call this to make sure reset() is called and the context is returned to the contextPool, because we are leaving this context and enter a child validator
-        // IMPORTANT that we pass undefined as success, so we don't modify short circuit state etc. as getting a prop is NOT a predicate
+        // IMPORTANT that we pass undefined as success, so we don't modify short-circuit state etc. as getting a prop is NOT a predicate
         this.#validatorContextDone(validatorContext, undefined);
         return validator;
     }
@@ -679,7 +709,7 @@ class Validator {
 
         let validator = this.#createChildValidator(validatorContext, this.#contextValue, this.#contextValuePath, this.#contextValueCurrentPath, errorContextPath);
         // important to call this to make sure reset() is called and the context is returned to the contextPool, because we are leaving this context and enter a child validator
-        // IMPORTANT that we pass undefined as success, so we don't modify short circuit state etc. as changing the errorContext is NOT a predicate
+        // IMPORTANT that we pass undefined as success, so we don't modify short-circuit state etc. as changing the errorContext is NOT a predicate
         this.#validatorContextDone(validatorContext, undefined);
         return validator;
     }
@@ -979,6 +1009,14 @@ class Validator {
 
     static #throwArgumentError(message) {
         throw new Error(`Validator usage error: ${message}`);
+    }
+
+    /**
+     * @returns {ValidatorContext}
+     * @private
+     */
+    static get _shortCircuitFulfilledValidatorContext() {
+        return Validator.#shortCircuitFulfilledValidatorContext;
     }
 
 }

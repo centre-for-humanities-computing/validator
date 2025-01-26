@@ -1,4 +1,4 @@
-import { Validator } from '../src/index.js';
+import { Validator } from '../../src/index.js';
 import Joi from 'joi';
 import FastestValidator from 'fastest-validator';
 import { faker } from '@faker-js/faker';

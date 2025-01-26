@@ -11,6 +11,7 @@ class ValidatorInternalState {
     #errorPrefix;
     #errorBasePath;
     #errorContextPaths;
+    #errorContextValuePaths;
     #validationResult;
 
     constructor(name) {
@@ -25,6 +26,7 @@ class ValidatorInternalState {
         this.#errorPrefix = errorPrefix;
         this.#errorBasePath = errorBasePath;
         this.#errorContextPaths = errorContextPaths;
+        this.#errorContextValuePaths = undefined; // calculated in the property getter
         this.#validationResult = validationResult;
     }
 
@@ -65,15 +67,19 @@ class ValidatorInternalState {
      * @returns {string[]} the contextValuePath prefixed with errorBasePath (if set) and post-fixed with errorContextPaths (if set)
      */
     get errorContextValuePaths() {
-        let paths = [];
-        if (this.#errorContextPaths === undefined) {
-            paths.push(utils.joinPropPaths(this.#errorBasePath, this.#contextValuePath));
-        } else {
-            for (let errorContextPath of this.#errorContextPaths) {
-                paths.push(utils.joinPropPaths(this.#errorBasePath, errorContextPath));
+        if (!this.#errorContextValuePaths) {
+            let paths = [];
+            if (this.#errorContextPaths === undefined) {
+                paths.push(utils.joinPropPaths(this.#errorBasePath, this.#contextValuePath));
+            } else {
+                for (let errorContextPath of this.#errorContextPaths) {
+                    paths.push(utils.joinPropPaths(this.#errorBasePath, errorContextPath));
+                }
             }
+            this.#errorContextValuePaths = paths;
         }
-        return paths;
+
+        return this.#errorContextValuePaths;
     }
 
     /**

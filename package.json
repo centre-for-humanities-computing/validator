@@ -23,7 +23,8 @@
   "devDependencies": {
     "@faker-js/faker": "^8.4.1",
     "fastest-validator": "^1.17.0",
-    "joi": "^17.12.2"
+    "joi": "^17.12.2",
+    "vitest": "^3.0.4"
   },
   "exports": {
     "./package.json": "./package.json",

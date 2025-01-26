@@ -1,4 +1,4 @@
-import { Validator } from '../src/index.js';
+import { Validator } from '../../src/index.js';
 
 let obj = {
     materials: [],

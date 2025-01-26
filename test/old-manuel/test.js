@@ -1,4 +1,4 @@
-import { Validator } from '../src/index.js';
+import { Validator } from '../../src/index.js';
 
 function run() {
     try {
@@ -27,7 +27,7 @@ function run() {
 
         let typeValueValidator = (date) => date.optional.fulfillOneOf((date) => [
                 //date.fulfill(d => console.log(d.is.anArray())),
-                date.is.anInteger() // da denne er true short circuits fulfillOneOf og ovenstående bliver kaldt med et objekt der altid er true,
+                date.is.anInteger() // da denne er true short-circuits fulfillOneOf og ovenstående bliver kaldt med et objekt der altid er true,
 
             ],
             '[min, max] filter value for field ${0} must be a date in one of the formats ' +
