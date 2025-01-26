@@ -97,15 +97,8 @@ class Validator {
             this.#validatorSharedState = validatorSharedState;
         } else {
             this.#validatorSharedState = {
-                failedPaths: [...validatorState.validationResult.errorPaths()]
+                failedPaths: []
             };
-            // include the previous failed paths, e.g., if the same test-function is invoked multiple times
-            // test(person).prop('name').is.aString('must be a string');
-            // test(person).prop('name').is.aString('must be a string');
-            // if a new context is needed, one should use Validator.createXxx()
-            if (validatorState.validationResult.isValid()) {
-                this.#validatorSharedState.failedPaths.push(...validatorState.validationResult.errorPaths());
-            }
         }
         if (shortCircuit) {
             this.#contextShortCircuit.fulfilled = true;

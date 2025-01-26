@@ -39,9 +39,12 @@ describe('#prop()', () => {
             vi.spyOn(console, 'warn').mockImplementation(() => undefined);
 
             let validator = nextPathValidator(person);
-            validator.prop('name').is.empty('name must be empty'); // something that errors
-            validator = nextPathValidator(person);
-            expect(validator.prop('name').is).toBe(Validator._shortCircuitFulfilledValidatorContext);
+            validator.fulfillAllOf(person => [
+                person.prop('name').is.empty('name must be empty'), // something that errors
+                person.prop('age').fulfill(() => {
+                    expect(person.prop('name').is).toBe(Validator._shortCircuitFulfilledValidatorContext);
+                })
+            ]);
         });
 
         it('console.warn() when trying to get a prop() of a path which have previously errored', () => {
@@ -49,10 +52,15 @@ describe('#prop()', () => {
             let warnMock = vi.spyOn(console, 'warn').mockImplementation(() => undefined);
 
             let validator = nextPathValidator(person);
-            validator.prop('name').is.empty('name must be empty'); // something that errors
-            validator = nextPathValidator(person); // get a new root validator, with the same error context
-            validator.prop('name');
-            expect(warnMock.mock.lastCall).to.match(/The property path "name" of "name"/);
+            validator.fulfillAllOf(person => [
+                person.prop('name').is.empty('name must be empty'), // something that errors
+                person.prop('age').fulfill(() => {
+                    person.prop('name'); // make it print the warning
+                    expect(warnMock.mock.lastCall).to.match(/The property path "name" of "name"/);
+                })
+            ]);
+
+
         });
     });
 });
