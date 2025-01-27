@@ -33,7 +33,7 @@ export function getParentPath(fullPath, currentPath) {
             dotCorrection = 1;
         }
         return fullPath.substring(0, fullPath.length - currentPath.length - dotCorrection);
-    } else { // in some cases the fullPath can differ from the currentPath because of errorContextPath modifications, in these cases just target nearest "."
+    } else { // in some cases the fullPath can differ from the currentPath because of errorContextPath modifications, in these cases just target the nearest "."
         let lastDot = fullPath.lastIndexOf('.');
         if (lastDot === -1) {
             return "";

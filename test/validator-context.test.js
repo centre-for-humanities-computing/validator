@@ -1,7 +1,7 @@
 // noinspection JSUnresolvedReference,DuplicatedCode
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { Validator } from "../src/validator.js";
+import { Validator } from "../src/index.js";
 
 let throwValidator;
 let breakValidator;
