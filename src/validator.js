@@ -297,7 +297,7 @@ class Validator {
                 * for a "conditionally" predicate which would give false positives as short-circuited validators always return true
                 * no matter what they test.
                 * */
-                console.warn(`The property path "${contextValueCurrentPath}" of "${contextValuePath}" has already errored (or a parent path has) and will therefore be short-circuited. `
+                console.warn(`Warning: The property path "${contextValueCurrentPath}" of "${contextValuePath}" has already errored (or a parent path has) and will therefore be short-circuited. `
                     + `This means that all validation tests performed on the property will always return true and would result in false positives which should not be used. `
                     + `If the property is needed in e.g., an conditionally predicate, create a new test context for the property.`);
 
