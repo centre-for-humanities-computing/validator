@@ -22,7 +22,7 @@ describe('#anArray()', () => {
         expect(throwValidator([]).is.anArray()).toBe(true);
     });
 
-    it('returns false when something else than array is passed in', () => {
+    it('returns false when something else than an array is passed in', () => {
         expect(throwValidator(null).is.anArray()).toBe(false);
         expect(throwValidator(undefined).is.anArray()).toBe(false);
         expect(throwValidator('').is.anArray()).toBe(false);

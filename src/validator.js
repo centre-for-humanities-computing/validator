@@ -23,6 +23,18 @@ function fulfilledPredicate() {
 function noopFunction() {
 }
 
+const SHORT_CIRCUIT_FULFILLED_VALIDATOR_CONTEXT = new Proxy(new ValidatorContext(), {
+    get(/*target, prop, receiver*/) {
+        return fulfilledPredicate; // make all methods of ValidatorContext() return true
+    }
+});
+
+const NOOP_VALIDATION_RESULT = new Proxy(new ValidationResult(), {
+    get(/*target, prop, receiver*/) {
+        return noopFunction;
+    }
+});
+
 /*
 * note to self
 * When returning something else than "this" to the user the chain is broken for this validator
@@ -40,17 +52,6 @@ class Validator {
     static #validatorPool = new ValidatorPool(POOL_MAX_SIZE, (name) => new Validator(name, PRIVATE_CONSTRUCTOR_KEY), 'ValidatorPool');
     static #validatorStatePool = new ValidatorPool(POOL_MAX_SIZE, (name) => new ValidatorInternalState(name), 'ValidatorStatePool');
 
-    static #shortCircuitFulfilledValidatorContext = new Proxy(new ValidatorContext(), {
-        get(/*target, prop, receiver*/) {
-            return fulfilledPredicate; // make all methods of ValidatorContext() return true
-        }
-    });
-
-    static #noopValidationResult = new Proxy(new ValidationResult(), {
-        get(/*target, prop, receiver*/) {
-            return noopFunction;
-        }
-    });
 
     /**
      * The possible Validator modes.
@@ -128,7 +129,7 @@ class Validator {
             Validator.#validatorPool.return(this);
         }
 
-        if (validatorContext !== Validator.#shortCircuitFulfilledValidatorContext) {
+        if (validatorContext !== SHORT_CIRCUIT_FULFILLED_VALIDATOR_CONTEXT) {
             validatorContext._reset();
             Validator.#contextPool.return(validatorContext);
         }
@@ -179,7 +180,7 @@ class Validator {
         let validatorContext;
         let shortCircuit = this.#shortCircuit();
         if (shortCircuit) {
-            validatorContext = Validator.#shortCircuitFulfilledValidatorContext;
+            validatorContext = SHORT_CIRCUIT_FULFILLED_VALIDATOR_CONTEXT;
         } else {
             validatorContext = Validator.#contextPool.get();
             validatorContext._init(this, this.#validatorState, notContext, this.#callbackContext);
@@ -196,7 +197,7 @@ class Validator {
     }
 
     #isShortCircuitValidatorContext(validatorContext) {
-        return validatorContext === Validator.#shortCircuitFulfilledValidatorContext;
+        return validatorContext === SHORT_CIRCUIT_FULFILLED_VALIDATOR_CONTEXT;
     }
 
     /**
@@ -460,9 +461,9 @@ class Validator {
     conditionally(predicate) {
         let fulfilled;
         if (isFunction(predicate)) {
-            // we need a new validator which does not add error messages etc. to the overall context, we only need of for the predicate result
+            // we need a new validator which does not add error messages etc. to the overall context, we only need the validator for the predicate result
             let validator = Validator.#instance(Validator.mode.ON_ERROR_BREAK, this.#contextValue, this.#contextValuePath, this.#contextValueCurrentPath,
-                "", "", Validator.#noopValidationResult);
+                "", "", NOOP_VALIDATION_RESULT);
             fulfilled = !!predicate(validator);
         } else {
             fulfilled = !!predicate;
@@ -1004,14 +1005,6 @@ class Validator {
         throw new Error(`Validator usage error: ${message}`);
     }
 
-    /**
-     * @returns {ValidatorContext}
-     * @private
-     */
-    static get _shortCircuitFulfilledValidatorContext() {
-        return Validator.#shortCircuitFulfilledValidatorContext;
-    }
-
 }
 
-export { Validator };
+export { Validator, SHORT_CIRCUIT_FULFILLED_VALIDATOR_CONTEXT };
